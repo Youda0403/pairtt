@@ -1,0 +1,19 @@
+name = "my-ai-chat"
+main = "worker.js"
+compatibility_date = "2026-08-01"
+compatibility_flags = ["nodejs_compat"]
+
+# public/ 아래 정적 파일(index.html)을 Worker가 직접 서빙한다.
+# /api/* 는 어떤 파일과도 매칭되지 않으므로 worker.js 로 넘어간다.
+[assets]
+directory = "./public"
+binding = "ASSETS"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "ai-chat"
+# ↓ `wrangler d1 create ai-chat` 실행 후 출력되는 실제 ID로 교체할 것
+database_id = "REPLACE_AFTER_WRANGLER_D1_CREATE"
+
+[observability]
+enabled = true

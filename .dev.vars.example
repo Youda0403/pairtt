@@ -1,0 +1,5 @@
+# 로컬 개발용(`npm run dev`). 실제 .dev.vars 는 커밋되지 않는다.
+# 배포 환경에서는 이 값들을 `wrangler secret put` 으로 등록한다.
+ANTHROPIC_API_KEY="sk-ant-..."
+APP_PASSWORD="로그인할 때 쓸 비밀번호"
+SESSION_SECRET="아무 긴 랜덤 문자열 (openssl rand -hex 32)"
