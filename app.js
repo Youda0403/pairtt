@@ -25,7 +25,7 @@ const SLOTS = [
   { k: 'cherry',  name: '체리',     box: { cx: 920, cy: 395, w:  76, h:  76 } },
   { k: 'ketchup', name: '케첩',     box: { cx:  86, cy: 751, w:  98, h: 186 } },
   { k: 'fries',   name: '감자튀김', box: { cx: 754, cy: 750, w: 108, h: 154 } },
-  { k: 'burger',  name: '햄버거',   box: { cx: 871, cy: 758, w: 184, h: 170 } },
+  { k: 'burger',  name: '햄버거',   box: { cx: 870, cy: 748, w: 190, h: 180 } },
 ];
 const SLOT_BY_K = Object.fromEntries(SLOTS.map(s => [s.k, s]));
 
@@ -35,7 +35,7 @@ const COLORS = [
   { k: 'p1',     name: '캐릭터 1 (핑크)',      def: '#E4707D' },
   { k: 'p2',     name: '캐릭터 2 (블루)',      def: '#4E93D6' },
   { k: 'green',  name: '사진 배경',           def: '#B9DFA6' },
-  { k: 'accent', name: '포인트 (별·감자)',     def: '#F2A03C' },
+  { k: 'accent', name: '포인트 (별·하트)',     def: '#F2A03C' },
 ];
 
 const PRESETS = [
@@ -50,7 +50,6 @@ const ROW_X = { c1: { left: 84, right: 432 }, c2: { left: 568, right: 916 } };
 const newSticker = () => ({ src: null, scale: 1, dx: 0, dy: 0 });
 
 const defaults = () => ({
-  tag: '',
   pair: '',
   c1: { name: '', age: '', job: '', like: 'LIKE' },
   c2: { name: '', age: '', job: '', like: 'LIKE' },
@@ -61,7 +60,7 @@ const defaults = () => ({
 
 let S = defaults();
 
-const PLACEHOLDER = { tag: 'Better Together !', pair: 'Pairname', c1: 'character 1', c2: 'character 2' };
+const PLACEHOLDER = { pair: 'Pairname', c1: 'character 1', c2: 'character 2' };
 
 /* ===================== 색 유틸 ===================== */
 
@@ -119,6 +118,12 @@ function grainOf(hex) {
   const [h, s] = rgb2hsl(hex);
   return lum(hex) > 0.5 ? hsl2hex(h, clamp(s, 0.15, 0.5), 0.32) : hsl2hex(h, clamp(s, 0.1, 0.4), 0.82);
 }
+/** 곰 귀·뺨·앞치마에 쓰는, 메인색을 연하게 푼 톤 */
+function tintOf(hex) {
+  const [h, s, l] = rgb2hsl(hex);
+  return lum(hex) > 0.6 ? hsl2hex(h, clamp(s * 0.7, 0, 1), clamp(l - 0.24, 0, 1))
+                        : hsl2hex(h, clamp(s * 0.55, 0, 1), clamp(l + 0.30, 0, 0.88));
+}
 /** 색이 칠해진 띠 위에 올릴 글자색: 띠가 밝으면 진하게, 어두우면 종이색으로 */
 function onColor(bg, sheet) {
   const [h, s] = rgb2hsl(bg);
@@ -138,6 +143,7 @@ function themeCss() {
   const ink   = inkOf(c.green);
   const sheet = sheetOf(c.paper);
   const grain = grainOf(c.paper);
+  const tint  = tintOf(c.red);
   return `
 .disp{font-family:${F_DISP}}
 .hand{font-family:${F_HAND}}
@@ -146,6 +152,10 @@ function themeCss() {
 .f-p1{fill:${c.p1}}.f-p2{fill:${c.p2}}.f-green{fill:${c.green}}
 .f-green-ink{fill:${ink}}.f-accent{fill:${c.accent}}.f-sheet{fill:${sheet}}
 .f-on-p1{fill:${onColor(c.p1, sheet)}}.f-on-p2{fill:${onColor(c.p2, sheet)}}
+.f-tint{fill:${tint}}
+.f-bun{fill:#EFB85C}.f-patty{fill:#8A4A29}.f-cheese{fill:#F5C33F}
+.f-lettuce{fill:#8AC169}.f-sesame{fill:#FFF4E0}.f-fry{fill:#F3BE4A}
+.s-food{stroke:#9C552A}
 .f-grain{fill:${grain};opacity:.16}
 .s-paper{stroke:${c.paper}}.s-red{stroke:${c.red}}.s-deep{stroke:${deep}}
 .s-p1{stroke:${c.p1}}.s-p2{stroke:${c.p2}}.s-green-ink{stroke:${ink}}.s-accent{stroke:${c.accent}}
@@ -252,29 +262,21 @@ async function ensureKrFonts() {
 function render() {
   applyTheme();
 
-  const tag  = S.tag.trim()     || PLACEHOLDER.tag;
   const pair = S.pair.trim()    || PLACEHOLDER.pair;
   const n1   = S.c1.name.trim() || PLACEHOLDER.c1;
   const n2   = S.c2.name.trim() || PLACEHOLDER.c2;
 
-  // 상단 문구: 길이에 따라 양옆 장식을 다시 붙인다
-  const tagEl = $('#tagLine');
-  tagEl.textContent = tag;
-  fitText(tagEl, 420, 42);
-  const th = textWidth(tagEl) / 2;
-  $('#tagNote')  .setAttribute('transform', `translate(${CENTER - th - 32},96) rotate(-8) scale(1.05)`);
-  $('#tagSpark') .setAttribute('transform', `translate(${CENTER - th - 60},116) rotate(12) scale(.85)`);
-  $('#tagHeart1').setAttribute('transform', `translate(${CENTER + th + 26},90) rotate(14) scale(1.25)`);
-  $('#tagHeart2').setAttribute('transform', `translate(${CENTER + th + 52},110) rotate(-10) scale(.9)`);
-
   const main = $('#pairName'), shadow = $('#pairShadow');
   main.textContent = shadow.textContent = pair;
-  fitText(main, FRAME.w, 122);                 // 사진 프레임과 같은 폭 안에 들어오게
+  fitText(main, 620, 140);                     // 부제를 없앤 만큼 크게 쓴다
   shadow.style.fontSize = main.style.fontSize;
 
-  // 별은 이름 길이에 따라 마지막 글자 오른쪽에 붙인다 (음료컵과 겹치지 않게 상한을 둔다).
-  const starX = clamp(CENTER + textWidth(main) / 2 + 32, 640, 848);
-  $('#pairStar').setAttribute('transform', `translate(${starX},204) rotate(-12) scale(2.1)`);
+  // 하트와 별은 이름 길이에 맞춰 양옆에 붙인다 (도장·로제트와 겹치지 않게 상한을 둔다).
+  const half = textWidth(main) / 2;
+  const heartX = clamp(CENTER - half - 34, 154, 360);
+  const starX  = clamp(CENTER + half + 34, 640, 846);
+  $('#titleHeart').setAttribute('transform', `translate(${heartX},192) rotate(-14) scale(2.4)`);
+  $('#pairStar')  .setAttribute('transform', `translate(${starX},192) rotate(-12) scale(2.4)`);
 
   const t1 = $('#c1Name'), t2 = $('#c2Name');
   t1.textContent = n1; fitText(t1, 222, 32);
@@ -751,7 +753,6 @@ function syncColorInputs() {
 }
 
 function syncInputs() {
-  $('#in-tag').value     = S.tag;
   $('#in-pair').value    = S.pair;
   $('#in-c1-name').value = S.c1.name;
   $('#in-c2-name').value = S.c2.name;
@@ -794,7 +795,6 @@ async function init() {
   buildColorUI();
   syncInputs();
 
-  bindText('#in-tag',     v => S.tag = v);
   bindText('#in-pair',    v => S.pair = v);
   bindText('#in-c1-name', v => S.c1.name = v);
   bindText('#in-c2-name', v => S.c2.name = v);
@@ -847,7 +847,7 @@ async function init() {
   // 라틴 폰트가 준비된 뒤 렌더해야 글자 폭 측정이 정확하다. (한글은 쓰일 때만 받는다)
   try {
     await Promise.all([
-      document.fonts.load("122px 'PFDisplay'"),
+      document.fonts.load("140px 'PFDisplay'"),
       document.fonts.load("32px 'PFHand'"),
       document.fonts.load("19px 'PFSans'"),
     ]);
