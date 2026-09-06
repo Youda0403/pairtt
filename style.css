@@ -36,8 +36,8 @@ button, input { font: inherit; color: inherit; }
   box-shadow: 0 18px 44px rgba(80, 55, 30, .28);
 }
 #poster { display: block; width: 100%; height: auto; }
-#poster .slot-img { display: none; }
-#poster #photoImg { display: none; }
+/* 사진·스티커의 display 는 app.js 가 인라인으로 직접 지정한다.
+   여기서 display:none 규칙을 두면 인라인 해제 시 그 규칙이 이겨 사진이 사라진다. */
 /* 사진 영역에서만 스크롤 제스처를 막아 드래그·핀치가 가능하게 한다 */
 #poster #photoHit { touch-action: none; cursor: grab; }
 #poster #photoHit:active { cursor: grabbing; }
@@ -93,8 +93,6 @@ button, input { font: inherit; color: inherit; }
 .btn.primary { background: #c4362c; border-color: #c4362c; color: #fff; font-weight: 800; }
 .btn.primary[disabled] { opacity: .6; cursor: progress; }
 .btn.small { font-size: 13px; padding: 8px 12px; }
-.btn.file { position: relative; overflow: hidden; }
-.btn.file input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
 .btn-row { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
 .btn-row .btn { flex: 1; }
 

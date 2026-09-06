@@ -8,7 +8,9 @@ const $  = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 
 const POSTER_W = 1000, POSTER_H = 1500;
-const FRAME = { x: 196, y: 278, w: 668, h: 590 };
+const CENTER = 500;
+/* 사진 프레임. index.html 의 #clip-photo / #photoHit 과 같은 값이어야 한다. */
+const FRAME = { x: 170, y: 278, w: 660, h: 590 };
 const EXPORT_SCALE = 3;               // 3000 x 4500 px
 const STORE_KEY = 'pairframe.v1';
 
@@ -26,12 +28,12 @@ const SLOTS = [
 ];
 
 const COLORS = [
-  { k: 'paper',  name: '종이 배경',        def: '#FBF2DF' },
-  { k: 'red',    name: '메인 레드 (선·글씨)', def: '#D6392E' },
-  { k: 'p1',     name: '캐릭터 1 (핑크)',   def: '#E4707D' },
-  { k: 'p2',     name: '캐릭터 2 (블루)',   def: '#4E93D6' },
-  { k: 'green',  name: '사진 배경',        def: '#B9DFA6' },
-  { k: 'accent', name: '포인트 (별·감자)',  def: '#F2A03C' },
+  { k: 'paper',  name: '종이 배경',           def: '#FBF2DF' },
+  { k: 'red',    name: '메인 레드 (선·글씨)',  def: '#D6392E' },
+  { k: 'p1',     name: '캐릭터 1 (핑크)',      def: '#E4707D' },
+  { k: 'p2',     name: '캐릭터 2 (블루)',      def: '#4E93D6' },
+  { k: 'green',  name: '사진 배경',           def: '#B9DFA6' },
+  { k: 'accent', name: '포인트 (별·감자)',     def: '#F2A03C' },
 ];
 
 const PRESETS = [
@@ -39,6 +41,9 @@ const PRESETS = [
   { name: '민트',   c: { paper:'#F2F7F2', red:'#2E9C86', p1:'#EF8FA0', p2:'#5C8FD6', green:'#FBDFB4', accent:'#EFAF3E' } },
   { name: '나이트', c: { paper:'#2B2733', red:'#F0E2C6', p1:'#EE8FA6', p2:'#7FB8E8', green:'#3F5C48', accent:'#EFBF5C' } },
 ];
+
+/* 카드 행(AGE/JOB/LIKE)의 라벨 시작 x 와 점선 끝 x */
+const ROW_X = { c1: { left: 72, right: 408 }, c2: { left: 592, right: 928 } };
 
 const defaults = () => ({
   pair: '',
@@ -65,7 +70,7 @@ function rgb2hex(r, g, b) {
   return '#' + [r, g, b].map(v => clamp(Math.round(v), 0, 255).toString(16).padStart(2, '0')).join('');
 }
 function rgb2hsl(hex) {
-  let [r, g, b] = hex2rgb(hex).map(v => v / 255);
+  const [r, g, b] = hex2rgb(hex).map(v => v / 255);
   const mx = Math.max(r, g, b), mn = Math.min(r, g, b), d = mx - mn;
   let h = 0;
   if (d) {
@@ -90,7 +95,7 @@ const lum = hex => { const [r,g,b] = hex2rgb(hex); return (0.299*r + 0.587*g + 0
 /** 메인 레드의 그림자용 진한 톤 */
 function deepOf(hex) {
   const [h, s, l] = rgb2hsl(hex);
-  return l > 0.55 ? hsl2hex(h, s, clamp(l - 0.22, 0, 1))    // 밝은 색이면 살짝만 어둡게
+  return l > 0.55 ? hsl2hex(h, s, clamp(l - 0.22, 0, 1))
                   : hsl2hex(h, Math.min(1, s * 1.05), clamp(l * 0.62, 0, 1));
 }
 /** 사진 배경색 위에 얹을 잉크색 (안내 문구·아이콘) */
@@ -98,7 +103,13 @@ function inkOf(hex) {
   const [h, s] = rgb2hsl(hex);
   return hsl2hex(h, clamp(s * 1.7, 0.35, 0.72), lum(hex) > 0.45 ? 0.31 : 0.78);
 }
-/** 종이 질감 얼룩색 */
+/** 영수증·사원증에 쓰는, 배경보다 한 톤 밝은 종이색 */
+function sheetOf(hex) {
+  const [h, s, l] = rgb2hsl(hex);
+  return lum(hex) > 0.5 ? hsl2hex(h, clamp(s * 0.7, 0, 1), clamp(l + 0.06, 0, 0.985))
+                        : hsl2hex(h, clamp(s * 0.9, 0, 1), clamp(l + 0.07, 0, 1));
+}
+/** 종이 얼룩·그림자에 쓰는 대비색 */
 function grainOf(hex) {
   const [h, s] = rgb2hsl(hex);
   return lum(hex) > 0.5 ? hsl2hex(h, clamp(s, 0.15, 0.5), 0.32) : hsl2hex(h, clamp(s, 0.1, 0.4), 0.82);
@@ -108,15 +119,19 @@ function grainOf(hex) {
 
 function themeCss() {
   const c = S.colors;
-  const deep = deepOf(c.red), ink = inkOf(c.green), grain = grainOf(c.paper);
+  const deep  = deepOf(c.red);
+  const ink   = inkOf(c.green);
+  const sheet = sheetOf(c.paper);
+  const grain = grainOf(c.paper);
   return `
 .disp{font-family:'PFDisplay','Apple SD Gothic Neo','Noto Sans KR','Malgun Gothic',cursive}
 .hand{font-family:'PFHand','Apple SD Gothic Neo','Noto Sans KR','Malgun Gothic',cursive}
 .sans{font-family:'PFSans','Apple SD Gothic Neo','Noto Sans KR','Malgun Gothic',sans-serif}
 .f-paper{fill:${c.paper}}.f-red{fill:${c.red}}.f-deep{fill:${deep}}
 .f-p1{fill:${c.p1}}.f-p2{fill:${c.p2}}.f-green{fill:${c.green}}
-.f-green-ink{fill:${ink}}.f-accent{fill:${c.accent}}
+.f-green-ink{fill:${ink}}.f-accent{fill:${c.accent}}.f-sheet{fill:${sheet}}
 .f-grain{fill:${grain};opacity:.16}
+.f-shade{fill:${grain};opacity:.13}
 .s-paper{stroke:${c.paper}}.s-red{stroke:${c.red}}.s-deep{stroke:${deep}}
 .s-p1{stroke:${c.p1}}.s-p2{stroke:${c.p2}}.s-green-ink{stroke:${ink}}.s-accent{stroke:${c.accent}}
 .lbl{font-size:19px;letter-spacing:1.6px}
@@ -128,10 +143,11 @@ function applyTheme() { $('#theme-style').textContent = themeCss(); }
 
 /* ===================== 텍스트 ===================== */
 
+const textWidth = el => { try { return el.getComputedTextLength(); } catch { return 0; } };
+
 function fitText(el, maxW, baseSize) {
   el.style.fontSize = baseSize + 'px';
-  let w = 0;
-  try { w = el.getComputedTextLength(); } catch { return; }
+  const w = textWidth(el);
   if (w > maxW && w > 0) el.style.fontSize = Math.max(9, baseSize * maxW / w) + 'px';
 }
 
@@ -143,9 +159,7 @@ function layoutRow(id, label, value, labelX, rightX) {
   const val   = $('.val', g);
 
   lbl.textContent = label;
-  let lw = 0;
-  try { lw = lbl.getComputedTextLength(); } catch {}
-  const colonX = labelX + lw + 12;
+  const colonX = labelX + textWidth(lbl) + 12;
   const startX = colonX + 18;
   const y = parseFloat(lbl.getAttribute('y'));
 
@@ -154,6 +168,27 @@ function layoutRow(id, label, value, labelX, rightX) {
   val.setAttribute('x', startX + 6);
   val.textContent = value;
   fitText(val, rightX - startX - 14, 30);
+}
+
+/** 하단 가운데 줄을 500 기준 좌우 대칭으로 배치한다 */
+function layoutFooter() {
+  const a = $('#ft-a'), b = $('#ft-b'), c = $('#ft-c');
+  const wa = textWidth(a), wb = textWidth(b), wc = textWidth(c);
+  const GAP = 46;                              // 글자 사이(별이 놓이는) 간격
+  const total = wa + wb + wc + GAP * 2;
+  const left = CENTER - total / 2;
+
+  let x = left;
+  a.setAttribute('x', x + wa / 2);  x += wa;
+  $('#ft-star-l').setAttribute('transform', `translate(${x + GAP / 2},1396) rotate(-14) scale(.9)`);
+  x += GAP;
+  b.setAttribute('x', x + wb / 2);  x += wb;
+  $('#ft-star-r').setAttribute('transform', `translate(${x + GAP / 2},1396) rotate(14) scale(.9)`);
+  x += GAP;
+  c.setAttribute('x', x + wc / 2);
+
+  $('#ft-rule-l').setAttribute('d', `M${left - 74} 1396 H${left - 20}`);
+  $('#ft-rule-r').setAttribute('d', `M${left + total + 20} 1396 H${left + total + 74}`);
 }
 
 /* ===================== 렌더 ===================== */
@@ -167,28 +202,26 @@ function render() {
 
   const main = $('#pairName'), shadow = $('#pairShadow');
   main.textContent = shadow.textContent = pair;
-  fitText(main, 690, 122);
+  fitText(main, FRAME.w, 122);                 // 사진 프레임과 같은 폭 안에 들어오게
   shadow.style.fontSize = main.style.fontSize;
 
-  // 별은 이름 길이에 따라 마지막 글자 오른쪽에 붙인다.
-  let half = 300;
-  try { half = main.getComputedTextLength() / 2; } catch {}
-  const starX = clamp(500 + half + 34, 620, 848);
-  $('#pairStar').setAttribute('transform', `translate(${starX},214) scale(2.2)`);
+  // 별은 이름 길이에 따라 마지막 글자 오른쪽에 붙인다 (음료컵과 겹치지 않게 상한을 둔다).
+  const starX = clamp(CENTER + textWidth(main) / 2 + 32, 640, 848);
+  $('#pairStar').setAttribute('transform', `translate(${starX},204) rotate(-12) scale(2.1)`);
 
   const t1 = $('#c1Name'), t2 = $('#c2Name');
-  t1.textContent = n1; fitText(t1, 240, 34);
-  t2.textContent = n2; fitText(t2, 202, 34);
+  t1.textContent = n1; fitText(t1, 212, 32);
+  t2.textContent = n2; fitText(t2, 212, 32);
 
-  layoutRow('row-1a', 'AGE',      S.c1.age, 98, 449);
-  layoutRow('row-1j', 'JOB',      S.c1.job, 98, 449);
-  layoutRow('row-1l', S.c1.like,  n2,       98, 449);
+  layoutRow('row-1a', 'AGE',     S.c1.age, ROW_X.c1.left, ROW_X.c1.right);
+  layoutRow('row-1j', 'JOB',     S.c1.job, ROW_X.c1.left, ROW_X.c1.right);
+  layoutRow('row-1l', S.c1.like, n2,       ROW_X.c1.left, ROW_X.c1.right);
 
-  // 오른쪽 끝은 'You + Me = Perfect' 세로 문구와 겹치지 않도록 928에서 끊는다
-  layoutRow('row-2a', 'AGE',      S.c2.age, 566, 928);
-  layoutRow('row-2j', 'JOB',      S.c2.job, 566, 928);
-  layoutRow('row-2l', S.c2.like,  n1,       566, 928);
+  layoutRow('row-2a', 'AGE',     S.c2.age, ROW_X.c2.left, ROW_X.c2.right);
+  layoutRow('row-2j', 'JOB',     S.c2.job, ROW_X.c2.left, ROW_X.c2.right);
+  layoutRow('row-2l', S.c2.like, n1,       ROW_X.c2.left, ROW_X.c2.right);
 
+  layoutFooter();
   placePhoto();
   renderStickers();
   save();
@@ -197,10 +230,11 @@ function render() {
 function placePhoto() {
   const p = S.photo, img = $('#photoImg'), hint = $('#photoHint');
 
+  // display 는 반드시 값으로 지정한다. ''(인라인 해제)로 두면 스타일시트 규칙이 이겨버린다.
   if (!p.src || !p.nw || !p.nh) {
     img.style.display = 'none';
     img.removeAttribute('href');
-    hint.style.display = '';
+    hint.style.display = 'inline';
     return;
   }
   hint.style.display = 'none';
@@ -217,7 +251,7 @@ function placePhoto() {
   img.setAttribute('y', FRAME.y + (FRAME.h - h) / 2 + p.oy);
   img.setAttribute('width', w);
   img.setAttribute('height', h);
-  img.style.display = '';
+  img.style.display = 'inline';
 }
 
 function renderStickers() {
@@ -226,9 +260,9 @@ function renderStickers() {
     if (src) {
       art.style.display = 'none';
       img.setAttribute('href', src);
-      img.style.display = '';
+      img.style.display = 'inline';
     } else {
-      art.style.display = '';
+      art.style.display = 'inline';
       img.removeAttribute('href');
       img.style.display = 'none';
     }
@@ -244,6 +278,7 @@ function save() {
 }
 
 function saveNow() {
+  clearTimeout(saveTimer);
   try {
     localStorage.setItem(STORE_KEY, JSON.stringify(S));
   } catch {
@@ -421,8 +456,8 @@ function loadSvgImage(xml) {
 
 async function exportPNG() {
   const btn = $('#btn-save');
-  btn.disabled = true;
   const label = btn.textContent;
+  btn.disabled = true;
   btn.textContent = '저장 준비 중…';
 
   try {
@@ -482,6 +517,8 @@ function toast(msg) {
   toastTimer = setTimeout(() => { t.hidden = true; }, 2600);
 }
 
+let pendingSlot = null;
+
 function buildStickerUI() {
   const wrap = $('#sticker-list');
   wrap.innerHTML = '';
@@ -492,30 +529,41 @@ function buildStickerUI() {
       <div class="nm">${name}</div>
       <div class="thumb" data-thumb="${k}"><span class="none">기본 일러스트</span></div>
       <div class="row">
-        <label class="btn file">교체<input type="file" accept="image/png,image/webp,image/*" data-slot="${k}"></label>
+        <button class="btn" type="button" data-slot="${k}">교체</button>
         <button class="btn ghost" type="button" data-reset="${k}">되돌리기</button>
       </div>`;
     wrap.appendChild(el);
   }
 
-  wrap.addEventListener('change', async e => {
-    const k = e.target.dataset.slot;
-    if (!k || !e.target.files[0]) return;
+  // 파일 입력은 하나만 두고 눌린 칸을 기억한다. label 안에 input 을 겹쳐 두면
+  // 모바일 브라우저에서 선택창이 두 번 열리거나 아예 안 열리는 일이 있다.
+  wrap.addEventListener('click', e => {
+    const pick = e.target.closest('[data-slot]');
+    if (pick) {
+      pendingSlot = pick.dataset.slot;
+      $('#in-sticker').click();
+      return;
+    }
+    const reset = e.target.closest('[data-reset]');
+    if (reset) {
+      delete S.stickers[reset.dataset.reset];
+      render();
+      updateStickerThumbs();
+    }
+  });
+
+  $('#in-sticker').addEventListener('change', async e => {
+    const f = e.target.files[0];
+    const k = pendingSlot;
+    e.target.value = '';
+    pendingSlot = null;
+    if (!f || !k) return;
     try {
-      const { src } = await readImage(e.target.files[0], 800, true);
+      const { src } = await readImage(f, 800, true);
       S.stickers[k] = src;
       render();
       updateStickerThumbs();
     } catch { toast('이미지를 읽지 못했어요.'); }
-    e.target.value = '';
-  });
-
-  wrap.addEventListener('click', e => {
-    const k = e.target.dataset.reset;
-    if (!k) return;
-    delete S.stickers[k];
-    render();
-    updateStickerThumbs();
   });
 }
 
@@ -620,8 +668,10 @@ async function init() {
   bindToggle('tg-c1', 'c1');
   bindToggle('tg-c2', 'c2');
 
+  $('#btn-photo-pick').addEventListener('click', () => $('#in-photo').click());
   $('#in-photo').addEventListener('change', async e => {
     const f = e.target.files[0];
+    e.target.value = '';
     if (!f) return;
     try {
       const { src, w, h } = await readImage(f, 2200, false);
@@ -629,7 +679,6 @@ async function init() {
       setZoom(1);
       render();
     } catch { toast('사진을 읽지 못했어요.'); }
-    e.target.value = '';
   });
   $('#btn-photo-clear').addEventListener('click', () => {
     S.photo = defaults().photo;
@@ -661,8 +710,8 @@ async function init() {
   // 폰트가 준비된 뒤 렌더해야 글자 폭 측정이 정확하다.
   try {
     await Promise.all([
-      document.fonts.load("152px 'PFDisplay'"),
-      document.fonts.load("34px 'PFHand'"),
+      document.fonts.load("122px 'PFDisplay'"),
+      document.fonts.load("32px 'PFHand'"),
       document.fonts.load("19px 'PFSans'"),
     ]);
   } catch {}
