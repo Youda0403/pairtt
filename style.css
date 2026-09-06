@@ -1,0 +1,161 @@
+/* ---------- 폰트 (로컬 서브셋: 저장 시 base64로 임베드됨) ---------- */
+@font-face { font-family: 'PFDisplay'; src: url('fonts/Pacifico-400.woff2') format('woff2'); font-display: block; }
+@font-face { font-family: 'PFHand';    src: url('fonts/Caveat-700.woff2')   format('woff2'); font-display: block; }
+@font-face { font-family: 'PFSans';    src: url('fonts/Nunito-800.woff2')   format('woff2'); font-display: block; }
+
+/* ---------- 기본 ---------- */
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: #efe7d8;
+  color: #43342b;
+  font-family: 'PFSans', system-ui, -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+  font-size: 15px;
+  -webkit-text-size-adjust: 100%;
+}
+h1, p { margin: 0; }
+button, input { font: inherit; color: inherit; }
+
+/* ---------- 레이아웃 ---------- */
+.app {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 380px;
+  gap: 28px;
+  align-items: start;
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 24px;
+}
+.stage { position: sticky; top: 24px; }
+.stage-inner {
+  /* 포스터 비율이 2:3이라 세로 여유에 맞춰 폭을 줄이면 항상 전체가 보인다 */
+  max-width: min(640px, calc((100vh - 48px) * 0.6667));
+  margin: 0 auto;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 18px 44px rgba(80, 55, 30, .28);
+}
+#poster { display: block; width: 100%; height: auto; }
+#poster .slot-img { display: none; }
+#poster #photoImg { display: none; }
+/* 사진 영역에서만 스크롤 제스처를 막아 드래그·핀치가 가능하게 한다 */
+#poster #photoHit { touch-action: none; cursor: grab; }
+#poster #photoHit:active { cursor: grabbing; }
+
+/* ---------- 패널 ---------- */
+.panel { min-width: 0; }
+.brand { padding: 4px 2px 16px; }
+.brand h1 { font-size: 26px; letter-spacing: -.5px; color: #c4362c; }
+.brand h1 em { font-style: normal; color: #43342b; }
+.brand p { font-size: 13px; opacity: .65; margin-top: 4px; }
+
+.sec {
+  background: #fdf8ee;
+  border: 1px solid #e0d2ba;
+  border-radius: 12px;
+  margin-bottom: 10px;
+  overflow: hidden;
+}
+.sec > summary {
+  cursor: pointer;
+  padding: 13px 16px;
+  font-size: 15px;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.sec > summary::-webkit-details-marker { display: none; }
+.sec > summary::after { content: '+'; font-size: 18px; opacity: .5; }
+.sec[open] > summary::after { content: '−'; }
+.sec[open] > summary { border-bottom: 1px solid #eee2cd; }
+.sec .body { padding: 14px 16px 16px; }
+
+.fld { display: block; margin-bottom: 12px; }
+.fld > span { display: block; font-size: 12px; opacity: .65; margin-bottom: 5px; }
+.fld > span b { font-weight: 800; opacity: .9; }
+.fld input[type=text] {
+  width: 100%; padding: 10px 12px;
+  border: 1px solid #ddceb4; border-radius: 9px; background: #fff;
+}
+.fld input[type=text]:focus { outline: 2px solid #dfa79a; outline-offset: -1px; }
+.fld input[type=range] { width: 100%; accent-color: #c4362c; }
+.hint { font-size: 12px; opacity: .55; line-height: 1.5; margin-top: 6px; }
+
+/* ---------- 버튼 ---------- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 10px 14px; border: 1px solid #ddceb4; border-radius: 9px;
+  background: #fff; cursor: pointer; font-size: 14px; white-space: nowrap;
+}
+.btn:active { transform: translateY(1px); }
+.btn.ghost { background: #f6eddc; }
+.btn.primary { background: #c4362c; border-color: #c4362c; color: #fff; font-weight: 800; }
+.btn.primary[disabled] { opacity: .6; cursor: progress; }
+.btn.small { font-size: 13px; padding: 8px 12px; }
+.btn.file { position: relative; overflow: hidden; }
+.btn.file input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.btn-row { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+.btn-row .btn { flex: 1; }
+
+.toggle { display: flex; border: 1px solid #ddceb4; border-radius: 9px; overflow: hidden; }
+.toggle button { flex: 1; padding: 9px 0; background: #fff; border: 0; cursor: pointer; font-size: 13px; }
+.toggle button.on { background: #c4362c; color: #fff; font-weight: 800; }
+
+/* ---------- 스티커 ---------- */
+.stickers { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.sticker {
+  border: 1px solid #e2d5be; border-radius: 10px; background: #fff;
+  padding: 8px; text-align: center;
+}
+.sticker .nm { font-size: 12px; opacity: .7; margin-bottom: 6px; }
+.sticker .thumb {
+  height: 52px; display: flex; align-items: center; justify-content: center;
+  margin-bottom: 6px; background: #faf4e8; border-radius: 6px; overflow: hidden;
+}
+.sticker .thumb img { max-width: 100%; max-height: 100%; }
+.sticker .thumb .none { font-size: 11px; opacity: .4; }
+.sticker .row { display: flex; gap: 5px; }
+.sticker .row .btn { flex: 1; font-size: 12px; padding: 7px 4px; }
+
+/* ---------- 색상 ---------- */
+.presets { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+.preset { border: 1px solid #ddceb4; border-radius: 9px; background: #fff; padding: 7px 10px; cursor: pointer; font-size: 12px; display: flex; gap: 6px; align-items: center; }
+.preset i { width: 12px; height: 12px; border-radius: 3px; display: block; }
+.colors { display: grid; gap: 8px; margin-bottom: 12px; }
+.color { display: flex; align-items: center; gap: 10px; }
+.color label { flex: 1; font-size: 13px; }
+.color input[type=color] {
+  width: 44px; height: 32px; padding: 0; border: 1px solid #ddceb4;
+  border-radius: 7px; background: none; cursor: pointer;
+}
+
+.actions { margin-top: 16px; display: grid; gap: 8px; }
+.actions .btn { width: 100%; padding: 14px; }
+
+/* ---------- 토스트 ---------- */
+.toast {
+  position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%);
+  background: #43342b; color: #fff; padding: 11px 18px; border-radius: 999px;
+  font-size: 13px; z-index: 50; box-shadow: 0 8px 24px rgba(0,0,0,.25);
+}
+
+/* ---------- 모바일 ---------- */
+@media (max-width: 900px) {
+  .app { grid-template-columns: 1fr; gap: 16px; padding: 12px 12px 92px; }
+  .stage { position: static; }
+  .stage-inner { max-width: 460px; }
+  .stickers { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .actions {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;
+    margin: 0; padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
+    background: rgba(239, 231, 216, .95);
+    backdrop-filter: blur(6px);
+    border-top: 1px solid #ddceb4;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+  }
+  .actions .btn { padding: 13px; }
+  .actions .btn.small { width: auto; padding: 13px 14px; }
+  .toast { bottom: 84px; }
+}

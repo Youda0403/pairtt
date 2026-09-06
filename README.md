@@ -1,125 +1,63 @@
-# 나만의 AI 채팅
+# Pairframe
 
-개인 전용 AI 채팅 웹앱. Cloudflare Worker 하나가 UI·API·DB를 전부 맡고,
-Anthropic API를 종량제로 호출한다. 폰 브라우저에서 쓰는 걸 전제로 만들었다.
+레트로 다이너 스타일 **페어 포스터 메이커**. 사진 한 장과 두 사람의 정보를 넣으면
+포스터가 완성되고, 고화질 PNG(3000 × 4500)로 저장할 수 있습니다.
 
-```
-[폰 브라우저] ──▶ [Cloudflare Worker] ──▶ [Anthropic API]
-                        │  (UI + API 한 오리진)
-                        └──▶ [Cloudflare D1] messages / memory
-```
+빌드 도구도 서버도 필요 없는 정적 사이트입니다. 파일 4개(+폰트)가 전부입니다.
 
-## 특징
+## 기능
 
-- **한 번 배포로 끝.** HTML까지 Worker가 서빙해서 CORS도, 별도 정적 호스팅도 없다.
-- **비밀번호 로그인.** 30일짜리 HttpOnly 세션 쿠키. 폰에서 한 번 넣으면 계속 유지된다.
-- **스트리밍 응답.** 답변이 한 글자씩 흘러나온다.
-- **장기 기억.** 오래된 대화는 기억 노트로 압축되지만 **원문은 절대 지우지 않는다.**
-- **모델 전환.** 헤더에서 Sonnet 5 / Opus 5 즉시 토글.
-- **기억 노트 직접 편집.** 헤더의 책 아이콘.
+| | |
+|---|---|
+| 페어 이름 | 길이에 맞춰 자동으로 크기가 줄고, 옆의 별도 따라 움직입니다 |
+| 캐릭터 1 · 2 | 이름 / 나이(Age) / 직업(Job) / **LIKE ↔ DISLIKE 토글** |
+| LIKE 값 | 상대 캐릭터의 이름이 자동으로 들어갑니다 |
+| 메인 사진 | 업로드 후 드래그로 위치 조정, 휠·두 손가락·슬라이더로 확대 |
+| 스티커 | 강아지 / 음료컵 / 체리 / 케첩 / 감자튀김 / 햄버거 6칸을 배경 투명 PNG로 교체 |
+| 색상 | 종이 · 메인 레드 · 캐릭터 1 · 캐릭터 2 · 사진 배경 · 포인트 6그룹 + 프리셋 3종 |
+| 저장 | 3000 × 4500 PNG. 폰트를 파일 안에 심어 어디서 열어도 글꼴이 유지됩니다 |
 
-## 배포
+입력값·색상·사진은 브라우저 `localStorage`에 남아 새로고침해도 유지됩니다.
 
-### 0. 준비
+## 실행
 
-```bash
-npm install
-npx wrangler login
-```
+파일을 `file://` 로 직접 열면 폰트 임베드용 `fetch`가 막혀 저장 품질이 떨어집니다.
+반드시 HTTP로 띄우세요.
 
-### 1. D1 데이터베이스 생성
-
-```bash
-npx wrangler d1 create ai-chat
+```sh
+python3 -m http.server 8000
+# http://localhost:8000
 ```
 
-출력에 나오는 `database_id`를 `wrangler.toml`의
-`REPLACE_AFTER_WRANGLER_D1_CREATE` 자리에 붙여넣는다.
+배포는 정적 호스팅 어디든 그대로 올리면 됩니다 (GitHub Pages, Cloudflare Pages, Netlify …).
 
-### 2. 테이블 생성
+## 파일
 
-```bash
-npm run db:init
+```
+index.html   UI 골격 + 포스터 전체(인라인 SVG). 디자인 수정은 대부분 여기서 한다.
+style.css    편집 화면 스타일. 포스터 자체의 색은 여기 없다(app.js가 주입).
+app.js       상태 관리, 텍스트 배치, 사진 조작, 색상 주입, PNG 내보내기.
+fonts/       Pacifico / Caveat / Nunito latin 서브셋 (OFL 1.1, fonts/OFL.txt 참고).
 ```
 
-### 3. 시크릿 3개 등록
+## 구조 메모
 
-```bash
-npx wrangler secret put ANTHROPIC_API_KEY   # console.anthropic.com 에서 발급
-npx wrangler secret put APP_PASSWORD        # 로그인에 쓸 비밀번호
-npx wrangler secret put SESSION_SECRET      # openssl rand -hex 32 결과를 붙여넣기
-```
+- 포스터는 `viewBox="0 0 1000 1500"` 인라인 SVG **하나**입니다.
+  화면에 보이는 것과 저장되는 것이 같은 SVG라 미리보기와 결과물이 어긋나지 않습니다.
+- 색은 SVG 안의 `<style id="theme-style">`에 `app.js`가 통째로 써넣습니다.
+  `.f-red`(fill) / `.s-red`(stroke) 같은 클래스만 쓰고 색을 직접 박지 않습니다.
+  이 `<style>`이 SVG 내부에 있어서 저장할 때 그대로 딸려 나갑니다.
+- 그림자 레드, 사진 안내문 초록, 종이 얼룩색은 사용자가 고른 색에서 자동 계산합니다
+  (`deepOf` / `inkOf` / `grainOf`). 그래서 조절 항목이 6개로 끝납니다.
+- 저장은 SVG를 복제 → 폰트를 base64로 심고 → `<img>`로 읽어 캔버스에 3배로 그린 뒤
+  `toBlob`으로 내려받습니다. 외부 라이브러리를 쓰지 않습니다.
+- 라벨(AGE/JOB/LIKE)은 글자 폭을 재서 콜론과 점선 시작점을 잡습니다.
+  그래서 `DISLIKE`처럼 길어져도 줄이 겹치지 않습니다.
 
-`SESSION_SECRET`을 나중에 바꾸면 기존 로그인 세션이 전부 무효가 된다(=다시 로그인).
+### 주의할 점
 
-### 4. 배포
-
-```bash
-npm run deploy
-```
-
-출력된 `https://my-ai-chat.<계정>.workers.dev` 를 폰에서 열고 비밀번호를 입력하면 끝.
-iOS Safari라면 공유 → "홈 화면에 추가"를 하면 앱처럼 전체 화면으로 뜬다.
-
-### 로컬에서 먼저 돌려보기
-
-```bash
-cp .dev.vars.example .dev.vars   # 값 채우기
-npm run db:init:local
-npm run dev
-```
-
-## 문제가 생기면
-
-```bash
-npm run tail    # 실시간 Worker 로그
-```
-
-- **로그인이 안 됨** → `APP_PASSWORD`, `SESSION_SECRET` 시크릿이 등록됐는지 확인.
-- **"API 키가 거부됐습니다"** → `ANTHROPIC_API_KEY` 재등록. 크레딧 잔액도 확인.
-- **응답이 안 옴** → `npm run tail` 로그부터. D1 바인딩(`database_id`)이 실제 값인지 확인.
-
-## 설정 바꾸기
-
-`worker.js` 맨 위 `CONFIG` 객체 하나만 보면 된다.
-
-| 항목 | 기본값 | 설명 |
-|---|---|---|
-| `MODELS` | Sonnet 5 / Opus 5 | UI에 노출할 모델 목록 |
-| `DEFAULT_MODEL` | `claude-sonnet-5` | 처음 접속했을 때 선택되는 모델 |
-| `SUMMARY_MODEL` | `claude-sonnet-5` | 기억 노트를 갱신하는 모델 |
-| `EFFORT` | `low` | 사고 깊이. 잡담은 `low`, 진지한 상담·분석은 `medium` 이상 |
-| `MAX_RECENT_MESSAGES` | 40 | 원문 그대로 API에 실어 보낼 메시지 개수 상한 |
-| `SUMMARIZE_CHUNK` | 20 | 상한을 넘겼을 때 한 번에 접을 개수 |
-| `MAX_MEMORY_CHARS` | 6000 | 기억 노트 길이 상한 |
-| `PERSONA` | (한국어 대화 상대) | 시스템 프롬프트. 여기가 성격을 정한다 |
-
-## 기억은 어떻게 동작하나
-
-1. 매 요청에 `summarized = 0`인 메시지를 전부 원문 그대로 보낸다.
-2. 그 개수가 `MAX_RECENT_MESSAGES`(40)를 넘으면, 응답을 사용자에게 다 보낸 **뒤에**
-   백그라운드(`ctx.waitUntil`)에서 가장 오래된 20개를 기억 노트로 접는다.
-3. 접힌 메시지는 `summarized = 1`로 표시될 뿐 **DB에서 지워지지 않는다.**
-   앱에서 "이전 대화 더 보기"로 계속 읽을 수 있다.
-4. 요약이 실패하면 조용히 넘어가고 다음 턴에 다시 시도한다. 대화는 막히지 않는다.
-
-기억 노트가 마음에 안 들면 책 아이콘을 눌러 직접 고치면 된다. 저장하는 순간부터 반영된다.
-
-## 비용에 대해
-
-프롬프트 캐싱을 시스템 프롬프트와 대화 기록 양쪽에 걸어뒀다. 캐시가 히트하면
-그 부분은 입력 단가의 10%만 청구된다. 다만 캐시 수명이 5분이라,
-
-- **몰아서 대화하는 패턴** → 대부분 히트. 구독보다 확실히 싸다.
-- **하루 종일 띄엄띄엄** → 대부분 미스. 컨텍스트가 길어질수록 비싸진다.
-
-후자가 본인 패턴이면 `MAX_RECENT_MESSAGES`를 20~30으로 낮추는 게 제일 직접적인 절감책이다.
-Anthropic 콘솔의 Usage 탭에서 실제 지출을 며칠 지켜보고 조정하는 걸 권한다.
-
-## 알아둘 것
-
-- 모델 안전 분류기가 요청을 거절하면(`stop_reason: "refusal"`) 그 사실을 그대로 표시한다.
-  거절 시 다른 모델로 자동 우회하는 server-side fallback 옵션이 있지만, 개인 대화 앱에서는
-  거의 쓸 일이 없고 베타 기능이라 실패 지점만 늘어서 넣지 않았다.
-- 프롬프트 캐시 수명을 1시간으로 늘리는 옵션(베타)이 따로 있다. 대화 간격이 길다면 검토해볼 만하다.
-- 첨부파일·이미지 입력은 아직 없다.
+- SVG를 문자열로 직렬화할 때는 **XML 규칙**을 따릅니다. 주석 안에 하이픈 두 개(`--`)가
+  있으면 파싱이 깨져 저장이 통째로 실패합니다. `stripComments()`가 내보내기 직전에
+  주석을 걷어내지만, SVG 안에 새 주석을 넣을 때 구분선을 `---`로 그리지 마세요.
+- 업로드한 이미지는 사진 2200px / 스티커 800px로 줄여서 담습니다.
+  원본을 그대로 두면 data URI가 커져 저장이 느려지고 `localStorage`도 넘칩니다.
