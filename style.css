@@ -2,6 +2,10 @@
 @font-face { font-family: 'PFDisplay'; src: url('fonts/Pacifico-400.woff2') format('woff2'); font-display: block; }
 @font-face { font-family: 'PFHand';    src: url('fonts/Caveat-700.woff2')   format('woff2'); font-display: block; }
 @font-face { font-family: 'PFSans';    src: url('fonts/Nunito-800.woff2')   format('woff2'); font-display: block; }
+/* 한글 폰트. 라틴 폰트에 한글 글리프가 없어 한글을 쓸 때만 브라우저가 내려받는다. */
+@font-face { font-family: 'PFDisplayKR'; src: url('fonts/Jua-KR.woff2')      format('woff2'); font-display: swap; }
+@font-face { font-family: 'PFHandKR';    src: url('fonts/Gaegu-KR.woff2')    format('woff2'); font-display: swap; }
+@font-face { font-family: 'PFSansKR';    src: url('fonts/GothicA1-KR.woff2') format('woff2'); font-display: swap; }
 
 /* ---------- 기본 ---------- */
 * { box-sizing: border-box; }
@@ -39,8 +43,10 @@ button, input { font: inherit; color: inherit; }
 /* 사진·스티커의 display 는 app.js 가 인라인으로 직접 지정한다.
    여기서 display:none 규칙을 두면 인라인 해제 시 그 규칙이 이겨 사진이 사라진다. */
 /* 사진 영역에서만 스크롤 제스처를 막아 드래그·핀치가 가능하게 한다 */
-#poster #photoHit { touch-action: none; cursor: grab; }
-#poster #photoHit:active { cursor: grabbing; }
+#poster #photoHit,
+#poster .slot-hit { touch-action: none; cursor: grab; }
+#poster #photoHit:active,
+#poster .slot-hit:active { cursor: grabbing; }
 
 /* ---------- 패널 ---------- */
 .panel { min-width: 0; }
@@ -113,6 +119,9 @@ button, input { font: inherit; color: inherit; }
 }
 .sticker .thumb img { max-width: 100%; max-height: 100%; }
 .sticker .thumb .none { font-size: 11px; opacity: .4; }
+.sticker .szrow { display: block; margin: 0 0 7px; }
+.sticker .szrow span { display: block; font-size: 11px; opacity: .55; margin-bottom: 2px; }
+.sticker .szrow input[type=range] { width: 100%; accent-color: #c4362c; }
 .sticker .row { display: flex; gap: 5px; }
 .sticker .row .btn { flex: 1; font-size: 12px; padding: 7px 4px; }
 

@@ -12,20 +12,22 @@ const CENTER = 500;
 /* 사진 프레임. index.html 의 #clip-photo / #photoHit 과 같은 값이어야 한다. */
 const FRAME = { x: 170, y: 278, w: 660, h: 590 };
 const EXPORT_SCALE = 3;               // 3000 x 4500 px
-const STORE_KEY = 'pairframe.v1';
+const STORE_KEY = 'pairframe.v2';
 
 const poster = $('#poster');
 
 /* ===================== 정의 ===================== */
 
+/* box = 스티커를 교체했을 때 기본으로 놓이는 자리(중심과 크기) */
 const SLOTS = [
-  { k: 'dog',     name: '강아지' },
-  { k: 'cup',     name: '음료컵' },
-  { k: 'cherry',  name: '체리' },
-  { k: 'ketchup', name: '케첩' },
-  { k: 'fries',   name: '감자튀김' },
-  { k: 'burger',  name: '햄버거' },
+  { k: 'dog',     name: '곰',       box: { cx:  81, cy: 276, w: 150, h: 180 } },
+  { k: 'cup',     name: '음료컵',   box: { cx: 905, cy: 277, w: 126, h: 176 } },
+  { k: 'cherry',  name: '체리',     box: { cx: 920, cy: 395, w:  76, h:  76 } },
+  { k: 'ketchup', name: '케첩',     box: { cx:  86, cy: 751, w:  98, h: 186 } },
+  { k: 'fries',   name: '감자튀김', box: { cx: 754, cy: 750, w: 108, h: 154 } },
+  { k: 'burger',  name: '햄버거',   box: { cx: 871, cy: 758, w: 184, h: 170 } },
 ];
+const SLOT_BY_K = Object.fromEntries(SLOTS.map(s => [s.k, s]));
 
 const COLORS = [
   { k: 'paper',  name: '종이 배경',           def: '#FBF2DF' },
@@ -42,21 +44,24 @@ const PRESETS = [
   { name: '나이트', c: { paper:'#2B2733', red:'#F0E2C6', p1:'#EE8FA6', p2:'#7FB8E8', green:'#3F5C48', accent:'#EFBF5C' } },
 ];
 
-/* 카드 행(AGE/JOB/LIKE)의 라벨 시작 x 와 점선 끝 x */
-const ROW_X = { c1: { left: 72, right: 408 }, c2: { left: 592, right: 928 } };
+/* 사원증 행(AGE/JOB/LIKE)의 라벨 시작 x 와 점선 끝 x */
+const ROW_X = { c1: { left: 84, right: 432 }, c2: { left: 568, right: 916 } };
+
+const newSticker = () => ({ src: null, scale: 1, dx: 0, dy: 0 });
 
 const defaults = () => ({
+  tag: '',
   pair: '',
   c1: { name: '', age: '', job: '', like: 'LIKE' },
   c2: { name: '', age: '', job: '', like: 'LIKE' },
   photo: { src: null, nw: 0, nh: 0, zoom: 1, ox: 0, oy: 0 },
-  stickers: {},
+  stickers: Object.fromEntries(SLOTS.map(s => [s.k, newSticker()])),
   colors: Object.fromEntries(COLORS.map(c => [c.k, c.def])),
 });
 
 let S = defaults();
 
-const PLACEHOLDER = { pair: 'Pairname', c1: 'character 1', c2: 'character 2' };
+const PLACEHOLDER = { tag: 'Better Together !', pair: 'Pairname', c1: 'character 1', c2: 'character 2' };
 
 /* ===================== 색 유틸 ===================== */
 
@@ -114,8 +119,18 @@ function grainOf(hex) {
   const [h, s] = rgb2hsl(hex);
   return lum(hex) > 0.5 ? hsl2hex(h, clamp(s, 0.15, 0.5), 0.32) : hsl2hex(h, clamp(s, 0.1, 0.4), 0.82);
 }
+/** 색이 칠해진 띠 위에 올릴 글자색: 띠가 밝으면 진하게, 어두우면 종이색으로 */
+function onColor(bg, sheet) {
+  const [h, s] = rgb2hsl(bg);
+  return lum(bg) > 0.62 ? hsl2hex(h, clamp(s * 1.1, 0, 1), 0.24) : sheet;
+}
 
 /* ===================== 테마 주입 ===================== */
+
+/* 한글은 라틴 폰트에 글리프가 없어 자동으로 뒤쪽 한글 폰트로 넘어간다. */
+const F_DISP = "'PFDisplay','PFDisplayKR','Apple SD Gothic Neo','Malgun Gothic',cursive";
+const F_HAND = "'PFHand','PFHandKR','Apple SD Gothic Neo','Malgun Gothic',cursive";
+const F_SANS = "'PFSans','PFSansKR','Apple SD Gothic Neo','Malgun Gothic',sans-serif";
 
 function themeCss() {
   const c = S.colors;
@@ -124,14 +139,14 @@ function themeCss() {
   const sheet = sheetOf(c.paper);
   const grain = grainOf(c.paper);
   return `
-.disp{font-family:'PFDisplay','Apple SD Gothic Neo','Noto Sans KR','Malgun Gothic',cursive}
-.hand{font-family:'PFHand','Apple SD Gothic Neo','Noto Sans KR','Malgun Gothic',cursive}
-.sans{font-family:'PFSans','Apple SD Gothic Neo','Noto Sans KR','Malgun Gothic',sans-serif}
+.disp{font-family:${F_DISP}}
+.hand{font-family:${F_HAND}}
+.sans{font-family:${F_SANS}}
 .f-paper{fill:${c.paper}}.f-red{fill:${c.red}}.f-deep{fill:${deep}}
 .f-p1{fill:${c.p1}}.f-p2{fill:${c.p2}}.f-green{fill:${c.green}}
 .f-green-ink{fill:${ink}}.f-accent{fill:${c.accent}}.f-sheet{fill:${sheet}}
+.f-on-p1{fill:${onColor(c.p1, sheet)}}.f-on-p2{fill:${onColor(c.p2, sheet)}}
 .f-grain{fill:${grain};opacity:.16}
-.f-shade{fill:${grain};opacity:.13}
 .s-paper{stroke:${c.paper}}.s-red{stroke:${c.red}}.s-deep{stroke:${deep}}
 .s-p1{stroke:${c.p1}}.s-p2{stroke:${c.p2}}.s-green-ink{stroke:${ink}}.s-accent{stroke:${c.accent}}
 .lbl{font-size:19px;letter-spacing:1.6px}
@@ -191,14 +206,66 @@ function layoutFooter() {
   $('#ft-rule-r').setAttribute('d', `M${left + total + 20} 1396 H${left + total + 74}`);
 }
 
+/* ===================== 한글 폰트 ===================== */
+
+const HANGUL = /[ᄀ-ᇿ㄰-㆏가-힣]/;
+
+/** 글자가 속한 역할(disp/hand/sans)을 조상까지 훑어 찾는다 */
+function roleOf(el) {
+  for (let n = el; n && n !== poster; n = n.parentNode) {
+    const c = n.getAttribute && n.getAttribute('class');
+    if (c) {
+      if (/\bdisp\b/.test(c)) return 'PFDisplayKR';
+      if (/\bhand\b/.test(c)) return 'PFHandKR';
+      if (/\bsans\b/.test(c)) return 'PFSansKR';
+    }
+  }
+  return 'PFSansKR';
+}
+
+/** 지금 포스터에서 실제로 한글이 쓰인 역할의 폰트만 고른다 */
+function neededKrFonts(root = poster) {
+  const need = new Set();
+  for (const t of root.querySelectorAll('text')) {
+    if (HANGUL.test(t.textContent)) need.add(roleOf(t));
+  }
+  return need;
+}
+
+const krLoaded = new Set();
+/** 한글 폰트는 1MB에 가까워 미리 받지 않는다. 실제로 쓰일 때만 받고 다시 그린다. */
+async function ensureKrFonts() {
+  let loadedSomething = false;
+  for (const fam of neededKrFonts()) {
+    if (krLoaded.has(fam)) continue;
+    krLoaded.add(fam);
+    try {
+      await document.fonts.load(`32px '${fam}'`);
+      loadedSomething = true;
+    } catch {}
+  }
+  if (loadedSomething) render();          // 폭을 다시 재야 배치가 맞는다
+}
+
 /* ===================== 렌더 ===================== */
 
 function render() {
   applyTheme();
 
-  const pair = S.pair.trim() || PLACEHOLDER.pair;
+  const tag  = S.tag.trim()     || PLACEHOLDER.tag;
+  const pair = S.pair.trim()    || PLACEHOLDER.pair;
   const n1   = S.c1.name.trim() || PLACEHOLDER.c1;
   const n2   = S.c2.name.trim() || PLACEHOLDER.c2;
+
+  // 상단 문구: 길이에 따라 양옆 장식을 다시 붙인다
+  const tagEl = $('#tagLine');
+  tagEl.textContent = tag;
+  fitText(tagEl, 420, 42);
+  const th = textWidth(tagEl) / 2;
+  $('#tagNote')  .setAttribute('transform', `translate(${CENTER - th - 32},96) rotate(-8) scale(1.05)`);
+  $('#tagSpark') .setAttribute('transform', `translate(${CENTER - th - 60},116) rotate(12) scale(.85)`);
+  $('#tagHeart1').setAttribute('transform', `translate(${CENTER + th + 26},90) rotate(14) scale(1.25)`);
+  $('#tagHeart2').setAttribute('transform', `translate(${CENTER + th + 52},110) rotate(-10) scale(.9)`);
 
   const main = $('#pairName'), shadow = $('#pairShadow');
   main.textContent = shadow.textContent = pair;
@@ -210,8 +277,8 @@ function render() {
   $('#pairStar').setAttribute('transform', `translate(${starX},204) rotate(-12) scale(2.1)`);
 
   const t1 = $('#c1Name'), t2 = $('#c2Name');
-  t1.textContent = n1; fitText(t1, 212, 32);
-  t2.textContent = n2; fitText(t2, 212, 32);
+  t1.textContent = n1; fitText(t1, 222, 32);
+  t2.textContent = n2; fitText(t2, 222, 32);
 
   layoutRow('row-1a', 'AGE',     S.c1.age, ROW_X.c1.left, ROW_X.c1.right);
   layoutRow('row-1j', 'JOB',     S.c1.job, ROW_X.c1.left, ROW_X.c1.right);
@@ -223,8 +290,9 @@ function render() {
 
   layoutFooter();
   placePhoto();
-  renderStickers();
+  SLOTS.forEach(s => placeSticker(s.k));
   save();
+  ensureKrFonts();
 }
 
 function placePhoto() {
@@ -254,19 +322,32 @@ function placePhoto() {
   img.style.display = 'inline';
 }
 
-function renderStickers() {
-  for (const { k } of SLOTS) {
-    const art = $('#art-' + k), img = $('#img-' + k), src = S.stickers[k];
-    if (src) {
-      art.style.display = 'none';
-      img.setAttribute('href', src);
-      img.style.display = 'inline';
-    } else {
-      art.style.display = 'inline';
-      img.removeAttribute('href');
-      img.style.display = 'none';
-    }
+function placeSticker(k) {
+  const st = S.stickers[k], box = SLOT_BY_K[k].box;
+  const art = $('#art-' + k), img = $('#img-' + k), hit = $('#hit-' + k);
+
+  if (!st || !st.src) {
+    art.style.display = 'inline';
+    img.style.display = 'none';
+    img.removeAttribute('href');
+    hit.style.display = 'none';
+    return;
   }
+  art.style.display = 'none';
+  if (img.getAttribute('href') !== st.src) img.setAttribute('href', st.src);
+
+  // 포스터 밖으로 완전히 사라지지만 않게 중심만 느슨하게 잡아 둔다.
+  st.dx = clamp(st.dx, -box.cx, POSTER_W - box.cx);
+  st.dy = clamp(st.dy, -box.cy, POSTER_H - box.cy);
+
+  const w = box.w * st.scale, h = box.h * st.scale;
+  const x = box.cx - w / 2 + st.dx, y = box.cy - h / 2 + st.dy;
+  for (const el of [img, hit]) {
+    el.setAttribute('x', x); el.setAttribute('y', y);
+    el.setAttribute('width', w); el.setAttribute('height', h);
+  }
+  img.style.display = 'inline';
+  hit.style.display = 'inline';
 }
 
 /* ===================== 저장(로컬) ===================== */
@@ -284,7 +365,11 @@ function saveNow() {
   } catch {
     // 이미지까지 넣으면 용량을 넘길 수 있다. 텍스트/색상만이라도 남긴다.
     try {
-      const light = { ...S, photo: { ...S.photo, src: null }, stickers: {} };
+      const light = {
+        ...S,
+        photo: { ...S.photo, src: null },
+        stickers: Object.fromEntries(Object.entries(S.stickers).map(([k, v]) => [k, { ...v, src: null }])),
+      };
       localStorage.setItem(STORE_KEY, JSON.stringify(light));
     } catch {}
   }
@@ -301,7 +386,8 @@ function load() {
       c1: { ...base.c1, ...(d.c1 || {}) },
       c2: { ...base.c2, ...(d.c2 || {}) },
       photo: { ...base.photo, ...(d.photo || {}) },
-      stickers: d.stickers || {},
+      stickers: Object.fromEntries(SLOTS.map(s =>
+        [s.k, { ...newSticker(), ...((d.stickers || {})[s.k] || {}) }])),
       colors: { ...base.colors, ...(d.colors || {}) },
     };
   } catch {}
@@ -331,30 +417,32 @@ function readImage(file, maxSide, png) {
   });
 }
 
-/* ===================== 사진 조작 ===================== */
+/* ===================== 드래그 / 핀치 ===================== */
+
+/* 모바일 사파리는 SVG 요소의 touch-action 을 무시할 때가 있어, 끄는 동안에는
+   touchmove 를 직접 막아 화면이 따라 스크롤되지 않게 한다. */
+let dragging = false;
+poster.addEventListener('touchmove', e => { if (dragging) e.preventDefault(); }, { passive: false });
 
 function svgPoint(e) {
   const r = poster.getBoundingClientRect();
   return { x: (e.clientX - r.left) / r.width * POSTER_W, y: (e.clientY - r.top) / r.height * POSTER_H };
 }
 
-function setZoom(z) {
-  S.photo.zoom = clamp(z, 1, 4);
-  $('#in-zoom').value = Math.round(S.photo.zoom * 100);
-  $('#lbl-zoom').textContent = Math.round(S.photo.zoom * 100) + '%';
-  placePhoto();
-  save();
-}
-
-function initPhotoGestures() {
-  const hit = $('#photoHit');
+/** hit 위에서의 끌기와 두 손가락 확대를 잡아 콜백으로 넘긴다 */
+function bindGesture(hit, { active, onDrag, onScale, onEnd }) {
   const pts = new Map();
   let last = null, pinch = 0;
+  const dist = () => {
+    const [a, b] = [...pts.values()];
+    return Math.hypot(a.x - b.x, a.y - b.y);
+  };
 
   hit.addEventListener('pointerdown', e => {
-    if (!S.photo.src) return;
+    if (!active()) return;
     hit.setPointerCapture(e.pointerId);
     pts.set(e.pointerId, svgPoint(e));
+    dragging = true;
     if (pts.size === 1) last = svgPoint(e);
     if (pts.size === 2) pinch = dist();
   });
@@ -366,15 +454,13 @@ function initPhotoGestures() {
 
     if (pts.size >= 2) {
       const d = dist();
-      if (pinch > 0 && d > 0) setZoom(S.photo.zoom * (d / pinch));
+      if (pinch > 0 && d > 0) onScale(d / pinch);
       pinch = d;
       return;
     }
     const p = svgPoint(e);
-    S.photo.ox += p.x - last.x;
-    S.photo.oy += p.y - last.y;
+    onDrag(p.x - last.x, p.y - last.y);
     last = p;
-    placePhoto();
   });
 
   const end = e => {
@@ -382,31 +468,66 @@ function initPhotoGestures() {
     pts.delete(e.pointerId);
     pinch = 0;
     if (pts.size === 1) last = [...pts.values()][0];
-    if (pts.size === 0) save();
+    if (pts.size === 0) { dragging = false; onEnd(); }
   };
   hit.addEventListener('pointerup', end);
   hit.addEventListener('pointercancel', end);
 
   hit.addEventListener('wheel', e => {
-    if (!S.photo.src) return;
+    if (!active()) return;
     e.preventDefault();
-    setZoom(S.photo.zoom * (1 - e.deltaY * 0.0015));
+    onScale(1 - e.deltaY * 0.0015);
+    onEnd();
   }, { passive: false });
+}
 
-  function dist() {
-    const [a, b] = [...pts.values()];
-    return Math.hypot(a.x - b.x, a.y - b.y);
+function setZoom(z) {
+  S.photo.zoom = clamp(z, 1, 4);
+  $('#in-zoom').value = Math.round(S.photo.zoom * 100);
+  $('#lbl-zoom').textContent = Math.round(S.photo.zoom * 100) + '%';
+  placePhoto();
+  save();
+}
+
+function setStickerScale(k, v) {
+  const st = S.stickers[k];
+  st.scale = clamp(v, 0.3, 3);
+  const sl = $(`[data-scale="${k}"]`);
+  if (sl) sl.value = Math.round(st.scale * 100);
+  placeSticker(k);
+  save();
+}
+
+function initGestures() {
+  bindGesture($('#photoHit'), {
+    active: () => !!S.photo.src,
+    onDrag: (dx, dy) => { S.photo.ox += dx; S.photo.oy += dy; placePhoto(); },
+    onScale: r => setZoom(S.photo.zoom * r),
+    onEnd: save,
+  });
+
+  for (const { k } of SLOTS) {
+    bindGesture($('#hit-' + k), {
+      active: () => !!S.stickers[k].src,
+      onDrag: (dx, dy) => { S.stickers[k].dx += dx; S.stickers[k].dy += dy; placeSticker(k); },
+      onScale: r => setStickerScale(k, S.stickers[k].scale * r),
+      onEnd: save,
+    });
   }
 }
 
 /* ===================== PNG 저장 ===================== */
 
-const FONT_FILES = [
-  ['PFDisplay', 'fonts/Pacifico-400.woff2'],
-  ['PFHand',    'fonts/Caveat-700.woff2'],
-  ['PFSans',    'fonts/Nunito-800.woff2'],
-];
-let fontCssCache = null;
+const FONT_FILES = {
+  PFDisplay:   'fonts/Pacifico-400.woff2',
+  PFHand:      'fonts/Caveat-700.woff2',
+  PFSans:      'fonts/Nunito-800.woff2',
+  PFDisplayKR: 'fonts/Jua-KR.woff2',
+  PFHandKR:    'fonts/Gaegu-KR.woff2',
+  PFSansKR:    'fonts/GothicA1-KR.woff2',
+};
+const LATIN_FONTS = ['PFDisplay', 'PFHand', 'PFSans'];
+const fontCache = new Map();
 
 function toBase64(buf) {
   const bytes = new Uint8Array(buf);
@@ -417,17 +538,21 @@ function toBase64(buf) {
   return btoa(s);
 }
 
-async function fontCss() {
-  if (fontCssCache !== null) return fontCssCache;
-  const out = [];
-  for (const [fam, url] of FONT_FILES) {
-    try {
-      const buf = await (await fetch(url)).arrayBuffer();
-      out.push(`@font-face{font-family:'${fam}';src:url(data:font/woff2;base64,${toBase64(buf)}) format('woff2')}`);
-    } catch {}
-  }
-  fontCssCache = out.join('');
-  return fontCssCache;
+async function faceCss(fam) {
+  if (fontCache.has(fam)) return fontCache.get(fam);
+  let css = '';
+  try {
+    const buf = await (await fetch(FONT_FILES[fam])).arrayBuffer();
+    css = `@font-face{font-family:'${fam}';src:url(data:font/woff2;base64,${toBase64(buf)}) format('woff2')}`;
+  } catch {}
+  fontCache.set(fam, css);
+  return css;
+}
+
+/** 라틴 3종은 항상, 한글 폰트는 실제로 쓰인 것만 심는다 (한 벌에 200~450KB) */
+async function fontCss(clone) {
+  const fams = [...LATIN_FONTS, ...neededKrFonts(clone)];
+  return (await Promise.all(fams.map(faceCss))).join('');
 }
 
 /** XML은 주석 안의 연속 하이픈을 허용하지 않아 직렬화 전에 주석을 걷어낸다. */
@@ -462,14 +587,14 @@ async function exportPNG() {
 
   try {
     await document.fonts.ready;
-    const css = await fontCss();
 
     const clone = poster.cloneNode(true);
     clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
     clone.setAttribute('width', POSTER_W * EXPORT_SCALE);
     clone.setAttribute('height', POSTER_H * EXPORT_SCALE);
-    $('#theme-style', clone).textContent = css + themeCss();
     clone.querySelector('#photoHit')?.remove();
+    clone.querySelectorAll('.slot-hit').forEach(n => n.remove());
+    $('#theme-style', clone).textContent = await fontCss(clone) + themeCss();
     stripComments(clone);
 
     const xml = new XMLSerializer().serializeToString(clone);
@@ -528,6 +653,10 @@ function buildStickerUI() {
     el.innerHTML = `
       <div class="nm">${name}</div>
       <div class="thumb" data-thumb="${k}"><span class="none">기본 일러스트</span></div>
+      <label class="szrow" data-sz="${k}" hidden>
+        <span>크기</span>
+        <input type="range" min="30" max="300" step="1" value="100" data-scale="${k}">
+      </label>
       <div class="row">
         <button class="btn" type="button" data-slot="${k}">교체</button>
         <button class="btn ghost" type="button" data-reset="${k}">되돌리기</button>
@@ -546,10 +675,15 @@ function buildStickerUI() {
     }
     const reset = e.target.closest('[data-reset]');
     if (reset) {
-      delete S.stickers[reset.dataset.reset];
+      S.stickers[reset.dataset.reset] = newSticker();
       render();
-      updateStickerThumbs();
+      updateStickerCards();
     }
+  });
+
+  wrap.addEventListener('input', e => {
+    const k = e.target.dataset.scale;
+    if (k) setStickerScale(k, +e.target.value / 100);
   });
 
   $('#in-sticker').addEventListener('change', async e => {
@@ -559,20 +693,21 @@ function buildStickerUI() {
     pendingSlot = null;
     if (!f || !k) return;
     try {
-      const { src } = await readImage(f, 800, true);
-      S.stickers[k] = src;
+      const { src } = await readImage(f, 900, true);
+      S.stickers[k] = { ...newSticker(), src };
       render();
-      updateStickerThumbs();
+      updateStickerCards();
     } catch { toast('이미지를 읽지 못했어요.'); }
   });
 }
 
-function updateStickerThumbs() {
+function updateStickerCards() {
   for (const { k } of SLOTS) {
+    const st = S.stickers[k];
     const box = $(`[data-thumb="${k}"]`);
-    box.innerHTML = S.stickers[k]
-      ? `<img src="${S.stickers[k]}" alt="">`
-      : '<span class="none">기본 일러스트</span>';
+    box.innerHTML = st.src ? `<img src="${st.src}" alt="">` : '<span class="none">기본 일러스트</span>';
+    $(`[data-sz="${k}"]`).hidden = !st.src;
+    $(`[data-scale="${k}"]`).value = Math.round(st.scale * 100);
   }
 }
 
@@ -616,6 +751,7 @@ function syncColorInputs() {
 }
 
 function syncInputs() {
+  $('#in-tag').value     = S.tag;
   $('#in-pair').value    = S.pair;
   $('#in-c1-name').value = S.c1.name;
   $('#in-c2-name').value = S.c2.name;
@@ -628,7 +764,7 @@ function syncInputs() {
   syncToggle('tg-c1', S.c1.like);
   syncToggle('tg-c2', S.c2.like);
   syncColorInputs();
-  updateStickerThumbs();
+  updateStickerCards();
 }
 
 function syncToggle(id, v) {
@@ -658,6 +794,7 @@ async function init() {
   buildColorUI();
   syncInputs();
 
+  bindText('#in-tag',     v => S.tag = v);
   bindText('#in-pair',    v => S.pair = v);
   bindText('#in-c1-name', v => S.c1.name = v);
   bindText('#in-c2-name', v => S.c2.name = v);
@@ -704,10 +841,10 @@ async function init() {
   });
   $('#btn-save').addEventListener('click', exportPNG);
 
-  initPhotoGestures();
+  initGestures();
   addEventListener('pagehide', saveNow);   // 지연 저장이 남아 있으면 떠나기 전에 비운다
 
-  // 폰트가 준비된 뒤 렌더해야 글자 폭 측정이 정확하다.
+  // 라틴 폰트가 준비된 뒤 렌더해야 글자 폭 측정이 정확하다. (한글은 쓰일 때만 받는다)
   try {
     await Promise.all([
       document.fonts.load("122px 'PFDisplay'"),

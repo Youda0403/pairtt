@@ -8,6 +8,14 @@
 - Nunito-800.woff2 — Copyright 2014 The Nunito Project Authors
   (https://github.com/googlefonts/nunito)
 
+한글 폰트(한글 음절·자모만 남긴 서브셋):
+- Jua-KR.woff2 — Copyright The Jua Project Authors
+  (https://github.com/googlefonts/jua)
+- GothicA1-KR.woff2 — Copyright The Gothic A1 Project Authors
+  (https://github.com/googlefonts/gothica1)
+- Gaegu-KR.woff2 — Copyright The Gaegu Project Authors
+  (https://github.com/googlefonts/gaegu)
+
 아래는 SIL Open Font License, Version 1.1 전문입니다.
 
 -------------------------------------------------------------------------

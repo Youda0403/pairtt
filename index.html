@@ -21,7 +21,7 @@
     <style id="theme-style"></style>
 
     <!-- 재사용 아이콘. 모두 fill 전용이라 use 한 번으로 색이 통일된다 -->
-    <g id="ic-heart"><path d="M0 4.6C-7.4-2.2-3.7-10 0-5.6 3.7-10 7.4-2.2 0 4.6Z"/></g>
+    <g id="ic-heart"><path d="M0 6.6C-1.4 5.4-7.6 1-7.6-2.8-7.6-5.9-5.1-7.7-2.8-7.7-1.2-7.7-.3-6.8 0-5.9 .3-6.8 1.2-7.7 2.8-7.7 5.1-7.7 7.6-5.9 7.6-2.8 7.6 1 1.4 5.4 0 6.6Z"/></g>
     <g id="ic-star"><path d="M0-10 2.9-3.4 10-2.7 4.6 2.1 6.2 9.2 0 5.4-6.2 9.2-4.6 2.1-10-2.7-2.9-3.4Z"/></g>
     <g id="ic-spark"><path d="M0-10C1.3-4 4-1.3 10 0 4 1.3 1.3 4 0 10-1.3 4-4 1.3-10 0-4-1.3-1.3-4 0-10Z"/></g>
     <g id="ic-note">
@@ -31,6 +31,17 @@
       <ellipse cx="-9.6" cy="4.2" rx="5" ry="3.8" transform="rotate(-20 -9.6 4.2)"/>
       <ellipse cx="3.6" cy="0.6" rx="5" ry="3.8" transform="rotate(-20 3.6 .6)"/>
     </g>
+
+    <!-- 도장 글씨가 따라 흐르는 원호 -->
+    <path id="stamp-top" d="M61 112 A34 34 0 0 1 129 112" fill="none"/>
+    <path id="stamp-bot" d="M49 112 A46 46 0 0 0 141 112" fill="none"/>
+
+    <filter id="lift" x="-12%" y="-12%" width="128%" height="128%">
+      <feDropShadow dx="3" dy="7" stdDeviation="7" flood-color="#4a2f18" flood-opacity=".26"/>
+    </filter>
+    <filter id="lift-sm" x="-14%" y="-14%" width="132%" height="132%">
+      <feDropShadow dx="2" dy="5" stdDeviation="5" flood-color="#4a2f18" flood-opacity=".22"/>
+    </filter>
 
     <!-- 체크무늬 (테두리 밴드) -->
     <pattern id="pat-check" width="40" height="40" patternUnits="userSpaceOnUse">
@@ -80,24 +91,34 @@
   <rect x="0" y="0" width="1000" height="40" fill="url(#pat-check)"/>
   <rect x="0" y="1460" width="1000" height="40" fill="url(#pat-check)"/>
 
-  <!-- 좌상단 스탬프 -->
-  <g transform="rotate(-7 95 110)">
-    <circle cx="95" cy="110" r="47" class="s-red" fill="none" stroke-width="3.2"/>
-    <circle cx="95" cy="110" r="40" class="s-red" fill="none" stroke-width="1.5"/>
-    <text class="sans f-red" x="95" y="96" font-size="13" text-anchor="middle" letter-spacing=".8">GOOD</text>
-    <text class="sans f-red" x="95" y="111" font-size="13" text-anchor="middle" letter-spacing=".8">FOOD</text>
-    <path d="M76 118 H114" class="s-red" stroke-width="1.6"/>
-    <text class="sans f-red" x="95" y="132" font-size="13" text-anchor="middle" letter-spacing=".8">GOOD</text>
-    <text class="sans f-red" x="95" y="145" font-size="10.5" text-anchor="middle" letter-spacing=".3">COMPANY</text>
+  <!-- 좌상단 고무도장 -->
+  <g transform="rotate(-7 95 112)">
+    <circle cx="95" cy="112" r="50" class="s-red" fill="none" stroke-width="3.4"/>
+    <circle cx="95" cy="112" r="45" class="s-red" fill="none" stroke-width="1.2"/>
+    <circle cx="95" cy="112" r="31" class="s-red" fill="none" stroke-width="1.6"/>
+    <text class="sans f-red" font-size="13" letter-spacing="1.8">
+      <textPath href="#stamp-top" startOffset="50%" text-anchor="middle">GOOD FOOD</textPath>
+    </text>
+    <text class="sans f-red" font-size="13" letter-spacing="1.8">
+      <textPath href="#stamp-bot" startOffset="50%" text-anchor="middle">GOOD COMPANY</textPath>
+    </text>
+    <path d="M50 112 l4.5-5.5 4.5 5.5 -4.5 5.5 z" class="f-red"/>
+    <path d="M131 112 l4.5-5.5 4.5 5.5 -4.5 5.5 z" class="f-red"/>
+    <g transform="translate(95,113)">
+      <path d="M-15-4 C-15-12 -8-17 0-17 C8-17 15-12 15-4 Z" class="f-red"/>
+      <path d="M-16 0 H16" class="s-red" stroke-width="2.6" stroke-linecap="round"/>
+      <rect x="-14" y="4" width="28" height="5" rx="2.5" class="f-red"/>
+      <path d="M-15 12 H15 C15 16 12 18 9 18 H-9 C-12 18 -15 16 -15 12 Z" class="f-red"/>
+    </g>
   </g>
 
-  <!-- Better Together (중앙 500 기준) -->
+  <!-- 상단 문구 (편집 가능, 중앙 500 기준) -->
   <g>
-    <use href="#ic-note" class="f-red" transform="translate(330,96) rotate(-8) scale(1.05)"/>
-    <use href="#ic-spark" class="f-red" transform="translate(302,116) rotate(12) scale(.85)"/>
-    <text class="hand f-red" x="500" y="106" font-size="42" text-anchor="middle">Better Together !</text>
-    <use href="#ic-heart" class="f-red" transform="translate(672,90) rotate(14) scale(1.15)"/>
-    <use href="#ic-heart" class="f-red" transform="translate(698,110) rotate(-10) scale(.85)"/>
+    <use id="tagNote" href="#ic-note" class="f-red" transform="translate(330,96) rotate(-8) scale(1.05)"/>
+    <use id="tagSpark" href="#ic-spark" class="f-red" transform="translate(302,116) rotate(12) scale(.85)"/>
+    <text id="tagLine" class="hand f-red" x="500" y="106" font-size="42" text-anchor="middle">Better Together !</text>
+    <use id="tagHeart1" href="#ic-heart" class="f-red" transform="translate(672,90) rotate(14) scale(1.25)"/>
+    <use id="tagHeart2" href="#ic-heart" class="f-red" transform="translate(698,110) rotate(-10) scale(.9)"/>
   </g>
 
   <!-- Pairname (중앙 500 기준) -->
@@ -111,66 +132,11 @@
   </g>
 
   <!-- Same Table Different Stories -->
-  <g class="hand f-red" font-size="25" text-anchor="end" transform="rotate(2 988 114)">
-    <text x="988" y="76">Same</text>
-    <text x="988" y="102">Table</text>
-    <text x="988" y="128">Different</text>
-    <text x="988" y="154">Stories</text>
-  </g>
-
-  <!-- 강아지 스티커 -->
-  <g class="slot">
-    <g id="art-dog" transform="translate(14,190) rotate(-5 66 78)">
-      <path d="M29 36 q0-22 34-22 q34 0 34 22 z" class="f-paper s-red" stroke-width="3"/>
-      <path d="M45 17 v18 M63 14 v21 M81 17 v18" class="s-red" stroke-width="3"/>
-      <rect x="25" y="32" width="76" height="12" rx="6" class="f-red"/>
-      <ellipse cx="24" cy="74" rx="13" ry="24" class="f-paper s-red" stroke-width="3" transform="rotate(-24 24 74)"/>
-      <ellipse cx="102" cy="74" rx="13" ry="24" class="f-paper s-red" stroke-width="3" transform="rotate(24 102 74)"/>
-      <circle cx="63" cy="62" r="33" class="f-paper s-red" stroke-width="3"/>
-      <circle cx="51" cy="60" r="3.6" class="f-red"/>
-      <circle cx="76" cy="60" r="3.6" class="f-red"/>
-      <ellipse cx="39" cy="71" rx="7" ry="4.4" class="f-p1" fill-opacity=".5"/>
-      <ellipse cx="88" cy="71" rx="7" ry="4.4" class="f-p1" fill-opacity=".5"/>
-      <ellipse cx="63.5" cy="70" rx="4.4" ry="3.2" class="f-red"/>
-      <path d="M63.5 73 q-6 8 -12 2 M63.5 73 q6 8 12 2" class="s-red" fill="none" stroke-width="2.6"/>
-      <path d="M33 100 q0-9 11-9 h39 q11 0 11 9 v42 q0 9-11 9 h-39 q-11 0-11-9 z" class="f-paper s-red" stroke-width="3"/>
-      <path d="M46 93 v56 M63 91 v58 M80 93 v56" class="s-red" stroke-width="2.2" opacity=".8"/>
-      <path d="M63 100 l-14-8 v16 z M63 100 l14-8 v16 z" class="f-red"/>
-      <circle cx="63" cy="100" r="3.6" class="f-red"/>
-      <path d="M92 108 q18 2 20 14" class="s-red" fill="none" stroke-width="3"/>
-      <ellipse cx="99" cy="130" rx="32" ry="8.5" class="f-paper s-red" stroke-width="3"/>
-      <g transform="translate(99,116)">
-        <path d="M-19-1 a19 13 0 0 1 38 0 z" class="f-accent s-red" stroke-width="2.4"/>
-        <path d="M-20 3 q20 7 40 0" class="s-green-ink" fill="none" stroke-width="3"/>
-        <rect x="-18" y="4" width="36" height="7" rx="3.5" class="f-deep"/>
-        <path d="M-19 12 h38 a5 5 0 0 1-5 6 h-28 a5 5 0 0 1-5-6 z" class="f-accent s-red" stroke-width="2.2"/>
-      </g>
-    </g>
-    <image id="img-dog" class="slot-img" x="8" y="186" width="146" height="166" preserveAspectRatio="xMidYMid meet"/>
-  </g>
-
-  <!-- 음료컵 스티커 -->
-  <g class="slot">
-    <g id="art-cup" transform="translate(852,226) rotate(4 53 66)">
-      <path d="M62 10 L78 -26" class="s-red" fill="none" stroke-width="8" stroke-linecap="round"/>
-      <rect x="6" y="2" width="94" height="20" rx="9" class="f-red"/>
-      <path d="M12 24 L26 120 q1.4 8 9.4 8 H70 q8 0 9.4-8 L94 24 Z" class="f-paper s-red" stroke-width="3.4"/>
-      <path d="M17 58 H90 M20 84 H86" class="s-red" stroke-width="2.2" opacity=".45"/>
-      <text class="hand f-red" x="53" y="72" font-size="22" text-anchor="middle" transform="rotate(-6 53 72)">Sweet</text>
-      <text class="hand f-red" x="53" y="96" font-size="22" text-anchor="middle" transform="rotate(-6 53 96)">&amp; Cool</text>
-    </g>
-    <image id="img-cup" class="slot-img" x="844" y="196" width="126" height="162" preserveAspectRatio="xMidYMid meet"/>
-  </g>
-
-  <!-- 체리 스티커 -->
-  <g class="slot">
-    <g id="art-cherry" transform="translate(896,368) rotate(-9 25 26)">
-      <path d="M13 32 q4-24 21-28 M36 34 q2-22 -2-30" class="s-red" fill="none" stroke-width="3"/>
-      <path d="M31 4 q12-7 18 3" class="s-green-ink" fill="none" stroke-width="4" stroke-linecap="round"/>
-      <circle cx="12" cy="42" r="11" class="f-red"/>
-      <circle cx="37" cy="44" r="11" class="f-red"/>
-    </g>
-    <image id="img-cherry" class="slot-img" x="890" y="364" width="62" height="60" preserveAspectRatio="xMidYMid meet"/>
+  <g class="hand f-red" font-size="26" text-anchor="end" transform="rotate(2.5 902 120)">
+    <text x="955" y="78">Same</text>
+    <text x="955" y="106">Table</text>
+    <text x="955" y="134">Different</text>
+    <text x="955" y="162">Stories</text>
   </g>
 
   <!-- 사진 프레임 (중앙 500 기준) -->
@@ -182,13 +148,13 @@
     </g>
     <g id="photoHint">
       <g class="s-green-ink" fill="none" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="462" y="512" width="76" height="62" rx="9"/>
-        <circle cx="483" cy="532" r="5.5"/>
-        <path d="M467 566 l21-23 15 15 11-11 19 17"/>
-        <path d="M436 522 l-15-9 M434 548 l-17 3 M444 570 l-14 11 M564 522 l15-9 M566 548 l17 3 M556 570 l14 11"/>
+        <rect x="462" y="500" width="76" height="62" rx="9"/>
+        <circle cx="483" cy="520" r="5.5"/>
+        <path d="M467 554 l21-23 15 15 11-11 19 17"/>
+        <path d="M436 510 l-15-9 M434 536 l-17 3 M444 558 l-14 11 M564 510 l15-9 M566 536 l17 3 M556 558 l14 11"/>
       </g>
-      <text class="hand f-green-ink" x="500" y="622" font-size="38" text-anchor="middle">photo here!</text>
-      <use href="#ic-heart" class="f-green-ink" transform="translate(500,644) scale(1.2)"/>
+      <text class="hand f-green-ink" x="500" y="610" font-size="38" text-anchor="middle">photo here!</text>
+      <use href="#ic-heart" class="f-green-ink" transform="translate(500,632) scale(1.2)"/>
     </g>
     <rect x="170" y="278" width="660" height="590" rx="14" class="s-red" fill="none" stroke-width="5"/>
     <rect id="photoHit" x="170" y="278" width="660" height="590" rx="14" fill="none" pointer-events="all"/>
@@ -199,35 +165,24 @@
   </g>
 
   <!-- 영수증 : 왼쪽으로 흘려보내 잘리게 두고, 종이색을 채워 실물처럼 -->
-  <g transform="rotate(-4 76 545)">
-    <path class="f-shade" transform="translate(4,5)" d="M-20 400 l11 -7 l11 7 l11 -7 l11 7 l11 -7 l11 7 l11 -7 l11 7 l11 -7 l11 7 l11 -7 l11 7 l11 -7 l11 7 l11 -7 l11 7 V690 l-11 7 l-11 -7 l-11 7 l-11 -7 l-11 7 l-11 -7 l-11 7 l-11 -7 l-11 7 l-11 -7 l-11 7 l-11 -7 l-11 7 l-11 -7 l-11 7 l-11 -7 Z"/>
-    <path class="f-sheet" d="M-20 400 l11 -7 l11 7 l11 -7 l11 7 l11 -7 l11 7 l11 -7 l11 7 l11 -7 l11 7 l11 -7 l11 7 l11 -7 l11 7 l11 -7 l11 7 V690 l-11 7 l-11 -7 l-11 7 l-11 -7 l-11 7 l-11 -7 l-11 7 l-11 -7 l-11 7 l-11 -7 l-11 7 l-11 -7 l-11 7 l-11 -7 l-11 7 l-11 -7 Z"/>
-    <text class="sans f-red" x="28" y="448" font-size="17" letter-spacing=".6">TODAY'S MENU</text>
-    <path d="M26 458 H146" class="s-red" stroke-width="1.8"/>
-    <g class="sans f-red" font-size="12.5" letter-spacing="1">
-      <text x="28" y="484">LOVE</text><path d="M74 480 H130" class="s-red" stroke-width="1.6" stroke-dasharray="1.5 5"/><text x="146" y="484" text-anchor="end">1</text>
-      <text x="28" y="512">LAUGHTER</text><path d="M108 508 H130" class="s-red" stroke-width="1.6" stroke-dasharray="1.5 5"/><text x="146" y="512" text-anchor="end">1</text>
-      <text x="28" y="540">GOOD FOOD</text><path d="M116 536 H130" class="s-red" stroke-width="1.6" stroke-dasharray="1.5 5"/><text x="146" y="540" text-anchor="end">1</text>
-      <text x="28" y="568">YOU &amp; ME</text><path d="M106 564 H120" class="s-red" stroke-width="1.6" stroke-dasharray="1.5 5"/>
+  <g transform="rotate(-2.5 72 514)">
+    <path class="f-sheet" filter="url(#lift-sm)"
+          d="M-16 376 l11 -7 l11 7 l11 -7 l11 7 l11 -7 l11 7 l11 -7 l11 7 l11 -7 l11 7 l11 -7 l11 7 l11 -7 l11 7 l11 -7 l11 7 V652 l-11 7 l-11 -7 l-11 7 l-11 -7 l-11 7 l-11 -7 l-11 7 l-11 -7 l-11 7 l-11 -7 l-11 7 l-11 -7 l-11 7 l-11 -7 l-11 7 l-11 -7 Z"/>
+    <text class="sans f-red" x="20" y="424" font-size="16" letter-spacing=".5">TODAY'S MENU</text>
+    <path d="M18 434 H148" class="s-red" stroke-width="1.8"/>
+    <g class="sans f-red" font-size="12" letter-spacing="1">
+      <text x="20" y="460">LOVE</text><path d="M64 456 H128" class="s-red" stroke-width="1.6" stroke-dasharray="1.5 5"/><text x="148" y="460" text-anchor="end">1</text>
+      <text x="20" y="488">LAUGHTER</text><path d="M96 484 H128" class="s-red" stroke-width="1.6" stroke-dasharray="1.5 5"/><text x="148" y="488" text-anchor="end">1</text>
+      <text x="20" y="516">GOOD FOOD</text><path d="M104 512 H128" class="s-red" stroke-width="1.6" stroke-dasharray="1.5 5"/><text x="148" y="516" text-anchor="end">1</text>
+      <text x="20" y="544">YOU &amp; ME</text><path d="M94 540 H118" class="s-red" stroke-width="1.6" stroke-dasharray="1.5 5"/>
     </g>
-    <g class="s-red" fill="none" stroke-width="2.2" transform="translate(134,564)">
+    <g class="s-red" fill="none" stroke-width="2.2" transform="translate(136,540)">
       <circle cx="-4.6" cy="0" r="4.4"/><circle cx="4.6" cy="0" r="4.4"/>
     </g>
-    <path d="M26 590 H146" class="s-red" stroke-width="1.2" opacity=".45" stroke-dasharray="4 4"/>
-    <ellipse cx="84" cy="628" rx="56" ry="23" class="s-p1" fill="none" stroke-width="2" transform="rotate(-5 84 628)"/>
-    <text class="hand f-p1" x="80" y="636" font-size="24" text-anchor="middle" transform="rotate(-5 80 636)">Best Choice!</text>
-    <use href="#ic-heart" class="f-p1" transform="translate(141,616) rotate(12) scale(1)"/>
-  </g>
-
-  <!-- 케첩 스티커 -->
-  <g class="slot">
-    <g id="art-ketchup" transform="translate(44,700) rotate(7 42 87)">
-      <path d="M28 0 H56 a7 7 0 0 1 7 7 V22 H21 V7 A7 7 0 0 1 28 0 Z" class="f-red"/>
-      <rect x="24" y="22" width="36" height="14" class="f-red"/>
-      <path d="M24 36 q-20 16 -20 46 v58 q0 18 18 18 h40 q18 0 18-18 v-58 q0-30 -20-46 z" class="f-red"/>
-      <path d="M42 82 c-15-17 -32 2 -17 15 l17 17 17-17 c15-13 -2-32 -17-15 z" class="f-paper"/>
-    </g>
-    <image id="img-ketchup" class="slot-img" x="38" y="696" width="90" height="166" preserveAspectRatio="xMidYMid meet"/>
+    <path d="M18 566 H148" class="s-red" stroke-width="1.2" opacity=".45" stroke-dasharray="4 4"/>
+    <ellipse cx="76" cy="604" rx="56" ry="22" class="s-p1" fill="none" stroke-width="2" transform="rotate(-5 76 604)"/>
+    <text class="hand f-p1" x="72" y="612" font-size="23" text-anchor="middle" transform="rotate(-5 72 612)">Best Choice!</text>
+    <use href="#ic-heart" class="f-p1" transform="translate(128,598) rotate(12) scale(1)"/>
   </g>
 
   <!-- Good Food = Good Mood -->
@@ -245,9 +200,138 @@
     <path d="M-6 3 q6 7 12 0"/>
   </g>
 
+  <!-- 사원증 1 (왼쪽) : 사진 프레임 아래를 살짝 덮으며 얹힌다 -->
+  <g transform="rotate(-1.8 258 1076)">
+    <g filter="url(#lift)">
+      <rect x="38" y="842" width="440" height="468" rx="20" class="f-sheet"/>
+    </g>
+    <rect x="38" y="842" width="440" height="468" rx="20" class="s-p1" fill="none" stroke-width="3"/>
+    <rect x="225" y="864" width="66" height="14" rx="7" class="s-p1" fill="none" stroke-width="2.6"/>
+
+    <rect x="54" y="894" width="408" height="48" rx="10" class="f-p1"/>
+    <use href="#ic-star" class="f-on-p1" transform="translate(76,918) rotate(-10) scale(1.15)"/>
+    <text class="sans f-on-p1" x="96" y="924" font-size="16" letter-spacing="2.4">CREW MEMBER</text>
+    <text class="sans f-on-p1" x="446" y="924" font-size="14" text-anchor="end" letter-spacing="1">No.01</text>
+
+    <rect x="133" y="960" width="250" height="56" rx="28" class="s-p1" fill="none" stroke-width="2.6"/>
+    <text id="c1Name" class="hand f-p1" x="258" y="999" font-size="32" text-anchor="middle">character 1</text>
+
+    <g id="row-1a"><text class="sans lbl f-p1" x="84" y="1076">AGE</text><text class="sans lbl f-p1 colon" y="1076">:</text><path class="dash s-p1"/><text class="hand val f-p1" y="1070"></text></g>
+    <g id="row-1j"><text class="sans lbl f-p1" x="84" y="1128">JOB</text><text class="sans lbl f-p1 colon" y="1128">:</text><path class="dash s-p1"/><text class="hand val f-p1" y="1122"></text></g>
+    <g id="row-1l"><text class="sans lbl f-p1" x="84" y="1180">LIKE</text><text class="sans lbl f-p1 colon" y="1180">:</text><path class="dash s-p1"/><text class="hand val f-p1" y="1174"></text></g>
+
+    <g class="f-p1"><rect x="84" y="1224" width="3.2" height="34" rx=".6"/><rect x="90.4" y="1224" width="3.2" height="34" rx=".6"/><rect x="96.2" y="1224" width="4.4" height="34" rx=".6"/><rect x="103.8" y="1224" width="1.6" height="34" rx=".6"/><rect x="107.4" y="1224" width="4.4" height="34" rx=".6"/><rect x="114.4" y="1224" width="4.4" height="34" rx=".6"/><rect x="120.8" y="1224" width="1.6" height="34" rx=".6"/><rect x="125" y="1224" width="2.4" height="34" rx=".6"/><rect x="129.4" y="1224" width="1.6" height="34" rx=".6"/><rect x="134.2" y="1224" width="1.6" height="34" rx=".6"/><rect x="139" y="1224" width="3.2" height="34" rx=".6"/><rect x="144.8" y="1224" width="4.4" height="34" rx=".6"/><rect x="152.4" y="1224" width="1.6" height="34" rx=".6"/><rect x="157.2" y="1224" width="1.6" height="34" rx=".6"/><rect x="162" y="1224" width="1.6" height="34" rx=".6"/><rect x="165.6" y="1224" width="1.6" height="34" rx=".6"/><rect x="169.2" y="1224" width="1.6" height="34" rx=".6"/><rect x="174" y="1224" width="1.6" height="34" rx=".6"/><rect x="178.2" y="1224" width="2.4" height="34" rx=".6"/><rect x="183.2" y="1224" width="4.4" height="34" rx=".6"/><rect x="189.6" y="1224" width="4.4" height="34" rx=".6"/><rect x="196" y="1224" width="2.4" height="34" rx=".6"/><rect x="201" y="1224" width="1.6" height="34" rx=".6"/><rect x="205.8" y="1224" width="1.6" height="34" rx=".6"/><rect x="210" y="1224" width="2.4" height="34" rx=".6"/><rect x="215" y="1224" width="4.4" height="34" rx=".6"/><rect x="221.4" y="1224" width="2.4" height="34" rx=".6"/><rect x="226.4" y="1224" width="1.6" height="34" rx=".6"/><rect x="231.2" y="1224" width="2.4" height="34" rx=".6"/></g>
+    <text class="sans f-p1" x="432" y="1254" font-size="14" text-anchor="end" letter-spacing="1.4">ID 0001</text>
+
+    <use href="#ic-heart" class="f-p1" transform="translate(414,1170) rotate(14) scale(2)" fill-opacity=".28"/>
+    <use href="#ic-spark" class="f-accent" transform="translate(418,1104) rotate(8) scale(.95)"/>
+  </g>
+
+  <!-- 사원증 2 (오른쪽) -->
+  <g transform="rotate(1.8 742 1076)">
+    <g filter="url(#lift)">
+      <rect x="522" y="842" width="440" height="468" rx="20" class="f-sheet"/>
+    </g>
+    <rect x="522" y="842" width="440" height="468" rx="20" class="s-p2" fill="none" stroke-width="3"/>
+    <rect x="709" y="864" width="66" height="14" rx="7" class="s-p2" fill="none" stroke-width="2.6"/>
+
+    <rect x="538" y="894" width="408" height="48" rx="10" class="f-p2"/>
+    <use href="#ic-star" class="f-on-p2" transform="translate(560,918) rotate(10) scale(1.15)"/>
+    <text class="sans f-on-p2" x="580" y="924" font-size="16" letter-spacing="2.4">CREW MEMBER</text>
+    <text class="sans f-on-p2" x="930" y="924" font-size="14" text-anchor="end" letter-spacing="1">No.02</text>
+
+    <rect x="617" y="960" width="250" height="56" rx="28" class="s-p2" fill="none" stroke-width="2.6"/>
+    <text id="c2Name" class="hand f-p2" x="742" y="999" font-size="32" text-anchor="middle">character 2</text>
+
+    <g id="row-2a"><text class="sans lbl f-p2" x="568" y="1076">AGE</text><text class="sans lbl f-p2 colon" y="1076">:</text><path class="dash s-p2"/><text class="hand val f-p2" y="1070"></text></g>
+    <g id="row-2j"><text class="sans lbl f-p2" x="568" y="1128">JOB</text><text class="sans lbl f-p2 colon" y="1128">:</text><path class="dash s-p2"/><text class="hand val f-p2" y="1122"></text></g>
+    <g id="row-2l"><text class="sans lbl f-p2" x="568" y="1180">LIKE</text><text class="sans lbl f-p2 colon" y="1180">:</text><path class="dash s-p2"/><text class="hand val f-p2" y="1174"></text></g>
+
+    <g class="f-p2"><rect x="568" y="1224" width="1.6" height="34" rx=".6"/><rect x="572.8" y="1224" width="1.6" height="34" rx=".6"/><rect x="577" y="1224" width="1.6" height="34" rx=".6"/><rect x="581.2" y="1224" width="3.2" height="34" rx=".6"/><rect x="586.4" y="1224" width="1.6" height="34" rx=".6"/><rect x="591.2" y="1224" width="1.6" height="34" rx=".6"/><rect x="594.8" y="1224" width="1.6" height="34" rx=".6"/><rect x="598.4" y="1224" width="3.2" height="34" rx=".6"/><rect x="604.2" y="1224" width="3.2" height="34" rx=".6"/><rect x="610" y="1224" width="1.6" height="34" rx=".6"/><rect x="614.8" y="1224" width="1.6" height="34" rx=".6"/><rect x="619.6" y="1224" width="2.4" height="34" rx=".6"/><rect x="624.6" y="1224" width="1.6" height="34" rx=".6"/><rect x="628.8" y="1224" width="2.4" height="34" rx=".6"/><rect x="633.2" y="1224" width="3.2" height="34" rx=".6"/><rect x="638.4" y="1224" width="1.6" height="34" rx=".6"/><rect x="642" y="1224" width="1.6" height="34" rx=".6"/><rect x="645.6" y="1224" width="1.6" height="34" rx=".6"/><rect x="649.8" y="1224" width="3.2" height="34" rx=".6"/><rect x="655" y="1224" width="4.4" height="34" rx=".6"/><rect x="661.4" y="1224" width="3.2" height="34" rx=".6"/><rect x="667.8" y="1224" width="1.6" height="34" rx=".6"/><rect x="672.6" y="1224" width="1.6" height="34" rx=".6"/><rect x="676.8" y="1224" width="3.2" height="34" rx=".6"/><rect x="682" y="1224" width="3.2" height="34" rx=".6"/><rect x="687.8" y="1224" width="1.6" height="34" rx=".6"/><rect x="691.4" y="1224" width="2.4" height="34" rx=".6"/><rect x="697" y="1224" width="2.4" height="34" rx=".6"/><rect x="701.4" y="1224" width="1.6" height="34" rx=".6"/><rect x="705" y="1224" width="3.2" height="34" rx=".6"/><rect x="711.4" y="1224" width="4.4" height="34" rx=".6"/></g>
+    <text class="sans f-p2" x="916" y="1254" font-size="14" text-anchor="end" letter-spacing="1.4">ID 0002</text>
+
+    <use href="#ic-star" class="f-p2" transform="translate(898,1170) rotate(-12) scale(1.8)" fill-opacity=".35"/>
+    <use href="#ic-spark" class="f-p2" transform="translate(904,1106) rotate(-6) scale(.95)"/>
+  </g>
+
+  <!-- 스티커 6종. 옮긴 스티커가 사진·사원증 뒤로 숨지 않도록 가장 위에 그린다 -->
+  <!-- 곰 스티커 -->
+  <g class="slot">
+    <g id="art-dog" transform="translate(14,190) rotate(-5 67 88)">
+      <path d="M33 10 C45 10 54 20 52 33 C50 44 41 51 31 50 C19 49 12 39 14 27 C16 16 24 10 33 10 Z" class="f-paper s-red" stroke-width="3"/>
+      <path d="M101 10 C89 10 80 20 82 33 C84 44 93 51 103 50 C115 49 122 39 120 27 C118 16 110 10 101 10 Z" class="f-paper s-red" stroke-width="3"/>
+      <path d="M32 21 C39 21 43 27 42 34 C41 40 36 43 31 42 C25 41 22 36 23 30 C24 24 28 21 32 21 Z" class="f-p1" fill-opacity=".45"/>
+      <path d="M102 21 C95 21 91 27 92 34 C93 40 98 43 103 42 C109 41 112 36 111 30 C110 24 106 21 102 21 Z" class="f-p1" fill-opacity=".45"/>
+      <path d="M67 22 C94 22 113 40 113 63 C113 88 93 105 67 105 C41 105 21 88 21 63 C21 40 40 22 67 22 Z" class="f-paper s-red" stroke-width="3"/>
+      <ellipse cx="50" cy="64" rx="4.4" ry="5.2" class="f-red"/>
+      <ellipse cx="84" cy="64" rx="4.4" ry="5.2" class="f-red"/>
+      <ellipse cx="30" cy="79" rx="8" ry="5" class="f-p1" fill-opacity=".5"/>
+      <ellipse cx="104" cy="79" rx="8" ry="5" class="f-p1" fill-opacity=".5"/>
+      <path d="M67 70 C81 70 92 77 92 86 C92 96 80 102 67 102 C54 102 42 96 42 86 C42 77 53 70 67 70 Z" class="f-paper s-red" stroke-width="2.6"/>
+      <path d="M67 76 C72 76 76 80 76 84 C76 88 72 91 67 91 C62 91 58 88 58 84 C58 80 62 76 67 76 Z" class="f-red"/>
+      <path d="M67 91 L67 95 M67 95 C63 101 56 100 54 95 M67 95 C71 101 78 100 80 95" class="s-red" fill="none" stroke-width="2.4" stroke-linecap="round"/>
+      <path d="M37 42 C37 21 50 11 67 11 C84 11 97 21 97 42 C85 34 49 34 37 42 Z" class="f-paper s-red" stroke-width="3"/>
+      <path d="M53 15 C51 25 50 33 50 39 M67 11 C66 23 66 31 66 37 M81 15 C83 25 84 33 84 39" class="s-red" fill="none" stroke-width="2.6"/>
+      <path d="M36 42 C48 34 86 34 98 42 L96 53 C84 45 50 45 38 53 Z" class="f-red"/>
+      <path d="M45 120 C45 111 55 107 67 107 C79 107 89 111 89 120 L94 152 C96 162 89 168 81 168 L53 168 C45 168 38 162 40 152 Z" class="f-paper s-red" stroke-width="3"/>
+      <path d="M55 118 C55 114 61 112 67 112 C73 112 79 114 79 118 L83 157 C83 162 80 164 76 164 L58 164 C54 164 51 162 51 157 Z" class="f-sheet s-red" stroke-width="2.2"/>
+      <path d="M55 119 C47 123 43 129 42 136 M79 119 C87 123 91 129 92 136" class="s-red" fill="none" stroke-width="2.2"/>
+      <path d="M67 112 L55 105 L55 118 Z M67 112 L79 105 L79 118 Z" class="f-red"/>
+      <circle cx="67" cy="112" r="3.6" class="f-red"/>
+      <ellipse cx="47" cy="147" rx="9.5" ry="7.5" class="f-paper s-red" stroke-width="2.6" transform="rotate(-14 47 147)"/>
+      <ellipse cx="87" cy="147" rx="9.5" ry="7.5" class="f-paper s-red" stroke-width="2.6" transform="rotate(14 87 147)"/>
+      <g transform="translate(67,142)">
+        <path d="M-17-2 C-17-11 -9-16 0-16 C9-16 17-11 17-2 Z" class="f-accent s-red" stroke-width="2.4"/>
+        <path d="M-18 2 C-9 8 9 8 18 2" class="s-green-ink" fill="none" stroke-width="4"/>
+        <rect x="-16" y="3" width="32" height="6" rx="3" class="f-deep"/>
+        <path d="M-17 9 H17 C17 14 14 16 11 16 H-11 C-14 16 -17 14 -17 9 Z" class="f-accent s-red" stroke-width="2.4"/>
+      </g>
+    </g>
+    <image id="img-dog" class="slot-img" preserveAspectRatio="xMidYMid meet"/>
+    <rect id="hit-dog" class="slot-hit" fill="none" pointer-events="all"/>
+  </g>
+
+  <!-- 음료컵 스티커 -->
+  <g class="slot">
+    <g id="art-cup" transform="translate(852,226) rotate(4 53 66)">
+      <path d="M62 10 L78 -26" class="s-red" fill="none" stroke-width="8" stroke-linecap="round"/>
+      <rect x="6" y="2" width="94" height="20" rx="9" class="f-red"/>
+      <path d="M12 24 L26 120 q1.4 8 9.4 8 H70 q8 0 9.4-8 L94 24 Z" class="f-paper s-red" stroke-width="3.4"/>
+      <path d="M17 58 H90 M20 84 H86" class="s-red" stroke-width="2.2" opacity=".45"/>
+      <text class="hand f-red" x="53" y="72" font-size="22" text-anchor="middle" transform="rotate(-6 53 72)">Sweet</text>
+      <text class="hand f-red" x="53" y="96" font-size="22" text-anchor="middle" transform="rotate(-6 53 96)">&amp; Cool</text>
+    </g>
+    <image id="img-cup" class="slot-img" preserveAspectRatio="xMidYMid meet"/>
+    <rect id="hit-cup" class="slot-hit" fill="none" pointer-events="all"/>
+  </g>
+
+  <!-- 체리 스티커 -->
+  <g class="slot">
+    <g id="art-cherry" transform="translate(896,368) rotate(-9 25 26)">
+      <path d="M13 32 q4-24 21-28 M36 34 q2-22 -2-30" class="s-red" fill="none" stroke-width="3"/>
+      <path d="M31 4 q12-7 18 3" class="s-green-ink" fill="none" stroke-width="4" stroke-linecap="round"/>
+      <circle cx="12" cy="42" r="11" class="f-red"/>
+      <circle cx="37" cy="44" r="11" class="f-red"/>
+    </g>
+    <image id="img-cherry" class="slot-img" preserveAspectRatio="xMidYMid meet"/>
+    <rect id="hit-cherry" class="slot-hit" fill="none" pointer-events="all"/>
+  </g>
+
+  <!-- 케첩 스티커 -->
+  <g class="slot">
+    <g id="art-ketchup" transform="translate(44,664) rotate(7 42 87)">
+      <path d="M28 0 H56 a7 7 0 0 1 7 7 V22 H21 V7 A7 7 0 0 1 28 0 Z" class="f-red"/>
+      <rect x="24" y="22" width="36" height="14" class="f-red"/>
+      <path d="M24 36 q-20 16 -20 46 v58 q0 18 18 18 h40 q18 0 18-18 v-58 q0-30 -20-46 z" class="f-red"/>
+      <path d="M42 82 c-15-17 -32 2 -17 15 l17 17 17-17 c15-13 -2-32 -17-15 z" class="f-paper"/>
+    </g>
+    <image id="img-ketchup" class="slot-img" preserveAspectRatio="xMidYMid meet"/>
+    <rect id="hit-ketchup" class="slot-hit" fill="none" pointer-events="all"/>
+  </g>
+
   <!-- 감자튀김 스티커 -->
   <g class="slot">
-    <g id="art-fries" transform="translate(712,716) rotate(-6 42 68)">
+    <g id="art-fries" transform="translate(712,682) rotate(-6 42 68)">
       <g class="f-accent s-red" stroke-width="2.4">
         <rect x="13" y="8" width="14" height="52" rx="4" transform="rotate(-12 20 34)"/>
         <rect x="53" y="8" width="14" height="52" rx="4" transform="rotate(12 60 34)"/>
@@ -258,12 +342,13 @@
       <path d="M2 52 H82 L72 128 q-1 9 -10 9 H22 q-9 0-10-9 Z" fill="url(#pat-check-s)" class="s-red" stroke-width="3.4"/>
       <path d="M2 52 H82" class="s-red" stroke-width="3.4"/>
     </g>
-    <image id="img-fries" class="slot-img" x="705" y="712" width="100" height="146" preserveAspectRatio="xMidYMid meet"/>
+    <image id="img-fries" class="slot-img" preserveAspectRatio="xMidYMid meet"/>
+    <rect id="hit-fries" class="slot-hit" fill="none" pointer-events="all"/>
   </g>
 
   <!-- 햄버거 + 깃발 스티커 -->
   <g class="slot">
-    <g id="art-burger" transform="translate(786,712) rotate(3 84 90)">
+    <g id="art-burger" transform="translate(786,678) rotate(3 84 84)">
       <path d="M86 72 V6" class="s-red" fill="none" stroke-width="3"/>
       <path d="M86 4 H166 l-11 15 11 15 H86 Z" class="f-red"/>
       <text class="sans f-paper" x="124" y="16" font-size="10.5" text-anchor="middle" letter-spacing=".8">HAPPY</text>
@@ -284,72 +369,8 @@
         <path d="M-52 32 H52 a11 11 0 0 1-11 12 H-41 a11 11 0 0 1-11-12 Z" class="f-accent s-red" stroke-width="3"/>
       </g>
     </g>
-    <image id="img-burger" class="slot-img" x="780" y="708" width="176" height="160" preserveAspectRatio="xMidYMid meet"/>
-  </g>
-
-  <!-- 사원증 1 (왼쪽) -->
-  <g transform="rotate(-1.8 240 1115)">
-    <rect x="32" y="904" width="424" height="430" rx="18" class="f-shade"/>
-    <rect x="28" y="900" width="424" height="430" rx="18" class="f-sheet"/>
-    <rect x="28" y="900" width="424" height="430" rx="18" class="s-p1" fill="none" stroke-width="3"/>
-
-    <g transform="translate(240,0)"><path d="M-24 870 h48 a5 5 0 0 1 5 5 v20 a5 5 0 0 1 -5 5 h-48 a5 5 0 0 1 -5-5 v-20 a5 5 0 0 1 5-5 z" class="f-sheet"/><path d="M-24 870 h48 a5 5 0 0 1 5 5 v20 a5 5 0 0 1 -5 5 h-48 a5 5 0 0 1 -5-5 v-20 a5 5 0 0 1 5-5 z" class="s-p1" fill="none" stroke-width="2.6"/><path d="M-16 884 h32" class="s-p1" stroke-width="2.2" opacity=".6"/></g>
-    <rect x="206" y="916" width="68" height="14" rx="7" class="s-p1" fill="none" stroke-width="2.6"/>
-
-    <rect x="46" y="944" width="388" height="46" rx="10" class="f-p1"/>
-    <use href="#ic-star" class="f-sheet" transform="translate(74,967) rotate(-10) scale(1.15)"/>
-    <text class="sans f-sheet" x="96" y="973" font-size="16" letter-spacing="2.4">CREW MEMBER</text>
-    <text class="sans f-sheet" x="416" y="973" font-size="14" text-anchor="end" letter-spacing="1">No.01</text>
-
-    <rect x="120" y="1006" width="240" height="52" rx="26" class="s-p1" fill="none" stroke-width="2.6"/>
-    <text id="c1Name" class="hand f-red" x="240" y="1043" font-size="32" text-anchor="middle">character 1</text>
-
-    <g id="row-1a"><text class="sans lbl f-p1" x="72" y="1100">AGE</text><text class="sans lbl f-p1 colon" y="1100">:</text><path class="dash s-p1"/><text class="hand val f-red" y="1094"></text></g>
-    <g id="row-1j"><text class="sans lbl f-p1" x="72" y="1146">JOB</text><text class="sans lbl f-p1 colon" y="1146">:</text><path class="dash s-p1"/><text class="hand val f-red" y="1140"></text></g>
-    <g id="row-1l"><text class="sans lbl f-p1" x="72" y="1192">LIKE</text><text class="sans lbl f-p1 colon" y="1192">:</text><path class="dash s-p1"/><text class="hand val f-red" y="1186"></text></g>
-
-    <g class="f-p1"><rect x="72" y="1238" width="2.4" height="34" rx=".6"/><rect x="76.4" y="1238" width="3.2" height="34" rx=".6"/><rect x="82.8" y="1238" width="1.6" height="34" rx=".6"/><rect x="86.4" y="1238" width="4.4" height="34" rx=".6"/><rect x="92.8" y="1238" width="2.4" height="34" rx=".6"/><rect x="98.4" y="1238" width="1.6" height="34" rx=".6"/><rect x="103.2" y="1238" width="1.6" height="34" rx=".6"/><rect x="106.8" y="1238" width="1.6" height="34" rx=".6"/><rect x="111" y="1238" width="3.2" height="34" rx=".6"/><rect x="116.2" y="1238" width="1.6" height="34" rx=".6"/><rect x="119.8" y="1238" width="4.4" height="34" rx=".6"/><rect x="126.8" y="1238" width="1.6" height="34" rx=".6"/><rect x="131.6" y="1238" width="1.6" height="34" rx=".6"/><rect x="135.2" y="1238" width="4.4" height="34" rx=".6"/><rect x="141.6" y="1238" width="4.4" height="34" rx=".6"/><rect x="149.2" y="1238" width="3.2" height="34" rx=".6"/><rect x="154.4" y="1238" width="1.6" height="34" rx=".6"/><rect x="158" y="1238" width="4.4" height="34" rx=".6"/><rect x="164.4" y="1238" width="2.4" height="34" rx=".6"/><rect x="169.4" y="1238" width="1.6" height="34" rx=".6"/><rect x="174.2" y="1238" width="1.6" height="34" rx=".6"/><rect x="179" y="1238" width="2.4" height="34" rx=".6"/><rect x="184.6" y="1238" width="1.6" height="34" rx=".6"/><rect x="188.2" y="1238" width="4.4" height="34" rx=".6"/><rect x="195.8" y="1238" width="1.6" height="34" rx=".6"/><rect x="200" y="1238" width="1.6" height="34" rx=".6"/><rect x="204.8" y="1238" width="1.6" height="34" rx=".6"/><rect x="209.6" y="1238" width="1.6" height="34" rx=".6"/><rect x="214.4" y="1238" width="1.6" height="34" rx=".6"/><rect x="218.6" y="1238" width="4.4" height="34" rx=".6"/></g>
-    <text class="sans f-p1" x="408" y="1268" font-size="14" text-anchor="end" letter-spacing="1.4">ID 0001</text>
-
-    <use href="#ic-heart" class="f-p1" transform="translate(392,1180) rotate(14) scale(1.9)" fill-opacity=".3"/>
-    <use href="#ic-spark" class="f-accent" transform="translate(396,1120) rotate(8) scale(.95)"/>
-  </g>
-
-  <!-- 사원증 2 (오른쪽) -->
-  <g transform="rotate(1.8 760 1115)">
-    <rect x="552" y="904" width="424" height="430" rx="18" class="f-shade"/>
-    <rect x="548" y="900" width="424" height="430" rx="18" class="f-sheet"/>
-    <rect x="548" y="900" width="424" height="430" rx="18" class="s-p2" fill="none" stroke-width="3"/>
-
-    <g transform="translate(760,0)"><path d="M-24 870 h48 a5 5 0 0 1 5 5 v20 a5 5 0 0 1 -5 5 h-48 a5 5 0 0 1 -5-5 v-20 a5 5 0 0 1 5-5 z" class="f-sheet"/><path d="M-24 870 h48 a5 5 0 0 1 5 5 v20 a5 5 0 0 1 -5 5 h-48 a5 5 0 0 1 -5-5 v-20 a5 5 0 0 1 5-5 z" class="s-p2" fill="none" stroke-width="2.6"/><path d="M-16 884 h32" class="s-p2" stroke-width="2.2" opacity=".6"/></g>
-    <rect x="726" y="916" width="68" height="14" rx="7" class="s-p2" fill="none" stroke-width="2.6"/>
-
-    <rect x="566" y="944" width="388" height="46" rx="10" class="f-p2"/>
-    <use href="#ic-star" class="f-sheet" transform="translate(594,967) rotate(10) scale(1.15)"/>
-    <text class="sans f-sheet" x="616" y="973" font-size="16" letter-spacing="2.4">CREW MEMBER</text>
-    <text class="sans f-sheet" x="936" y="973" font-size="14" text-anchor="end" letter-spacing="1">No.02</text>
-
-    <rect x="640" y="1006" width="240" height="52" rx="26" class="s-p2" fill="none" stroke-width="2.6"/>
-    <text id="c2Name" class="hand f-p2" x="760" y="1043" font-size="32" text-anchor="middle">character 2</text>
-
-    <g id="row-2a"><text class="sans lbl f-p2" x="592" y="1100">AGE</text><text class="sans lbl f-p2 colon" y="1100">:</text><path class="dash s-p2"/><text class="hand val f-p2" y="1094"></text></g>
-    <g id="row-2j"><text class="sans lbl f-p2" x="592" y="1146">JOB</text><text class="sans lbl f-p2 colon" y="1146">:</text><path class="dash s-p2"/><text class="hand val f-p2" y="1140"></text></g>
-    <g id="row-2l"><text class="sans lbl f-p2" x="592" y="1192">LIKE</text><text class="sans lbl f-p2 colon" y="1192">:</text><path class="dash s-p2"/><text class="hand val f-p2" y="1186"></text></g>
-
-    <g class="f-p2"><rect x="592" y="1238" width="2.4" height="34" rx=".6"/><rect x="597" y="1238" width="4.4" height="34" rx=".6"/><rect x="604" y="1238" width="2.4" height="34" rx=".6"/><rect x="609" y="1238" width="1.6" height="34" rx=".6"/><rect x="612.6" y="1238" width="1.6" height="34" rx=".6"/><rect x="616.2" y="1238" width="4.4" height="34" rx=".6"/><rect x="623.2" y="1238" width="4.4" height="34" rx=".6"/><rect x="630.2" y="1238" width="2.4" height="34" rx=".6"/><rect x="635.8" y="1238" width="3.2" height="34" rx=".6"/><rect x="641.6" y="1238" width="4.4" height="34" rx=".6"/><rect x="648" y="1238" width="1.6" height="34" rx=".6"/><rect x="652.8" y="1238" width="3.2" height="34" rx=".6"/><rect x="658" y="1238" width="2.4" height="34" rx=".6"/><rect x="662.4" y="1238" width="3.2" height="34" rx=".6"/><rect x="668.2" y="1238" width="1.6" height="34" rx=".6"/><rect x="673" y="1238" width="1.6" height="34" rx=".6"/><rect x="677.8" y="1238" width="4.4" height="34" rx=".6"/><rect x="684.8" y="1238" width="2.4" height="34" rx=".6"/><rect x="690.4" y="1238" width="2.4" height="34" rx=".6"/><rect x="696" y="1238" width="3.2" height="34" rx=".6"/><rect x="702.4" y="1238" width="3.2" height="34" rx=".6"/><rect x="707.6" y="1238" width="1.6" height="34" rx=".6"/><rect x="711.8" y="1238" width="3.2" height="34" rx=".6"/><rect x="718.2" y="1238" width="1.6" height="34" rx=".6"/><rect x="721.8" y="1238" width="2.4" height="34" rx=".6"/><rect x="727.4" y="1238" width="4.4" height="34" rx=".6"/><rect x="735" y="1238" width="3.2" height="34" rx=".6"/><rect x="740.8" y="1238" width="3.2" height="34" rx=".6"/></g>
-    <text class="sans f-p2" x="928" y="1268" font-size="14" text-anchor="end" letter-spacing="1.4">ID 0002</text>
-
-    <use href="#ic-star" class="f-p2" transform="translate(910,1180) rotate(-12) scale(1.7)" fill-opacity=".4"/>
-    <use href="#ic-spark" class="f-p2" transform="translate(916,1122) rotate(-6) scale(.95)"/>
-  </g>
-
-  <!-- You + Me = Perfect : 두 사원증 사이를 잇는 중앙 문구 -->
-  <g class="hand f-p2" font-size="25" text-anchor="middle">
-    <text x="500" y="1046">You</text>
-    <text x="500" y="1086">+</text>
-    <text x="500" y="1124">Me</text>
-    <text x="500" y="1164">=</text>
-    <text x="500" y="1204">Perfect</text>
+    <image id="img-burger" class="slot-img" preserveAspectRatio="xMidYMid meet"/>
+    <rect id="hit-burger" class="slot-hit" fill="none" pointer-events="all"/>
   </g>
 
   <!-- 하단 (좌우 대칭, 가운데 줄은 JS가 폭을 재서 배치) -->
@@ -382,11 +403,12 @@
     <use href="#ic-star"  class="f-accent" transform="translate(22,676) rotate(-14) scale(.95)"/>
     <use href="#ic-star"  class="f-accent" transform="translate(146,812) rotate(-20) scale(1.25)"/>
     <use href="#ic-spark" class="f-p1"     transform="translate(20,786) rotate(10) scale(.9)"/>
+    <use href="#ic-spark" class="f-accent" transform="translate(14,336) rotate(-12) scale(.85)"/>
     <use href="#ic-heart" class="f-p1"     transform="translate(206,150) rotate(-12) scale(1.15)"/>
 
-    <use href="#ic-star"  class="f-accent" transform="translate(850,690) rotate(-16) scale(1.15)"/>
-    <use href="#ic-star"  class="f-accent" transform="translate(978,700) rotate(14) scale(.95)"/>
-    <use href="#ic-star"  class="f-accent" transform="translate(982,604) rotate(20) scale(1.25)"/>
+    <use href="#ic-star"  class="f-accent" transform="translate(982,700) rotate(-16) scale(1.15)"/>
+    <use href="#ic-star"  class="f-accent" transform="translate(976,606) rotate(14) scale(.95)"/>
+    <use href="#ic-star"  class="f-accent" transform="translate(986,800) rotate(-20) scale(1.25)"/>
     <use href="#ic-spark" class="f-p1"     transform="translate(866,436) rotate(-10) scale(.9)"/>
     <use href="#ic-star"  class="f-p1"     transform="translate(976,462) rotate(-18) scale(.95)"/>
   </g>
@@ -405,6 +427,8 @@
     <details class="sec" open>
       <summary>제목 &amp; 이름</summary>
       <div class="body">
+        <label class="fld"><span>상단 문구</span>
+          <input id="in-tag" type="text" maxlength="24" placeholder="Better Together !"></label>
         <label class="fld"><span>페어 이름</span>
           <input id="in-pair" type="text" maxlength="16" placeholder="Pairname"></label>
         <label class="fld"><span>캐릭터 1 이름</span>
@@ -470,7 +494,8 @@
     <details class="sec">
       <summary>스티커 바꾸기</summary>
       <div class="body">
-        <p class="hint">배경이 지워진 PNG를 올리면 해당 자리의 일러스트가 교체됩니다.</p>
+        <p class="hint">배경이 지워진 PNG를 올리면 해당 자리의 일러스트가 교체됩니다.
+          올린 뒤에는 포스터 위에서 끌어 옮기고, 아래 슬라이더로 크기를 맞출 수 있어요.</p>
         <div class="stickers" id="sticker-list"></div>
         <input id="in-sticker" type="file" accept="image/*" hidden>
       </div>
