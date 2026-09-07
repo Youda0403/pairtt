@@ -44,8 +44,12 @@ button, input { font: inherit; color: inherit; }
    여기서 display:none 규칙을 두면 인라인 해제 시 그 규칙이 이겨 사진이 사라진다. */
 /* 사진 영역에서만 스크롤 제스처를 막아 드래그·핀치가 가능하게 한다 */
 #poster #photoHit,
+#poster #c1Hit,
+#poster #c2Hit,
 #poster .slot-hit { touch-action: none; cursor: grab; }
 #poster #photoHit:active,
+#poster #c1Hit:active,
+#poster #c2Hit:active,
 #poster .slot-hit:active { cursor: grabbing; }
 
 /* ---------- 패널 ---------- */
@@ -87,6 +91,9 @@ button, input { font: inherit; color: inherit; }
 .fld input[type=text]:focus { outline: 2px solid #dfa79a; outline-offset: -1px; }
 .fld input[type=range] { width: 100%; accent-color: #c4362c; }
 .hint { font-size: 12px; opacity: .55; line-height: 1.5; margin-top: 6px; }
+.hint code { background: #f1e6d2; border-radius: 4px; padding: 0 3px; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0 10px; }
+.fld > span code { font-size: 11px; }
 
 /* ---------- 버튼 ---------- */
 .btn {
@@ -99,6 +106,7 @@ button, input { font: inherit; color: inherit; }
 .btn.primary { background: #c4362c; border-color: #c4362c; color: #fff; font-weight: 800; }
 .btn.primary[disabled] { opacity: .6; cursor: progress; }
 .btn.small { font-size: 13px; padding: 8px 12px; }
+.btn.wide { width: 100%; }
 .btn-row { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
 .btn-row .btn { flex: 1; }
 
@@ -107,7 +115,7 @@ button, input { font: inherit; color: inherit; }
 .toggle button.on { background: #c4362c; color: #fff; font-weight: 800; }
 
 /* ---------- 스티커 ---------- */
-.stickers { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.stickers { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
 .sticker {
   border: 1px solid #e2d5be; border-radius: 10px; background: #fff;
   padding: 8px; text-align: center;
@@ -152,7 +160,7 @@ button, input { font: inherit; color: inherit; }
   .app { grid-template-columns: 1fr; gap: 16px; padding: 12px 12px 92px; }
   .stage { position: static; }
   .stage-inner { max-width: 460px; }
-  .stickers { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .stickers { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .actions {
     position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;
     margin: 0; padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
