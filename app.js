@@ -24,17 +24,17 @@ const poster = $('#poster');
 
 /* 사진이 들어가는 세 자리. box 는 index.html 의 clip-path / hit 사각형과 같아야 한다. */
 const FRAMES = {
-  main: { box: { x: 210, y: 384, w: 580, h: 308 }, img: '#photoImg', hint: '#photoHint', hit: '#photoHit' },
-  c1:   { box: { x:  88, y: 842, w: 144, h: 170 }, img: '#c1Img',    hint: '#c1Hint',    hit: '#c1Hit'    },
-  c2:   { box: { x: 536, y: 842, w: 144, h: 170 }, img: '#c2Img',    hint: '#c2Hint',    hit: '#c2Hit'    },
+  main: { box: { x: 154, y: 364, w: 692, h: 336 }, img: '#photoImg', hint: '#photoHint', hit: '#photoHit' },
+  c1:   { box: { x:  90, y: 810, w: 148, h: 200 }, img: '#c1Img',    hint: '#c1Hint',    hit: '#c1Hit'    },
+  c2:   { box: { x: 534, y: 810, w: 148, h: 200 }, img: '#c2Img',    hint: '#c2Hint',    hit: '#c2Hit'    },
 };
 const framePic = k => (k === 'main' ? S.photo : S[k].img);
 
 /* 교체 가능한 일러스트. box = 교체 이미지가 놓이는 기본 자리(중심과 크기) */
 const SLOTS = [
-  { k: 'shake',  name: '밀크셰이크', box: { cx: 118, cy: 566, w: 130, h: 240 } },
-  { k: 'fries',  name: '감자튀김',   box: { cx: 937, cy: 614, w:  86, h: 124 } },
-  { k: 'burger', name: '햄버거',     box: { cx: 843, cy: 628, w: 172, h: 170 } },
+  { k: 'shake',  name: '밀크셰이크', box: { cx: 124, cy: 565, w: 130, h: 240 } },
+  { k: 'fries',  name: '감자튀김',   box: { cx: 926, cy: 630, w:  80, h: 118 } },
+  { k: 'burger', name: '햄버거',     box: { cx: 853, cy: 641, w: 164, h: 168 } },
 ];
 const SLOT_BY_K = Object.fromEntries(SLOTS.map(s => [s.k, s]));
 
@@ -54,7 +54,10 @@ const PRESETS = [
 ];
 
 /* 캐릭터 카드 행(NAME/AGE/JOB/LIKE)의 라벨 시작 x 와 점선 끝 x */
-const ROW_X = { c1: { left: 256, right: 470 }, c2: { left: 704, right: 918 } };
+const ROW_X = { c1: { left: 260, right: 468 }, c2: { left: 704, right: 912 } };
+/* 카드 머리 띠 / TODAY'S ORDER 띠가 시작하는 x (index.html 의 아이콘·글자 위치와 맞춘다) */
+const CARD_X = { c1: { head: 80, order: 90 }, c2: { head: 524, order: 534 } };
+const TAG_CX = 486;                   // 상단 문구 중심 (EST 배지 자리를 비워 둔다)
 const MENU_DEF = ['LOVE', 'LAUGHTER', 'GOOD FOOD', 'YOU & ME'];
 
 const newSticker = () => ({ src: null, scale: 1, dx: 0, dy: 0 });
@@ -278,28 +281,28 @@ function render() {
 
   /* --- 간판 --- */
   const tag = setText('#tagLine', S.tag.trim() || PH.tag);
-  fitText(tag, 560, 17);
+  fitText(tag, 540, 17);
   const tagHalf = textWidth(tag) / 2;
-  $('#tagStarL').setAttribute('transform', `translate(${CENTER - tagHalf - 22},66) scale(.9)`);
-  $('#tagStarR').setAttribute('transform', `translate(${CENTER + tagHalf + 22},66) scale(.9)`);
+  $('#tagStarL').setAttribute('transform', `translate(${TAG_CX - tagHalf - 22},54) scale(.9)`);
+  $('#tagStarR').setAttribute('transform', `translate(${TAG_CX + tagHalf + 22},54) scale(.9)`);
 
   fitText(setText('#estYear', S.est.trim() || PH.est), 96, 19);
 
   const main = $('#pairName'), shadow = $('#pairShadow');
   main.textContent = shadow.textContent = pair;
-  fitText(main, 730, 152);
+  fitText(main, 800, 168);
   shadow.style.fontSize = main.style.fontSize;
 
   const sub = setText('#bn-sub-t', S.sub.trim() || PH.sub);
-  fitText(sub, 480, 22);
-  ribbon('#bn-sub-p', CENTER, 279, textWidth(sub), 44, 34);
+  fitText(sub, 440, 19);
+  ribbon('#bn-sub-p', CENTER, 264, textWidth(sub), 38, 30);
 
-  starRibbon('#bn-sp-p', '#bn-sp-t', '#bn-sp-l', '#bn-sp-r', CENTER, 347, 420, 20);
-  starRibbon('#bn-pr-p', '#bn-pr-t', '#bn-pr-l', '#bn-pr-r', CENTER, 763, 420, 20);
+  starRibbon('#bn-sp-p', '#bn-sp-t', '#bn-sp-l', '#bn-sp-r', CENTER, 330, 430, 21);
+  starRibbon('#bn-pr-p', '#bn-pr-t', '#bn-pr-l', '#bn-pr-r', CENTER, 746, 430, 21);
 
   /* --- 캐릭터 카드 --- */
-  for (const [key, cardX, ord] of [['c1', 76, '#c1Order'], ['c2', 524, '#c2Order']]) {
-    const c = S[key], X = ROW_X[key], n = key === 'c1' ? 1 : 2;
+  for (const [key, ord] of [['c1', '#c1Order'], ['c2', '#c2Order']]) {
+    const c = S[key], X = ROW_X[key], CX = CARD_X[key], n = key === 'c1' ? 1 : 2;
     const other = key === 'c1' ? n2 : n1;
 
     layoutRow(`row-${n}n`, 'NAME', key === 'c1' ? n1 : n2, X.left, X.right);
@@ -309,14 +312,13 @@ function render() {
 
     // 머리 띠: 아이콘 + 글자 폭에 맞춰 깃발 크기를 잡는다
     const ht = $(`#bn-c${n}-t`);
-    tab(`#bn-c${n}-p`, cardX, 804, 40 + textWidth(ht) + 18, 36);
+    tab(`#bn-c${n}-p`, CX.head, 776, 40 + textWidth(ht) + 18, 36);
 
     // TODAY'S ORDER: 값이 비면 상대 이름이 들어간다
     const ot = $(`#bn-o${n}-t`);
-    const tabX = cardX + 12;
-    tab(`#bn-o${n}-p`, tabX, 1054, 12 + textWidth(ot) + 16, 32);
+    tab(`#bn-o${n}-p`, CX.order, 1050, 12 + textWidth(ot) + 16, 32);
     const ov = setText(ord, c.order.trim() || other);
-    ov.setAttribute('x', tabX + 12 + textWidth(ot) + 16 + 14 + 12);
+    ov.setAttribute('x', CX.order + 12 + textWidth(ot) + 16 + 14 + 12);
     fitText(ov, X.right - parseFloat(ov.getAttribute('x')) + 8, 27);
   }
 
@@ -327,10 +329,10 @@ function render() {
   const always = setText('#atText', S.always.trim() || PH.always);
   fitText(always, 420, 16);
   const aHalf = textWidth(always) / 2;
-  $('#atL').setAttribute('transform', `translate(${CENTER - aHalf - 20},1156) scale(1.1)`);
-  $('#atR').setAttribute('transform', `translate(${CENTER + aHalf + 20},1156) scale(1.1)`);
+  $('#atL').setAttribute('transform', `translate(${CENTER - aHalf - 20},1138) scale(1.1)`);
+  $('#atR').setAttribute('transform', `translate(${CENTER + aHalf + 20},1138) scale(1.1)`);
 
-  fitText(setText('#footText', S.foot.trim() || PH.foot), 660, 15);
+  fitText(setText('#footText', S.foot.trim() || PH.foot), 680, 15);
 
   Object.keys(FRAMES).forEach(placeFrame);
   SLOTS.forEach(s => placeSticker(s.k));
@@ -342,23 +344,23 @@ function renderMenu() {
   const g = $('#menu-rows');
   g.textContent = '';
   MENU_DEF.forEach((def, i) => {
-    const y = 1230 + i * 42;
-    const t = svgEl('text', { class: 'sans f-green', x: 292, y, 'font-size': 17, 'letter-spacing': 1.6 });
+    const y = 1212 + i * 44;
+    const t = svgEl('text', { class: 'sans f-green', x: 296, y, 'font-size': 18, 'letter-spacing': 1.6 });
     t.textContent = (S.menu[i] || '').trim() || def;
     g.appendChild(t);
-    fitText(t, 250, 17);
+    fitText(t, 250, 18);
 
     g.appendChild(svgEl('path', {
-      class: 's-green', d: `M${292 + textWidth(t) + 16} ${y - 5} H604`,
+      class: 's-green', d: `M${296 + textWidth(t) + 16} ${y - 5} H612`,
       'stroke-width': 1.6, 'stroke-dasharray': '2 7', 'stroke-linecap': 'round', opacity: .8,
     }));
 
     if (i < MENU_DEF.length - 1) {
-      const u = svgEl('use', { class: 'f-red', transform: `translate(628,${y - 6}) scale(1.2)` });
+      const u = svgEl('use', { class: 'f-red', transform: `translate(640,${y - 6}) scale(1.2)` });
       u.setAttribute('href', '#ic-heart');
       g.appendChild(u);
     } else {
-      const inf = svgEl('g', { class: 's-red', fill: 'none', 'stroke-width': 2.4, transform: `translate(628,${y - 6})` });
+      const inf = svgEl('g', { class: 's-red', fill: 'none', 'stroke-width': 2.4, transform: `translate(640,${y - 6})` });
       inf.appendChild(svgEl('circle', { cx: -5.5, cy: 0, r: 5 }));
       inf.appendChild(svgEl('circle', { cx: 5.5, cy: 0, r: 5 }));
       g.appendChild(inf);
@@ -371,10 +373,10 @@ function renderNote() {
   g.textContent = '';
   const lines = (S.note.trim() || PH.note).split('/').map(s => s.trim()).filter(Boolean).slice(0, 3);
   lines.forEach((line, i) => {
-    const t = svgEl('text', { x: 700, y: 1256 + i * 40 });
+    const t = svgEl('text', { x: 716, y: 1238 + i * 42 });
     t.textContent = line;
     g.appendChild(t);
-    fitText(t, 226, 27);
+    fitText(t, 210, 27);
   });
 }
 
@@ -933,7 +935,7 @@ async function init() {
   // 라틴 폰트가 준비된 뒤 렌더해야 글자 폭 측정이 정확하다. (한글은 쓰일 때만 받는다)
   try {
     await Promise.all([
-      document.fonts.load("152px 'PFDisplay'"),
+      document.fonts.load("168px 'PFDisplay'"),
       document.fonts.load("27px 'PFHand'"),
       document.fonts.load("17px 'PFSans'"),
     ]);
