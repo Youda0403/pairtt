@@ -25,8 +25,8 @@ const poster = $('#poster');
 /* 사진이 들어가는 세 자리. box 는 index.html 의 clip-path / hit 사각형과 같아야 한다. */
 const FRAMES = {
   main: { box: { x: 482, y: 280, w: 442, h: 294 }, img: '#photoImg', hint: '#photoHint', hit: '#photoHit' },
-  c1:   { box: { x:  64, y: 832, w: 168, h: 236 }, img: '#c1Img',    hint: '#c1Hint',    hit: '#c1Hit'    },
-  c2:   { box: { x: 522, y: 832, w: 168, h: 236 }, img: '#c2Img',    hint: '#c2Hint',    hit: '#c2Hit'    },
+  c1:   { box: { x:  88, y: 850, w: 126, h: 166 }, img: '#c1Img',    hint: '#c1Hint',    hit: '#c1Hit'    },
+  c2:   { box: { x: 564, y: 850, w: 126, h: 166 }, img: '#c2Img',    hint: '#c2Hint',    hit: '#c2Hit'    },
 };
 const framePic = k => (k === 'main' ? S.photo : S[k].img);
 
@@ -54,10 +54,10 @@ const PRESETS = [
 ];
 
 /* 캐릭터 한 항목이 쓰는 폭. x 는 항목 시작, dx 는 초상 오른쪽 글자 블록의 시작 */
-const COL_W = 414, DET_W = 226;
+const COL_W = 396, DET_W = 204;
 const CHARS = [
-  { key: 'c1', n: 1, x:  64, dx: 252 },
-  { key: 'c2', n: 2, x: 522, dx: 710 },
+  { key: 'c1', n: 1, x:  88, dx: 232 },
+  { key: 'c2', n: 2, x: 564, dx: 708 },
 ];
 const MENU_DEF = ['LOVE', 'LAUGHTER', 'GOOD FOOD', 'YOU & ME'];
 
@@ -277,16 +277,15 @@ function render() {
     const self  = key === 'c1' ? n1 : n2;
     const other = key === 'c1' ? n2 : n1;
 
-    tabLabel(`#bn-c${n}-p`, `#bn-c${n}-t`, x, 700, 32, x + 32);
-    fitText(setText(`#c${n}Name`, self), COL_W, 44);
+    fitText(setText(`#c${n}Name`, self), 320, 30);   // 이름 pill 안쪽 폭
 
     // 나이와 직업은 한 줄로 붙인다. 둘 다 비면 예시를 보여 준다
     const meta = [c.age.trim(), c.job.trim()].filter(Boolean).join('  ·  ');
-    fitText(setText(`#c${n}Meta`, meta || `${demo.age}  ·  ${demo.job}`), COL_W, 15);
+    fitText(setText(`#c${n}Meta`, meta || `${demo.age}  ·  ${demo.job}`), DET_W, 24);
 
-    fitText(setText(`#c${n}Like`, c.like.trim() || demo.like), DET_W, 27);
+    fitText(setText(`#c${n}Like`, c.like.trim() || demo.like), DET_W, 24);
     // TODAY'S PICK: 값이 비면 상대 이름이 들어간다
-    fitText(setText(`#c${n}Pick`, c.order.trim() || other), DET_W, 27);
+    fitText(setText(`#c${n}Pick`, c.order.trim() || other), DET_W, 24);
   }
 
   /* --- 오늘의 메뉴 --- */

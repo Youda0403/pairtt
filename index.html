@@ -27,6 +27,11 @@
       <feDropShadow dx="2" dy="6" stdDeviation="6" flood-color="#4a3a24" flood-opacity=".2"/>
     </filter>
 
+    <filter id="lift-card" x="-14%" y="-14%" width="132%" height="132%">
+      <feDropShadow dx="0" dy="14" stdDeviation="14" flood-color="#4a3a24" flood-opacity=".14"/>
+      <feDropShadow dx="2" dy="4"  stdDeviation="3"  flood-color="#4a3a24" flood-opacity=".22"/>
+    </filter>
+
     <pattern id="pat-check" width="24" height="24" patternUnits="userSpaceOnUse">
       <rect width="24" height="24" class="f-paper"/>
       <rect width="12" height="12" class="f-red"/>
@@ -54,8 +59,8 @@
     </pattern>
 
     <clipPath id="clip-photo"><rect x="482" y="280" width="442" height="294" rx="8"/></clipPath>
-    <clipPath id="clip-c1"><rect x="64" y="832" width="168" height="236" rx="8"/></clipPath>
-    <clipPath id="clip-c2"><rect x="522" y="832" width="168" height="236" rx="8"/></clipPath>
+    <clipPath id="clip-c1"><rect x="88"  y="850" width="126" height="166" rx="8"/></clipPath>
+    <clipPath id="clip-c2"><rect x="564" y="850" width="126" height="166" rx="8"/></clipPath>
     <clipPath id="clip-shake"><path d="M18 46 H98 L86 196 Q85 208 74 208 H42 Q31 208 30 196 Z"/></clipPath>
   </defs>
 
@@ -150,65 +155,166 @@
     <circle cx="500" cy="640" r="30" class="s-red" fill="none" stroke-width="2.4"/>
     <circle cx="500" cy="640" r="24" class="s-red" fill="none" stroke-width="1.2" stroke-dasharray="2 6" stroke-linecap="round"/>
     <use href="#ic-heart" class="f-red" transform="translate(500,638) scale(1.6)"/>
-    <path d="M500 690 V1062" class="s-red" fill="none" stroke-width="1.6" stroke-dasharray="2 8" stroke-linecap="round" opacity=".35"/>
   </g>
 
-  <!-- 캐릭터 01 : 메뉴판의 한 항목처럼 (상자 없음) -->
-  <g>
-    <path id="bn-c1-p" class="f-p1"/>
-    <use id="bn-c1-i" href="#ic-heart" class="f-on-p1" transform="translate(80,700)"/>
-    <text id="bn-c1-t" class="sans f-on-p1" x="96" y="705" font-size="14" letter-spacing="2.6">SPECIAL #01</text>
+  <!-- 캐릭터 01 : 다이너 사원증. 안쪽이 아래로 모이도록 살짝 기울인다 -->
+  <g transform="rotate(1.5 262 892)">
+    <g filter="url(#lift-card)">
+      <rect x="64" y="694" width="396" height="396" rx="16" class="f-sheet"/>
+    </g>
+    <rect x="64" y="694" width="396" height="396" rx="16" class="s-p1" fill="none" stroke-width="3"/>
+    <rect x="71" y="701" width="382" height="382" rx="11" class="s-p1" fill="none" stroke-width="1.2" opacity=".5"/>
 
-    <text id="c1Name" class="disp f-ink" x="64" y="770" font-size="44">character 1</text>
-    <text id="c1Meta" class="sans f-p1" x="64" y="800" font-size="15" letter-spacing="2.6">26 · BARISTA</text>
-    <path d="M64 816 H478" class="s-p1" fill="none" stroke-width="1.4" opacity=".55"/>
+    <!-- 목걸이 구멍. 종이색으로 채워 뒤의 메뉴판이 비쳐 보이게 한다 -->
+    <rect x="230" y="714" width="64" height="15" rx="7.5" class="f-paper"/>
+    <rect x="230" y="714" width="64" height="15" rx="7.5" class="s-p1" fill="none" stroke-width="2"/>
 
-    <rect x="64" y="832" width="168" height="236" rx="8" class="f-p1" fill-opacity=".16"/>
+    <rect x="88" y="742" width="348" height="44" rx="7" class="f-p1"/>
+    <use href="#ic-heart" class="f-on-p1" transform="translate(110,764) scale(.8)"/>
+    <text id="bn-c1-t" class="sans f-on-p1" x="128" y="770" font-size="17" letter-spacing="3.4">CREW MEMBER</text>
+    <text class="sans f-on-p1" x="422" y="770" font-size="15" text-anchor="end" letter-spacing="1.6">No.01</text>
+
+    <rect x="88" y="794" width="348" height="42" rx="21" class="s-p1" fill="none" stroke-width="2"/>
+    <text id="c1Name" class="hand f-p1" x="262" y="824" font-size="30" text-anchor="middle">character 1</text>
+
+    <rect x="88" y="850" width="126" height="166" rx="8" class="f-p1" fill-opacity=".14"/>
     <g clip-path="url(#clip-c1)"><image id="c1Img" preserveAspectRatio="none" style="display:none"/></g>
-    <g id="c1Hint" class="s-p1" fill="none" stroke-width="5" stroke-linecap="round" opacity=".5"
-       transform="translate(148,950)">
-      <circle cx="0" cy="-22" r="19"/>
-      <path d="M-33 34 C-33 7 -17 -3 0 -3 C17 -3 33 7 33 34"/>
+    <g id="c1Hint" class="s-p1" fill="none" stroke-width="5" stroke-linecap="round" opacity=".45"
+       transform="translate(151,947)">
+      <circle cx="0" cy="-25" r="17"/>
+      <path d="M-30 31 C-30 6 -15 -4 0 -4 C15 -4 30 6 30 31"/>
     </g>
-    <rect x="64" y="832" width="168" height="236" rx="8" class="s-p1" fill="none" stroke-width="2.4"/>
-    <rect id="c1Hit" x="64" y="832" width="168" height="236" rx="8" fill="none" pointer-events="all"/>
+    <rect x="88" y="850" width="126" height="166" rx="8" class="s-p1" fill="none" stroke-width="2"/>
+    <rect id="c1Hit" x="88" y="850" width="126" height="166" rx="8" fill="none" pointer-events="all"/>
 
-    <use href="#ic-heart" class="f-p1" transform="translate(259,872) scale(.85)"/>
-    <text class="sans f-p1" x="274" y="876" font-size="12" letter-spacing="2.6">LIKES</text>
-    <text id="c1Like" class="hand f-ink" x="252" y="912" font-size="27">Cheeseburger</text>
-    <path d="M252 942 H478" class="s-p1" fill="none" stroke-width="1.4" stroke-dasharray="2 7" stroke-linecap="round" opacity=".7"/>
-    <use href="#ic-star" class="f-p1" transform="translate(259,970) scale(.8)"/>
-    <text class="sans f-p1" x="274" y="974" font-size="12" letter-spacing="2.6">TODAY'S PICK</text>
-    <text id="c1Pick" class="hand f-p1" x="252" y="1010" font-size="27">character 2</text>
+    <text class="sans f-p1" x="232" y="868" font-size="12" letter-spacing="2.6">AGE / JOB</text>
+    <text id="c1Meta" class="hand f-ink" x="232" y="896" font-size="24">26 &#183; BARISTA</text>
+    <path d="M232 906 H436" class="s-p1" fill="none" stroke-width="1.2" stroke-dasharray="2 7" stroke-linecap="round" opacity=".7"/>
+    <text class="sans f-p1" x="232" y="932" font-size="12" letter-spacing="2.6">LIKES</text>
+    <text id="c1Like" class="hand f-ink" x="232" y="960" font-size="24">Cheeseburger</text>
+    <path d="M232 970 H436" class="s-p1" fill="none" stroke-width="1.2" stroke-dasharray="2 7" stroke-linecap="round" opacity=".7"/>
+    <text class="sans f-p1" x="232" y="996" font-size="12" letter-spacing="2.6">TODAY'S PICK</text>
+    <text id="c1Pick" class="hand f-p1" x="232" y="1024" font-size="24">character 2</text>
+
+    <g id="c1Bar">
+      <rect x="88.0" y="1050" width="1.6" height="22" class="f-p1"/>
+      <rect x="92.8" y="1050" width="1.6" height="22" class="f-p1"/>
+      <rect x="96.8" y="1050" width="1.6" height="22" class="f-p1"/>
+      <rect x="100.8" y="1050" width="3.2" height="22" class="f-p1"/>
+      <rect x="106.4" y="1050" width="3.2" height="22" class="f-p1"/>
+      <rect x="111.2" y="1050" width="1.6" height="22" class="f-p1"/>
+      <rect x="115.2" y="1050" width="1.6" height="22" class="f-p1"/>
+      <rect x="119.2" y="1050" width="3.2" height="22" class="f-p1"/>
+      <rect x="125.6" y="1050" width="1.6" height="22" class="f-p1"/>
+      <rect x="130.4" y="1050" width="3.2" height="22" class="f-p1"/>
+      <rect x="136.0" y="1050" width="1.6" height="22" class="f-p1"/>
+      <rect x="140.8" y="1050" width="1.6" height="22" class="f-p1"/>
+      <rect x="144.8" y="1050" width="1.6" height="22" class="f-p1"/>
+      <rect x="148.0" y="1050" width="1.6" height="22" class="f-p1"/>
+      <rect x="152.8" y="1050" width="4.4" height="22" class="f-p1"/>
+      <rect x="158.8" y="1050" width="3.2" height="22" class="f-p1"/>
+      <rect x="165.2" y="1050" width="1.6" height="22" class="f-p1"/>
+      <rect x="169.2" y="1050" width="1.6" height="22" class="f-p1"/>
+      <rect x="174.0" y="1050" width="1.6" height="22" class="f-p1"/>
+      <rect x="178.0" y="1050" width="3.2" height="22" class="f-p1"/>
+      <rect x="184.4" y="1050" width="1.6" height="22" class="f-p1"/>
+      <rect x="188.4" y="1050" width="1.6" height="22" class="f-p1"/>
+      <rect x="193.2" y="1050" width="1.6" height="22" class="f-p1"/>
+      <rect x="197.2" y="1050" width="2.4" height="22" class="f-p1"/>
+      <rect x="201.2" y="1050" width="3.2" height="22" class="f-p1"/>
+      <rect x="207.6" y="1050" width="1.6" height="22" class="f-p1"/>
+      <rect x="210.8" y="1050" width="2.4" height="22" class="f-p1"/>
+      <rect x="214.8" y="1050" width="2.4" height="22" class="f-p1"/>
+      <rect x="220.4" y="1050" width="4.4" height="22" class="f-p1"/>
+      <rect x="227.2" y="1050" width="4.4" height="22" class="f-p1"/>
+      <rect x="234.8" y="1050" width="1.6" height="22" class="f-p1"/>
+      <rect x="238.8" y="1050" width="2.4" height="22" class="f-p1"/>
+      <rect x="244.4" y="1050" width="3.2" height="22" class="f-p1"/>
+      <rect x="250.8" y="1050" width="3.2" height="22" class="f-p1"/>
+      <rect x="257.2" y="1050" width="1.6" height="22" class="f-p1"/>
+      <rect x="261.2" y="1050" width="1.6" height="22" class="f-p1"/>
+      <rect x="266.0" y="1050" width="3.2" height="22" class="f-p1"/>
+      <rect x="271.6" y="1050" width="1.6" height="22" class="f-p1"/>
+    </g>
+    <text class="sans f-p1" x="436" y="1069" font-size="13" text-anchor="end" letter-spacing="2">ID 0001</text>
   </g>
 
-  <!-- 캐릭터 02 : 01 을 458 만큼 옮긴 자리 -->
-  <g>
-    <path id="bn-c2-p" class="f-p2"/>
-    <use id="bn-c2-i" href="#ic-star" class="f-on-p2" transform="translate(538,700) scale(.9)"/>
-    <text id="bn-c2-t" class="sans f-on-p2" x="554" y="705" font-size="14" letter-spacing="2.6">SPECIAL #02</text>
-
-    <text id="c2Name" class="disp f-ink" x="522" y="770" font-size="44">character 2</text>
-    <text id="c2Meta" class="sans f-p2" x="522" y="800" font-size="15" letter-spacing="2.6">28 · DESIGNER</text>
-    <path d="M522 816 H936" class="s-p2" fill="none" stroke-width="1.4" opacity=".55"/>
-
-    <rect x="522" y="832" width="168" height="236" rx="8" class="f-p2" fill-opacity=".16"/>
-    <g clip-path="url(#clip-c2)"><image id="c2Img" preserveAspectRatio="none" style="display:none"/></g>
-    <g id="c2Hint" class="s-p2" fill="none" stroke-width="5" stroke-linecap="round" opacity=".5"
-       transform="translate(606,950)">
-      <circle cx="0" cy="-22" r="19"/>
-      <path d="M-33 34 C-33 7 -17 -3 0 -3 C17 -3 33 7 33 34"/>
+  <!-- 캐릭터 02 : 01 을 476 만큼 옮기고 기울기만 뒤집은 자리 -->
+  <g transform="rotate(-1.5 738 892)">
+    <g filter="url(#lift-card)">
+      <rect x="540" y="694" width="396" height="396" rx="16" class="f-sheet"/>
     </g>
-    <rect x="522" y="832" width="168" height="236" rx="8" class="s-p2" fill="none" stroke-width="2.4"/>
-    <rect id="c2Hit" x="522" y="832" width="168" height="236" rx="8" fill="none" pointer-events="all"/>
+    <rect x="540" y="694" width="396" height="396" rx="16" class="s-p2" fill="none" stroke-width="3"/>
+    <rect x="547" y="701" width="382" height="382" rx="11" class="s-p2" fill="none" stroke-width="1.2" opacity=".5"/>
 
-    <use href="#ic-heart" class="f-p2" transform="translate(717,872) scale(.85)"/>
-    <text class="sans f-p2" x="732" y="876" font-size="12" letter-spacing="2.6">LIKES</text>
-    <text id="c2Like" class="hand f-ink" x="710" y="912" font-size="27">Strawberry shake</text>
-    <path d="M710 942 H936" class="s-p2" fill="none" stroke-width="1.4" stroke-dasharray="2 7" stroke-linecap="round" opacity=".7"/>
-    <use href="#ic-star" class="f-p2" transform="translate(717,970) scale(.8)"/>
-    <text class="sans f-p2" x="732" y="974" font-size="12" letter-spacing="2.6">TODAY'S PICK</text>
-    <text id="c2Pick" class="hand f-p2" x="710" y="1010" font-size="27">character 1</text>
+    <rect x="706" y="714" width="64" height="15" rx="7.5" class="f-paper"/>
+    <rect x="706" y="714" width="64" height="15" rx="7.5" class="s-p2" fill="none" stroke-width="2"/>
+
+    <rect x="564" y="742" width="348" height="44" rx="7" class="f-p2"/>
+    <use href="#ic-star" class="f-on-p2" transform="translate(586,764) scale(.8)"/>
+    <text id="bn-c2-t" class="sans f-on-p2" x="604" y="770" font-size="17" letter-spacing="3.4">CREW MEMBER</text>
+    <text class="sans f-on-p2" x="898" y="770" font-size="15" text-anchor="end" letter-spacing="1.6">No.02</text>
+
+    <rect x="564" y="794" width="348" height="42" rx="21" class="s-p2" fill="none" stroke-width="2"/>
+    <text id="c2Name" class="hand f-p2" x="738" y="824" font-size="30" text-anchor="middle">character 2</text>
+
+    <rect x="564" y="850" width="126" height="166" rx="8" class="f-p2" fill-opacity=".14"/>
+    <g clip-path="url(#clip-c2)"><image id="c2Img" preserveAspectRatio="none" style="display:none"/></g>
+    <g id="c2Hint" class="s-p2" fill="none" stroke-width="5" stroke-linecap="round" opacity=".45"
+       transform="translate(627,947)">
+      <circle cx="0" cy="-25" r="17"/>
+      <path d="M-30 31 C-30 6 -15 -4 0 -4 C15 -4 30 6 30 31"/>
+    </g>
+    <rect x="564" y="850" width="126" height="166" rx="8" class="s-p2" fill="none" stroke-width="2"/>
+    <rect id="c2Hit" x="564" y="850" width="126" height="166" rx="8" fill="none" pointer-events="all"/>
+
+    <text class="sans f-p2" x="708" y="868" font-size="12" letter-spacing="2.6">AGE / JOB</text>
+    <text id="c2Meta" class="hand f-ink" x="708" y="896" font-size="24">28 &#183; DESIGNER</text>
+    <path d="M708 906 H912" class="s-p2" fill="none" stroke-width="1.2" stroke-dasharray="2 7" stroke-linecap="round" opacity=".7"/>
+    <text class="sans f-p2" x="708" y="932" font-size="12" letter-spacing="2.6">LIKES</text>
+    <text id="c2Like" class="hand f-ink" x="708" y="960" font-size="24">Strawberry shake</text>
+    <path d="M708 970 H912" class="s-p2" fill="none" stroke-width="1.2" stroke-dasharray="2 7" stroke-linecap="round" opacity=".7"/>
+    <text class="sans f-p2" x="708" y="996" font-size="12" letter-spacing="2.6">TODAY'S PICK</text>
+    <text id="c2Pick" class="hand f-p2" x="708" y="1024" font-size="24">character 1</text>
+
+    <g id="c2Bar">
+      <rect x="564.0" y="1050" width="1.6" height="22" class="f-p2"/>
+      <rect x="567.2" y="1050" width="1.6" height="22" class="f-p2"/>
+      <rect x="571.2" y="1050" width="1.6" height="22" class="f-p2"/>
+      <rect x="576.0" y="1050" width="2.4" height="22" class="f-p2"/>
+      <rect x="580.8" y="1050" width="4.4" height="22" class="f-p2"/>
+      <rect x="586.8" y="1050" width="4.4" height="22" class="f-p2"/>
+      <rect x="592.8" y="1050" width="4.4" height="22" class="f-p2"/>
+      <rect x="600.4" y="1050" width="1.6" height="22" class="f-p2"/>
+      <rect x="604.4" y="1050" width="3.2" height="22" class="f-p2"/>
+      <rect x="610.8" y="1050" width="4.4" height="22" class="f-p2"/>
+      <rect x="617.6" y="1050" width="4.4" height="22" class="f-p2"/>
+      <rect x="624.4" y="1050" width="4.4" height="22" class="f-p2"/>
+      <rect x="631.2" y="1050" width="1.6" height="22" class="f-p2"/>
+      <rect x="634.4" y="1050" width="2.4" height="22" class="f-p2"/>
+      <rect x="639.2" y="1050" width="2.4" height="22" class="f-p2"/>
+      <rect x="644.0" y="1050" width="3.2" height="22" class="f-p2"/>
+      <rect x="650.4" y="1050" width="1.6" height="22" class="f-p2"/>
+      <rect x="655.2" y="1050" width="1.6" height="22" class="f-p2"/>
+      <rect x="658.4" y="1050" width="1.6" height="22" class="f-p2"/>
+      <rect x="661.6" y="1050" width="1.6" height="22" class="f-p2"/>
+      <rect x="665.6" y="1050" width="1.6" height="22" class="f-p2"/>
+      <rect x="668.8" y="1050" width="4.4" height="22" class="f-p2"/>
+      <rect x="676.4" y="1050" width="2.4" height="22" class="f-p2"/>
+      <rect x="682.0" y="1050" width="4.4" height="22" class="f-p2"/>
+      <rect x="688.0" y="1050" width="3.2" height="22" class="f-p2"/>
+      <rect x="693.6" y="1050" width="4.4" height="22" class="f-p2"/>
+      <rect x="700.4" y="1050" width="4.4" height="22" class="f-p2"/>
+      <rect x="707.2" y="1050" width="2.4" height="22" class="f-p2"/>
+      <rect x="712.0" y="1050" width="1.6" height="22" class="f-p2"/>
+      <rect x="716.0" y="1050" width="3.2" height="22" class="f-p2"/>
+      <rect x="722.4" y="1050" width="4.4" height="22" class="f-p2"/>
+      <rect x="728.4" y="1050" width="3.2" height="22" class="f-p2"/>
+      <rect x="734.0" y="1050" width="3.2" height="22" class="f-p2"/>
+      <rect x="740.4" y="1050" width="4.4" height="22" class="f-p2"/>
+      <rect x="747.2" y="1050" width="3.2" height="22" class="f-p2"/>
+    </g>
+    <text class="sans f-p2" x="912" y="1069" font-size="13" text-anchor="end" letter-spacing="2">ID 0002</text>
   </g>
 
   <!-- 오늘의 메뉴 : 상자를 없애고 괘선 + 한 줄로 압축 -->
