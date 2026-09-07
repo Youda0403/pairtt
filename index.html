@@ -53,204 +53,194 @@
       </g>
     </pattern>
 
-    <clipPath id="clip-photo"><rect x="154" y="364" width="692" height="336" rx="10"/></clipPath>
-    <clipPath id="clip-c1"><rect x="90" y="810" width="148" height="200" rx="10"/></clipPath>
-    <clipPath id="clip-c2"><rect x="534" y="810" width="148" height="200" rx="10"/></clipPath>
+    <clipPath id="clip-photo"><rect x="482" y="280" width="442" height="294" rx="8"/></clipPath>
+    <clipPath id="clip-c1"><rect x="64" y="832" width="168" height="236" rx="8"/></clipPath>
+    <clipPath id="clip-c2"><rect x="522" y="832" width="168" height="236" rx="8"/></clipPath>
     <clipPath id="clip-shake"><path d="M18 46 H98 L86 196 Q85 208 74 208 H42 Q31 208 30 196 Z"/></clipPath>
   </defs>
 
   <rect width="1000" height="1500" class="f-paper"/>
   <rect width="1000" height="1500" fill="url(#pat-grain)"/>
 
-  <rect x="0" y="0" width="1000" height="26" fill="url(#pat-check)"/>
-  <rect x="0" y="1474" width="1000" height="26" fill="url(#pat-check)"/>
+  <rect x="0" y="0" width="1000" height="24" fill="url(#pat-check)"/>
+  <rect x="0" y="1476" width="1000" height="24" fill="url(#pat-check)"/>
 
-  <!-- 상단 문구 + EST 배지 (기둥 오른쪽 끝 936 에 정렬) -->
+  <!-- 머리 괘선 : 상단 문구와 전표 번호를 한 줄에 묶는다 -->
   <g>
-    <use id="tagStarL" href="#ic-star" class="f-red" transform="translate(300,54) scale(.9)"/>
-    <text id="tagLine" class="sans f-green" x="486" y="60" font-size="17" text-anchor="middle" letter-spacing="3">GOOD FOOD • GOOD FRIENDS • BETTER DAYS</text>
-    <use id="tagStarR" href="#ic-star" class="f-red" transform="translate(672,54) scale(.9)"/>
-    <path d="M288 78 Q486 102 684 78" class="s-green" fill="none" stroke-width="5" stroke-linecap="round"/>
-    <path d="M320 88 Q486 106 652 88" class="s-green" fill="none" stroke-width="2" stroke-linecap="round" opacity=".7"/>
-
-    <rect x="814" y="36" width="122" height="58" rx="29" class="s-green" fill="none" stroke-width="3"/>
-    <text class="sans f-green" x="875" y="60" font-size="13" text-anchor="middle" letter-spacing="2.4">EST.</text>
-    <text id="estYear" class="sans f-green" x="875" y="82" font-size="19" text-anchor="middle" letter-spacing="1.6">20XX</text>
+    <text id="tagLine" class="sans f-green" x="64" y="64" font-size="16" letter-spacing="3">GOOD FOOD • GOOD FRIENDS • BETTER DAYS</text>
+    <text class="sans f-red" x="936" y="64" font-size="13" text-anchor="end" letter-spacing="2.6">ORDER No. 042</text>
+    <path d="M64 84 H936" class="s-red" fill="none" stroke-width="2" opacity=".5"/>
   </g>
 
-  <!-- 페어명 : 다이너 간판처럼 (그린 그림자 + 크림 아웃라인 + 레드) -->
+  <!-- 로고 락업 : 페어명 + 부제 + 오른쪽으로 뻗는 괘선 -->
   <g>
-    <text id="pairShadow" class="disp f-green s-green" x="507" y="233" font-size="168" text-anchor="middle"
-          paint-order="stroke" stroke-width="13" stroke-linejoin="round">Pairname</text>
-    <text id="pairName" class="disp f-red s-paper" x="500" y="226" font-size="168" text-anchor="middle"
-          paint-order="stroke" stroke-width="17" stroke-linejoin="round">Pairname</text>
+    <text id="pairShadow" class="disp f-green s-green" x="71" y="203" font-size="104"
+          paint-order="stroke" stroke-width="10" stroke-linejoin="round">Pairname</text>
+    <text id="pairName" class="disp f-red s-paper" x="64" y="196" font-size="104"
+          paint-order="stroke" stroke-width="12" stroke-linejoin="round">Pairname</text>
+    <text id="bn-sub-t" class="sans f-red" x="68" y="250" font-size="17" letter-spacing="6">DINER &amp; GRILL</text>
+    <path id="bn-sub-r" class="s-red" fill="none" stroke-width="1.6" opacity=".55"/>
   </g>
 
-  <!-- DINER &amp; GRILL 리본 : 타이틀 디센더에 걸치는 부제 -->
-  <g>
-    <path id="bn-sub-p" class="f-red"/>
-    <text id="bn-sub-t" class="sans f-on-red" x="500" y="271" font-size="19" text-anchor="middle" letter-spacing="5">DINER &amp; GRILL</text>
+  <!-- EST 씰 : 머리 괘선을 뚫고 앉는다 -->
+  <g transform="rotate(-5 866 142)">
+    <circle cx="866" cy="142" r="56" class="f-paper"/>
+    <circle cx="866" cy="142" r="56" class="s-green" fill="none" stroke-width="2.6"/>
+    <circle cx="866" cy="142" r="47" class="s-green" fill="none" stroke-width="1.2" stroke-dasharray="2 6" stroke-linecap="round"/>
+    <text class="sans f-green" x="866" y="122" font-size="12" text-anchor="middle" letter-spacing="3">EST.</text>
+    <text id="estYear" class="sans f-green" x="866" y="160" font-size="30" text-anchor="middle" letter-spacing="1.4">20XX</text>
+    <use href="#ic-star" class="f-accent" transform="translate(866,178) scale(.62)"/>
   </g>
 
-  <!-- 메인 사진 카드 (기둥 안에서 720 폭, 장식이 올라탄다) -->
+  <!-- 메인 사진 : 오른쪽에만 놓아 세로 지배력을 줄인다 -->
   <g id="photoBlock">
     <g filter="url(#lift)">
-      <rect x="140" y="346" width="720" height="368" rx="18" class="f-sheet"/>
+      <rect x="470" y="268" width="466" height="318" rx="14" class="f-sheet"/>
     </g>
-    <rect x="140" y="346" width="720" height="368" rx="18" class="s-red" fill="none" stroke-width="3.5"/>
-    <rect x="147" y="353" width="706" height="354" rx="13" class="s-red" fill="none" stroke-width="1.2" opacity=".75"/>
-    <rect x="154" y="364" width="692" height="336" rx="10" class="f-glight"/>
+    <rect x="470" y="268" width="466" height="318" rx="14" class="s-red" fill="none" stroke-width="3.5"/>
+    <rect x="477" y="275" width="452" height="304" rx="10" class="s-red" fill="none" stroke-width="1.2" opacity=".7"/>
+    <rect x="482" y="280" width="442" height="294" rx="8" class="f-glight"/>
     <g clip-path="url(#clip-photo)">
       <image id="photoImg" preserveAspectRatio="none" style="display:none"/>
     </g>
     <g id="photoHint">
       <g class="s-green" fill="none" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity=".8">
-        <rect x="466" y="477" width="68" height="56" rx="8"/>
-        <circle cx="485" cy="495" r="5"/>
-        <path d="M470 526 l19-21 13 13 10-10 17 15"/>
-        <path d="M444 485 l-13-8 M442 509 l-15 3 M450 529 l-12 10 M556 485 l13-8 M558 509 l15 3 M550 529 l12 10"/>
+        <rect x="669" y="404" width="68" height="56" rx="8"/>
+        <circle cx="688" cy="422" r="5"/>
+        <path d="M673 453 l19-21 13 13 10-10 17 15"/>
+        <path d="M647 412 l-13-8 M645 436 l-15 3 M653 456 l-12 10 M759 412 l13-8 M761 436 l15 3 M753 456 l12 10"/>
       </g>
-      <text class="hand f-green" x="500" y="577" font-size="34" text-anchor="middle">photo here!</text>
-      <use href="#ic-heart" class="f-green" transform="translate(500,597) scale(1.1)"/>
+      <text class="hand f-green" x="703" y="504" font-size="34" text-anchor="middle">photo here!</text>
+      <use href="#ic-heart" class="f-green" transform="translate(703,524) scale(1.1)"/>
     </g>
-    <rect x="154" y="364" width="692" height="336" rx="10" class="s-red" fill="none" stroke-width="2.6"/>
-    <rect id="photoHit" x="154" y="364" width="692" height="336" rx="10" fill="none" pointer-events="all"/>
+    <rect x="482" y="280" width="442" height="294" rx="8" class="s-red" fill="none" stroke-width="2.4"/>
+    <rect id="photoHit" x="482" y="280" width="442" height="294" rx="8" fill="none" pointer-events="all"/>
   </g>
 
-  <!-- TODAY'S SPECIAL 배너 : 사진 카드 위 가장자리에 얹힌다 -->
+  <!-- 마스킹 테이프 : 사진 오른쪽 위 모서리를 물고 기둥 밖으로 나간다 -->
+  <g transform="rotate(24 928 272)">
+    <rect x="878" y="258" width="100" height="26" fill="url(#pat-tape)"/>
+    <rect x="878" y="258" width="100" height="26" class="s-p1" fill="none" stroke-width="1" opacity=".45"/>
+  </g>
+
+  <!-- TODAY'S SPECIAL 깃발 : 끝이 사진 테두리에 닿는다 -->
   <g>
     <path id="bn-sp-p" class="f-red"/>
-    <use id="bn-sp-l" href="#ic-star" class="f-accent" transform="translate(400,333) scale(.85)"/>
-    <text id="bn-sp-t" class="sans f-on-red" x="500" y="340" font-size="21" text-anchor="middle" letter-spacing="4">TODAY'S SPECIAL</text>
-    <use id="bn-sp-r" href="#ic-star" class="f-accent" transform="translate(600,333) scale(.85)"/>
+    <use id="bn-sp-i" href="#ic-star" class="f-accent" transform="translate(88,318) scale(.85)"/>
+    <text id="bn-sp-t" class="sans f-on-red" x="110" y="325" font-size="21" letter-spacing="4">TODAY'S SPECIAL</text>
   </g>
 
-  <!-- OUR STORY 하트 배지 : 사진 카드 왼쪽 위 모서리에 올라탄다 -->
-  <g transform="rotate(-8 126 378)">
-    <use href="#ic-heart" class="f-red" transform="translate(126,376) scale(6.6)"/>
-    <text class="sans f-on-red" x="126" y="366" font-size="15" text-anchor="middle" letter-spacing="1.6">OUR</text>
-    <text class="sans f-on-red" x="126" y="388" font-size="15" text-anchor="middle" letter-spacing="1.6">STORY</text>
-  </g>
-
-  <!-- Better Together 티켓 : 사진 카드 오른쪽 위 모서리에 올라탄다 -->
-  <g transform="rotate(5 872 408)">
-    <g filter="url(#lift)">
-      <path class="f-sheet" d="M812 348 H932 V468 L922 460 L912 468 L902 460 L892 468 L882 460 L872 468 L862 460 L852 468 L842 460 L832 468 L822 460 L812 468 Z"/>
-    </g>
-    <path class="s-red" fill="none" stroke-width="2" stroke-dasharray="1.5 6" stroke-linecap="round"
-          d="M820 358 H924 V456"/>
-    <text class="hand f-red" x="872" y="404" font-size="26" text-anchor="middle">Better</text>
-    <text class="hand f-red" x="872" y="432" font-size="26" text-anchor="middle">Together</text>
-    <use href="#ic-heart" class="f-red" transform="translate(872,448) scale(1.1)"/>
-    <g transform="rotate(-14 872 348)">
-      <rect x="822" y="334" width="100" height="26" fill="url(#pat-tape)"/>
-      <rect x="822" y="334" width="100" height="26" class="s-p1" fill="none" stroke-width="1" opacity=".5"/>
-    </g>
-  </g>
-
-  <!-- OUR SPECIAL PAIR 배너 -->
+  <!-- 사진 왼쪽 빈 열 : 손글씨 메모 -->
   <g>
-    <path id="bn-pr-p" class="f-red"/>
-    <use id="bn-pr-l" href="#ic-star" class="f-accent" transform="translate(390,739) scale(.85)"/>
-    <text id="bn-pr-t" class="sans f-on-red" x="500" y="746" font-size="21" text-anchor="middle" letter-spacing="4">OUR SPECIAL PAIR</text>
-    <use id="bn-pr-r" href="#ic-star" class="f-accent" transform="translate(610,739) scale(.85)"/>
+    <text class="sans f-red" x="68" y="392" font-size="12" letter-spacing="3.4">HOUSE FAVORITE</text>
+    <path d="M68 402 H240" class="s-red" fill="none" stroke-width="1.4" opacity=".5"/>
+    <g id="noteLines" class="hand f-red" font-size="30"></g>
+    <path d="M70 542 q86 12 176 1" class="s-red" fill="none" stroke-width="3" stroke-linecap="round" opacity=".85"/>
   </g>
 
-  <!-- 캐릭터 카드 1 : 그림자 없이 선만 (웹 카드처럼 보이지 않게) -->
+  <!-- 페어 괘선 + 가운데 하트 메달 -->
   <g>
-    <rect x="64" y="776" width="428" height="328" rx="14" class="f-sheet"/>
-    <rect x="64" y="776" width="428" height="328" rx="14" class="s-p1" fill="none" stroke-width="3"/>
+    <path d="M64 640 H936" class="s-green" fill="none" stroke-width="2" opacity=".55"/>
+    <path id="bn-pr-p" class="f-green"/>
+    <use id="bn-pr-i" href="#ic-star" class="f-accent" transform="translate(88,640) scale(.85)"/>
+    <text id="bn-pr-t" class="sans f-on-green" x="110" y="647" font-size="19" letter-spacing="4">OUR SPECIAL PAIR</text>
+    <text class="sans f-green" x="936" y="632" font-size="12" text-anchor="end" letter-spacing="2.6">TABLE 02 · SERVES 2</text>
 
-    <rect x="90" y="810" width="148" height="200" rx="10" class="f-p1" fill-opacity=".16"/>
+    <circle cx="500" cy="640" r="30" class="f-paper"/>
+    <circle cx="500" cy="640" r="30" class="s-red" fill="none" stroke-width="2.4"/>
+    <circle cx="500" cy="640" r="24" class="s-red" fill="none" stroke-width="1.2" stroke-dasharray="2 6" stroke-linecap="round"/>
+    <use href="#ic-heart" class="f-red" transform="translate(500,638) scale(1.6)"/>
+    <path d="M500 690 V1062" class="s-red" fill="none" stroke-width="1.6" stroke-dasharray="2 8" stroke-linecap="round" opacity=".35"/>
+  </g>
+
+  <!-- 캐릭터 01 : 메뉴판의 한 항목처럼 (상자 없음) -->
+  <g>
+    <path id="bn-c1-p" class="f-p1"/>
+    <use id="bn-c1-i" href="#ic-heart" class="f-on-p1" transform="translate(80,700)"/>
+    <text id="bn-c1-t" class="sans f-on-p1" x="96" y="705" font-size="14" letter-spacing="2.6">SPECIAL #01</text>
+
+    <text id="c1Name" class="disp f-ink" x="64" y="770" font-size="44">character 1</text>
+    <text id="c1Meta" class="sans f-p1" x="64" y="800" font-size="15" letter-spacing="2.6">26 · BARISTA</text>
+    <path d="M64 816 H478" class="s-p1" fill="none" stroke-width="1.4" opacity=".55"/>
+
+    <rect x="64" y="832" width="168" height="236" rx="8" class="f-p1" fill-opacity=".16"/>
     <g clip-path="url(#clip-c1)"><image id="c1Img" preserveAspectRatio="none" style="display:none"/></g>
     <g id="c1Hint" class="s-p1" fill="none" stroke-width="5" stroke-linecap="round" opacity=".5"
-       transform="translate(164,910)">
+       transform="translate(148,950)">
       <circle cx="0" cy="-22" r="19"/>
       <path d="M-33 34 C-33 7 -17 -3 0 -3 C17 -3 33 7 33 34"/>
     </g>
-    <rect x="90" y="810" width="148" height="200" rx="10" class="s-p1" fill="none" stroke-width="2.4"/>
-    <rect id="c1Hit" x="90" y="810" width="148" height="200" rx="10" fill="none" pointer-events="all"/>
+    <rect x="64" y="832" width="168" height="236" rx="8" class="s-p1" fill="none" stroke-width="2.4"/>
+    <rect id="c1Hit" x="64" y="832" width="168" height="236" rx="8" fill="none" pointer-events="all"/>
 
-    <g id="row-1n"><text class="sans lbl f-p1" x="260" y="840">NAME</text><text class="sans lbl f-p1 colon" y="840">:</text><path class="dash s-p1"/><text class="hand val f-ink" y="835"></text></g>
-    <g id="row-1a"><text class="sans lbl f-p1" x="260" y="884">AGE</text><text class="sans lbl f-p1 colon" y="884">:</text><path class="dash s-p1"/><text class="hand val f-ink" y="879"></text></g>
-    <g id="row-1j"><text class="sans lbl f-p1" x="260" y="928">JOB</text><text class="sans lbl f-p1 colon" y="928">:</text><path class="dash s-p1"/><text class="hand val f-ink" y="923"></text></g>
-    <g id="row-1l"><text class="sans lbl f-p1" x="260" y="972">LIKE</text><text class="sans lbl f-p1 colon" y="972">:</text><path class="dash s-p1"/><text class="hand val f-ink" y="967"></text></g>
-
-    <path id="bn-o1-p" class="f-p1"/>
-    <text id="bn-o1-t" class="sans f-on-p1" x="102" y="1056" font-size="14" letter-spacing="2.4">TODAY'S ORDER</text>
-    <text id="c1Order" class="hand f-p1" x="294" y="1058" font-size="27">character 2</text>
-
-    <path id="bn-c1-p" class="f-p1"/>
-    <use id="bn-c1-i" href="#ic-heart" class="f-on-p1" transform="translate(102,776) scale(1.1)"/>
-    <text id="bn-c1-t" class="sans f-on-p1" x="120" y="782" font-size="16" letter-spacing="2.6">CHARACTER 01</text>
+    <use href="#ic-heart" class="f-p1" transform="translate(259,872) scale(.85)"/>
+    <text class="sans f-p1" x="274" y="876" font-size="12" letter-spacing="2.6">LIKES</text>
+    <text id="c1Like" class="hand f-ink" x="252" y="912" font-size="27">Cheeseburger</text>
+    <path d="M252 942 H478" class="s-p1" fill="none" stroke-width="1.4" stroke-dasharray="2 7" stroke-linecap="round" opacity=".7"/>
+    <use href="#ic-star" class="f-p1" transform="translate(259,970) scale(.8)"/>
+    <text class="sans f-p1" x="274" y="974" font-size="12" letter-spacing="2.6">TODAY'S PICK</text>
+    <text id="c1Pick" class="hand f-p1" x="252" y="1010" font-size="27">character 2</text>
   </g>
 
-  <!-- 캐릭터 카드 2 -->
+  <!-- 캐릭터 02 : 01 을 458 만큼 옮긴 자리 -->
   <g>
-    <rect x="508" y="776" width="428" height="328" rx="14" class="f-sheet"/>
-    <rect x="508" y="776" width="428" height="328" rx="14" class="s-p2" fill="none" stroke-width="3"/>
+    <path id="bn-c2-p" class="f-p2"/>
+    <use id="bn-c2-i" href="#ic-star" class="f-on-p2" transform="translate(538,700) scale(.9)"/>
+    <text id="bn-c2-t" class="sans f-on-p2" x="554" y="705" font-size="14" letter-spacing="2.6">SPECIAL #02</text>
 
-    <rect x="534" y="810" width="148" height="200" rx="10" class="f-p2" fill-opacity=".16"/>
+    <text id="c2Name" class="disp f-ink" x="522" y="770" font-size="44">character 2</text>
+    <text id="c2Meta" class="sans f-p2" x="522" y="800" font-size="15" letter-spacing="2.6">28 · DESIGNER</text>
+    <path d="M522 816 H936" class="s-p2" fill="none" stroke-width="1.4" opacity=".55"/>
+
+    <rect x="522" y="832" width="168" height="236" rx="8" class="f-p2" fill-opacity=".16"/>
     <g clip-path="url(#clip-c2)"><image id="c2Img" preserveAspectRatio="none" style="display:none"/></g>
     <g id="c2Hint" class="s-p2" fill="none" stroke-width="5" stroke-linecap="round" opacity=".5"
-       transform="translate(608,910)">
+       transform="translate(606,950)">
       <circle cx="0" cy="-22" r="19"/>
       <path d="M-33 34 C-33 7 -17 -3 0 -3 C17 -3 33 7 33 34"/>
     </g>
-    <rect x="534" y="810" width="148" height="200" rx="10" class="s-p2" fill="none" stroke-width="2.4"/>
-    <rect id="c2Hit" x="534" y="810" width="148" height="200" rx="10" fill="none" pointer-events="all"/>
+    <rect x="522" y="832" width="168" height="236" rx="8" class="s-p2" fill="none" stroke-width="2.4"/>
+    <rect id="c2Hit" x="522" y="832" width="168" height="236" rx="8" fill="none" pointer-events="all"/>
 
-    <g id="row-2n"><text class="sans lbl f-p2" x="704" y="840">NAME</text><text class="sans lbl f-p2 colon" y="840">:</text><path class="dash s-p2"/><text class="hand val f-ink" y="835"></text></g>
-    <g id="row-2a"><text class="sans lbl f-p2" x="704" y="884">AGE</text><text class="sans lbl f-p2 colon" y="884">:</text><path class="dash s-p2"/><text class="hand val f-ink" y="879"></text></g>
-    <g id="row-2j"><text class="sans lbl f-p2" x="704" y="928">JOB</text><text class="sans lbl f-p2 colon" y="928">:</text><path class="dash s-p2"/><text class="hand val f-ink" y="923"></text></g>
-    <g id="row-2l"><text class="sans lbl f-p2" x="704" y="972">LIKE</text><text class="sans lbl f-p2 colon" y="972">:</text><path class="dash s-p2"/><text class="hand val f-ink" y="967"></text></g>
-
-    <path id="bn-o2-p" class="f-p2"/>
-    <text id="bn-o2-t" class="sans f-on-p2" x="546" y="1056" font-size="14" letter-spacing="2.4">TODAY'S ORDER</text>
-    <text id="c2Order" class="hand f-p2" x="738" y="1058" font-size="27">character 1</text>
-
-    <path id="bn-c2-p" class="f-p2"/>
-    <use id="bn-c2-i" href="#ic-star" class="f-on-p2" transform="translate(546,776) scale(1.1)"/>
-    <text id="bn-c2-t" class="sans f-on-p2" x="564" y="782" font-size="16" letter-spacing="2.6">CHARACTER 02</text>
+    <use href="#ic-heart" class="f-p2" transform="translate(717,872) scale(.85)"/>
+    <text class="sans f-p2" x="732" y="876" font-size="12" letter-spacing="2.6">LIKES</text>
+    <text id="c2Like" class="hand f-ink" x="710" y="912" font-size="27">Strawberry shake</text>
+    <path d="M710 942 H936" class="s-p2" fill="none" stroke-width="1.4" stroke-dasharray="2 7" stroke-linecap="round" opacity=".7"/>
+    <use href="#ic-star" class="f-p2" transform="translate(717,970) scale(.8)"/>
+    <text class="sans f-p2" x="732" y="974" font-size="12" letter-spacing="2.6">TODAY'S PICK</text>
+    <text id="c2Pick" class="hand f-p2" x="710" y="1010" font-size="27">character 1</text>
   </g>
 
-  <!-- ALWAYS TOGETHER -->
+  <!-- 오늘의 메뉴 : 상자를 없애고 괘선 + 한 줄로 압축 -->
   <g>
-    <use id="atL" href="#ic-heart" class="f-red" transform="translate(410,1138) scale(1.1)"/>
-    <text id="atText" class="sans f-red" x="500" y="1144" font-size="16" text-anchor="middle" letter-spacing="4">ALWAYS TOGETHER</text>
-    <use id="atR" href="#ic-heart" class="f-red" transform="translate(590,1138) scale(1.1)"/>
-  </g>
-
-  <!-- TODAY'S MENU 카드 -->
-  <g>
-    <rect x="64" y="1164" width="872" height="220" rx="14" class="f-sheet"/>
-    <rect x="64" y="1164" width="872" height="220" rx="14" class="s-green" fill="none" stroke-width="3"/>
-    <rect x="73" y="1173" width="854" height="202" rx="9" class="s-green" fill="none" stroke-width="1.2" opacity=".55"/>
-
-    <rect x="90" y="1218" width="170" height="82" rx="10" class="f-green"/>
-    <text class="sans f-on-green" x="175" y="1250" font-size="18" text-anchor="middle" letter-spacing="2">TODAY'S</text>
-    <text class="sans f-on-green" x="175" y="1278" font-size="21" text-anchor="middle" letter-spacing="2">MENU</text>
-
+    <path d="M64 1140 H936" class="s-green" fill="none" stroke-width="2" opacity=".55"/>
+    <path id="bn-mn-p" class="f-green"/>
+    <use id="bn-mn-i" href="#ic-star" class="f-accent" transform="translate(88,1140) scale(.85)"/>
+    <text id="bn-mn-t" class="sans f-on-green" x="110" y="1147" font-size="19" letter-spacing="4">TODAY'S MENU</text>
+    <text class="sans f-green" x="936" y="1132" font-size="12" text-anchor="end" letter-spacing="2.6">MADE FOR TWO</text>
     <g id="menu-rows"></g>
-
-    <path d="M682 1192 V1356" class="s-green" stroke-width="1.6" stroke-dasharray="4 6" stroke-linecap="round" opacity=".7"/>
-    <g id="noteLines" class="hand f-red" font-size="27"></g>
-    <path d="M716 1344 q46 10 96 2" class="s-red" fill="none" stroke-width="3" stroke-linecap="round" opacity=".85"/>
   </g>
 
-  <!-- 하단 : 문구와 도장을 기둥 안에 맞춰 한 덩어리로 -->
+  <!-- 바닥 괘선 : 문구가 괘선 위에 앉고, 왼쪽 버거와 오른쪽 도장이 괘선을 가로지른다 -->
   <g>
-    <text id="footText" class="sans f-green" x="464" y="1428" font-size="15" text-anchor="middle" letter-spacing="3.4">ALWAYS TOGETHER, ALWAYS HUNGRY</text>
-    <g transform="rotate(-10 902 1424)">
-      <circle cx="902" cy="1424" r="34" class="s-red" fill="none" stroke-width="2.6"/>
-      <circle cx="902" cy="1424" r="29" class="s-red" fill="none" stroke-width="1.2"/>
-      <text class="hand f-red" x="902" y="1434" font-size="30" text-anchor="middle">xoxo</text>
+    <path d="M64 1300 H936" class="s-red" fill="none" stroke-width="1.6" stroke-dasharray="3 8" stroke-linecap="round" opacity=".6"/>
+    <rect id="atBg" class="f-paper" x="380" y="1286" width="240" height="28"/>
+    <use id="atL" href="#ic-heart" class="f-red" transform="translate(410,1300) scale(1.1)"/>
+    <text id="atText" class="sans f-red" x="500" y="1306" font-size="17" text-anchor="middle" letter-spacing="5">ALWAYS TOGETHER</text>
+    <use id="atR" href="#ic-heart" class="f-red" transform="translate(590,1300) scale(1.1)"/>
+
+    <text id="footText" class="sans f-green" x="268" y="1352" font-size="15" letter-spacing="3.4">ALWAYS TOGETHER, ALWAYS HUNGRY</text>
+    <g transform="rotate(-8 876 1320)">
+      <circle cx="876" cy="1320" r="36" class="f-paper"/>
+      <circle cx="876" cy="1320" r="36" class="s-red" fill="none" stroke-width="2.6"/>
+      <circle cx="876" cy="1320" r="30" class="s-red" fill="none" stroke-width="1.2" stroke-dasharray="2 6" stroke-linecap="round"/>
+      <text class="hand f-red" x="876" y="1331" font-size="32" text-anchor="middle">xoxo</text>
     </g>
   </g>
 
   <!-- 스티커 3종. 옮긴 스티커가 다른 요소 뒤로 숨지 않도록 가장 위에 그린다 -->
   <g class="slot">
-    <g id="art-shake" transform="translate(66,470)">
+    <g id="art-shake" transform="translate(384,375)">
       <path d="M52 42 L36 -8" class="s-red" stroke-width="7" stroke-linecap="round" fill="none"/>
       <path d="M70 42 L88 -4" class="s-red" stroke-width="7" stroke-linecap="round" fill="none"/>
       <circle cx="60" cy="6" r="10" class="f-red"/>
@@ -273,7 +263,7 @@
   </g>
 
   <g class="slot">
-    <g id="art-fries" transform="translate(898,584) scale(.68)">
+    <g id="art-fries" transform="translate(867,519) scale(.68)">
       <g class="f-fry s-food" stroke-width="2.4">
         <rect x="13" y="8" width="14" height="52" rx="4" transform="rotate(-12 20 34)"/>
         <rect x="53" y="8" width="14" height="52" rx="4" transform="rotate(12 60 34)"/>
@@ -289,7 +279,7 @@
   </g>
 
   <g class="slot">
-    <g id="art-burger" transform="translate(782,566) scale(.85)">
+    <g id="art-burger" transform="translate(83,1226) scale(.85)">
       <ellipse cx="84" cy="158" rx="82" ry="15" class="f-sheet s-red" stroke-width="3"/>
       <g transform="translate(84,100)">
         <path d="M-50 40 H50 C50 51 42 58 31 58 H-31 C-42 58 -50 51 -50 40 Z" class="f-bun s-food" stroke-width="2.8"/>

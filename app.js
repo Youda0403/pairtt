@@ -24,17 +24,17 @@ const poster = $('#poster');
 
 /* 사진이 들어가는 세 자리. box 는 index.html 의 clip-path / hit 사각형과 같아야 한다. */
 const FRAMES = {
-  main: { box: { x: 154, y: 364, w: 692, h: 336 }, img: '#photoImg', hint: '#photoHint', hit: '#photoHit' },
-  c1:   { box: { x:  90, y: 810, w: 148, h: 200 }, img: '#c1Img',    hint: '#c1Hint',    hit: '#c1Hit'    },
-  c2:   { box: { x: 534, y: 810, w: 148, h: 200 }, img: '#c2Img',    hint: '#c2Hint',    hit: '#c2Hit'    },
+  main: { box: { x: 482, y: 280, w: 442, h: 294 }, img: '#photoImg', hint: '#photoHint', hit: '#photoHit' },
+  c1:   { box: { x:  64, y: 832, w: 168, h: 236 }, img: '#c1Img',    hint: '#c1Hint',    hit: '#c1Hit'    },
+  c2:   { box: { x: 522, y: 832, w: 168, h: 236 }, img: '#c2Img',    hint: '#c2Hint',    hit: '#c2Hit'    },
 };
 const framePic = k => (k === 'main' ? S.photo : S[k].img);
 
 /* 교체 가능한 일러스트. box = 교체 이미지가 놓이는 기본 자리(중심과 크기) */
 const SLOTS = [
-  { k: 'shake',  name: '밀크셰이크', box: { cx: 124, cy: 565, w: 130, h: 240 } },
-  { k: 'fries',  name: '감자튀김',   box: { cx: 926, cy: 630, w:  80, h: 118 } },
-  { k: 'burger', name: '햄버거',     box: { cx: 853, cy: 641, w: 164, h: 168 } },
+  { k: 'shake',  name: '밀크셰이크', box: { cx: 440, cy: 470, w: 130, h: 240 } },
+  { k: 'fries',  name: '감자튀김',   box: { cx: 896, cy: 566, w:  84, h: 118 } },
+  { k: 'burger', name: '햄버거',     box: { cx: 154, cy: 1324, w: 164, h: 150 } },
 ];
 const SLOT_BY_K = Object.fromEntries(SLOTS.map(s => [s.k, s]));
 
@@ -53,11 +53,12 @@ const PRESETS = [
   { name: '나이트', c: { paper:'#2A2A33', red:'#EFC7A8', green:'#8FC7A4', p1:'#EE8FA6', p2:'#7FB8E8', accent:'#F0C766' } },
 ];
 
-/* 캐릭터 카드 행(NAME/AGE/JOB/LIKE)의 라벨 시작 x 와 점선 끝 x */
-const ROW_X = { c1: { left: 260, right: 468 }, c2: { left: 704, right: 912 } };
-/* 카드 머리 띠 / TODAY'S ORDER 띠가 시작하는 x (index.html 의 아이콘·글자 위치와 맞춘다) */
-const CARD_X = { c1: { head: 80, order: 90 }, c2: { head: 524, order: 534 } };
-const TAG_CX = 486;                   // 상단 문구 중심 (EST 배지 자리를 비워 둔다)
+/* 캐릭터 한 항목이 쓰는 폭. x 는 항목 시작, dx 는 초상 오른쪽 글자 블록의 시작 */
+const COL_W = 414, DET_W = 226;
+const CHARS = [
+  { key: 'c1', n: 1, x:  64, dx: 252 },
+  { key: 'c2', n: 2, x: 522, dx: 710 },
+];
 const MENU_DEF = ['LOVE', 'LAUGHTER', 'GOOD FOOD', 'YOU & ME'];
 
 const newSticker = () => ({ src: null, scale: 1, dx: 0, dy: 0 });
@@ -82,6 +83,10 @@ const PH = {
   always: 'ALWAYS TOGETHER', foot: 'ALWAYS TOGETHER, ALWAYS HUNGRY',
   note: 'Same table / Different worlds / One story',
   c1: 'character 1', c2: 'character 2',
+  demo: {
+    c1: { age: '26', job: 'BARISTA',  like: 'Cheeseburger' },
+    c2: { age: '28', job: 'DESIGNER', like: 'Strawberry shake' },
+  },
 };
 
 /* ===================== 색 유틸 ===================== */
@@ -172,8 +177,6 @@ function themeCss() {
 .f-grain{fill:${grainOf(c.paper)};opacity:.13}
 .s-paper{stroke:${c.paper}}.s-red{stroke:${c.red}}.s-green{stroke:${c.green}}
 .s-p1{stroke:${c.p1}}.s-p2{stroke:${c.p2}}
-.lbl{font-size:16px;letter-spacing:1.8px}
-.dash{fill:none;stroke-width:1.6;stroke-dasharray:2 7;stroke-linecap:round;opacity:.85}
 `;
 }
 
@@ -191,47 +194,16 @@ function fitText(el, maxW, baseSize) {
 
 const setText = (sel, str) => { $(sel).textContent = str; return $(sel); };
 
-/** 양끝이 뾰족한 리본. 안쪽 내용 폭에 맞춰 크기를 잡는다 */
-function ribbon(pathSel, cx, cy, innerW, h, pad = 30) {
-  const w = innerW + pad * 2, n = h * 0.4;
-  const x1 = cx - w / 2, x2 = cx + w / 2, y1 = cy - h / 2, y2 = cy + h / 2;
-  $(pathSel).setAttribute('d',
-    `M${x1} ${y1} H${x2} L${x2 + n} ${cy} L${x2} ${y2} H${x1} L${x1 - n} ${cy} Z`);
-}
-/** 오른쪽 끝만 뾰족한 깃발 (카드 머리 띠) */
+/** 왼쪽 기둥에 물려 오른쪽 끝만 뾰족한 깃발 */
 function tab(pathSel, x1, cy, w, h) {
   const x2 = x1 + w, n = h * 0.45;
   $(pathSel).setAttribute('d',
     `M${x1} ${cy - h / 2} H${x2} L${x2 + n} ${cy} L${x2} ${cy + h / 2} H${x1} Z`);
 }
 
-/** 아이콘 - 글자 - 아이콘 을 가운데 정렬하고 리본 크기를 맞춘다 */
-function starRibbon(pathSel, textSel, iconL, iconR, cx, cy, maxW, base) {
-  const t = $(textSel);
-  fitText(t, maxW, base);
-  const half = textWidth(t) / 2;
-  $(iconL).setAttribute('transform', `translate(${cx - half - 20},${cy - 7}) scale(.85)`);
-  $(iconR).setAttribute('transform', `translate(${cx + half + 20},${cy - 7}) scale(.85)`);
-  ribbon(pathSel, cx, cy, half * 2 + 58, 42, 26);
-}
-
-function layoutRow(id, label, value, labelX, rightX) {
-  const g     = $('#' + id);
-  const lbl   = $('.lbl:not(.colon)', g);
-  const colon = $('.colon', g);
-  const dash  = $('.dash', g);
-  const val   = $('.val', g);
-
-  lbl.textContent = label;
-  const colonX = labelX + textWidth(lbl) + 10;
-  const startX = colonX + 14;
-  const y = parseFloat(lbl.getAttribute('y'));
-
-  colon.setAttribute('x', colonX);
-  dash.setAttribute('d', `M${startX} ${y + 7} H${rightX}`);
-  val.setAttribute('x', startX + 4);
-  val.textContent = value;
-  fitText(val, rightX - startX - 10, 26);
+/** 글자 폭에 맞춰 깃발을 그린다. minW 를 주면 그만큼은 반드시 뻗는다(사진에 닿게) */
+function tabLabel(pathSel, textSel, x1, cy, h, textX, minW = 0) {
+  tab(pathSel, x1, cy, Math.max(textX - x1 + textWidth($(textSel)) + 16, minW), h);
 }
 
 /* ===================== 한글 폰트 ===================== */
@@ -279,60 +251,59 @@ function render() {
   const n1   = S.c1.name.trim() || PH.c1;
   const n2   = S.c2.name.trim() || PH.c2;
 
-  /* --- 간판 --- */
-  const tag = setText('#tagLine', S.tag.trim() || PH.tag);
-  fitText(tag, 540, 17);
-  const tagHalf = textWidth(tag) / 2;
-  $('#tagStarL').setAttribute('transform', `translate(${TAG_CX - tagHalf - 22},54) scale(.9)`);
-  $('#tagStarR').setAttribute('transform', `translate(${TAG_CX + tagHalf + 22},54) scale(.9)`);
-
-  fitText(setText('#estYear', S.est.trim() || PH.est), 96, 19);
+  /* --- 머리 괘선 + 로고 락업 --- */
+  fitText(setText('#tagLine', S.tag.trim() || PH.tag), 600, 16);
+  fitText(setText('#estYear', S.est.trim() || PH.est), 84, 30);
 
   const main = $('#pairName'), shadow = $('#pairShadow');
   main.textContent = shadow.textContent = pair;
-  fitText(main, 800, 168);
+  fitText(main, 640, 104);
   shadow.style.fontSize = main.style.fontSize;
 
+  // 부제 뒤로 괘선이 오른쪽 끝까지 이어져 머리 덩어리를 한 장으로 묶는다
   const sub = setText('#bn-sub-t', S.sub.trim() || PH.sub);
-  fitText(sub, 440, 19);
-  ribbon('#bn-sub-p', CENTER, 264, textWidth(sub), 38, 30);
+  fitText(sub, 420, 17);
+  const subEnd = 68 + textWidth(sub) + 20;
+  $('#bn-sub-r').setAttribute('d', subEnd < 900 ? `M${subEnd} 244 H936` : '');
 
-  starRibbon('#bn-sp-p', '#bn-sp-t', '#bn-sp-l', '#bn-sp-r', CENTER, 330, 430, 21);
-  starRibbon('#bn-pr-p', '#bn-pr-t', '#bn-pr-l', '#bn-pr-r', CENTER, 746, 430, 21);
+  // TODAY'S SPECIAL 깃발은 최소 388 을 뻗어 끝이 사진 테두리(470)에 닿는다
+  tabLabel('#bn-sp-p', '#bn-sp-t', 64, 318, 44, 110, 388);
+  tabLabel('#bn-pr-p', '#bn-pr-t', 64, 640, 40, 110);
+  tabLabel('#bn-mn-p', '#bn-mn-t', 64, 1140, 38, 110);
 
-  /* --- 캐릭터 카드 --- */
-  for (const [key, ord] of [['c1', '#c1Order'], ['c2', '#c2Order']]) {
-    const c = S[key], X = ROW_X[key], CX = CARD_X[key], n = key === 'c1' ? 1 : 2;
+  /* --- 캐릭터 : 메뉴판의 한 항목처럼 --- */
+  for (const { key, n, x, dx } of CHARS) {
+    const c = S[key], demo = PH.demo[key];
+    const self  = key === 'c1' ? n1 : n2;
     const other = key === 'c1' ? n2 : n1;
 
-    layoutRow(`row-${n}n`, 'NAME', key === 'c1' ? n1 : n2, X.left, X.right);
-    layoutRow(`row-${n}a`, 'AGE',  c.age,  X.left, X.right);
-    layoutRow(`row-${n}j`, 'JOB',  c.job,  X.left, X.right);
-    layoutRow(`row-${n}l`, 'LIKE', c.like, X.left, X.right);
+    tabLabel(`#bn-c${n}-p`, `#bn-c${n}-t`, x, 700, 32, x + 32);
+    fitText(setText(`#c${n}Name`, self), COL_W, 44);
 
-    // 머리 띠: 아이콘 + 글자 폭에 맞춰 깃발 크기를 잡는다
-    const ht = $(`#bn-c${n}-t`);
-    tab(`#bn-c${n}-p`, CX.head, 776, 40 + textWidth(ht) + 18, 36);
+    // 나이와 직업은 한 줄로 붙인다. 둘 다 비면 예시를 보여 준다
+    const meta = [c.age.trim(), c.job.trim()].filter(Boolean).join('  ·  ');
+    fitText(setText(`#c${n}Meta`, meta || `${demo.age}  ·  ${demo.job}`), COL_W, 15);
 
-    // TODAY'S ORDER: 값이 비면 상대 이름이 들어간다
-    const ot = $(`#bn-o${n}-t`);
-    tab(`#bn-o${n}-p`, CX.order, 1050, 12 + textWidth(ot) + 16, 32);
-    const ov = setText(ord, c.order.trim() || other);
-    ov.setAttribute('x', CX.order + 12 + textWidth(ot) + 16 + 14 + 12);
-    fitText(ov, X.right - parseFloat(ov.getAttribute('x')) + 8, 27);
+    fitText(setText(`#c${n}Like`, c.like.trim() || demo.like), DET_W, 27);
+    // TODAY'S PICK: 값이 비면 상대 이름이 들어간다
+    fitText(setText(`#c${n}Pick`, c.order.trim() || other), DET_W, 27);
   }
 
   /* --- 오늘의 메뉴 --- */
   renderMenu();
   renderNote();
 
+  // 가운데 문구는 바닥 괘선 위에 앉는다. 종이색 판을 글자 폭에 맞춰 깔아 괘선을 끊는다
   const always = setText('#atText', S.always.trim() || PH.always);
-  fitText(always, 420, 16);
+  fitText(always, 420, 17);
   const aHalf = textWidth(always) / 2;
-  $('#atL').setAttribute('transform', `translate(${CENTER - aHalf - 20},1138) scale(1.1)`);
-  $('#atR').setAttribute('transform', `translate(${CENTER + aHalf + 20},1138) scale(1.1)`);
+  $('#atL').setAttribute('transform', `translate(${CENTER - aHalf - 20},1300) scale(1.1)`);
+  $('#atR').setAttribute('transform', `translate(${CENTER + aHalf + 20},1300) scale(1.1)`);
+  const aBg = $('#atBg');
+  aBg.setAttribute('x', CENTER - aHalf - 44);
+  aBg.setAttribute('width', aHalf * 2 + 88);
 
-  fitText(setText('#footText', S.foot.trim() || PH.foot), 680, 15);
+  fitText(setText('#footText', S.foot.trim() || PH.foot), 440, 15);
 
   Object.keys(FRAMES).forEach(placeFrame);
   SLOTS.forEach(s => placeSticker(s.k));
@@ -340,43 +311,54 @@ function render() {
   ensureKrFonts();
 }
 
+/* 메뉴 4개를 하트로 이어 한 줄에 놓는다. 카드(상자)를 쓰지 않는다. */
+const MENU_Y = 1204, MENU_SEP = 36, MENU_MAX = 856, MENU_SIZE = 25;
+
 function renderMenu() {
   const g = $('#menu-rows');
   g.textContent = '';
-  MENU_DEF.forEach((def, i) => {
-    const y = 1212 + i * 44;
-    const t = svgEl('text', { class: 'sans f-green', x: 296, y, 'font-size': 18, 'letter-spacing': 1.6 });
+
+  const els = MENU_DEF.map((def, i) => {
+    const t = svgEl('text', { class: 'sans f-green', y: MENU_Y, 'letter-spacing': 2 });
     t.textContent = (S.menu[i] || '').trim() || def;
+    t.style.fontSize = MENU_SIZE + 'px';
     g.appendChild(t);
-    fitText(t, 250, 18);
+    return t;
+  });
 
-    g.appendChild(svgEl('path', {
-      class: 's-green', d: `M${296 + textWidth(t) + 16} ${y - 5} H612`,
-      'stroke-width': 1.6, 'stroke-dasharray': '2 7', 'stroke-linecap': 'round', opacity: .8,
-    }));
+  const measure = () => els.map(textWidth);
+  let w = measure();
+  let total = w.reduce((a, b) => a + b, 0) + MENU_SEP * (els.length - 1);
+  if (total > MENU_MAX) {                       // 긴 문구는 줄 전체를 함께 줄인다
+    const size = Math.max(11, MENU_SIZE * MENU_MAX / total);
+    els.forEach(t => { t.style.fontSize = size + 'px'; });
+    w = measure();
+    total = w.reduce((a, b) => a + b, 0) + MENU_SEP * (els.length - 1);
+  }
 
-    if (i < MENU_DEF.length - 1) {
-      const u = svgEl('use', { class: 'f-red', transform: `translate(640,${y - 6}) scale(1.2)` });
+  let x = CENTER - total / 2;
+  els.forEach((t, i) => {
+    t.setAttribute('x', x);
+    x += w[i];
+    if (i < els.length - 1) {
+      const u = svgEl('use', { class: 'f-red', transform: `translate(${x + MENU_SEP / 2},${MENU_Y - 6}) scale(1.1)` });
       u.setAttribute('href', '#ic-heart');
       g.appendChild(u);
-    } else {
-      const inf = svgEl('g', { class: 's-red', fill: 'none', 'stroke-width': 2.4, transform: `translate(640,${y - 6})` });
-      inf.appendChild(svgEl('circle', { cx: -5.5, cy: 0, r: 5 }));
-      inf.appendChild(svgEl('circle', { cx: 5.5, cy: 0, r: 5 }));
-      g.appendChild(inf);
+      x += MENU_SEP;
     }
   });
 }
 
+/* 손글씨 메모는 사진 왼쪽 빈 열에 놓는다 */
 function renderNote() {
   const g = $('#noteLines');
   g.textContent = '';
   const lines = (S.note.trim() || PH.note).split('/').map(s => s.trim()).filter(Boolean).slice(0, 3);
   lines.forEach((line, i) => {
-    const t = svgEl('text', { x: 716, y: 1238 + i * 42 });
+    const t = svgEl('text', { x: 68, y: 440 + i * 40 });
     t.textContent = line;
     g.appendChild(t);
-    fitText(t, 210, 27);
+    fitText(t, 300, 30);
   });
 }
 
@@ -733,7 +715,7 @@ const CHAR_FIELDS = [
   ['age',   '나이 (AGE)',         12, '26'],
   ['job',   '직업 (JOB)',         18, 'Barista'],
   ['like',  '좋아하는 것 (LIKE)', 18, 'Cheeseburger'],
-  ['order', "오늘의 주문 (TODAY'S ORDER)", 18, '비우면 상대 이름이 들어갑니다'],
+  ['order', "오늘의 픽 (TODAY'S PICK)", 18, '비우면 상대 이름이 들어갑니다'],
 ];
 
 function buildCharUI() {
