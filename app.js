@@ -24,9 +24,9 @@ const poster = $('#poster');
 
 /* 사진이 들어가는 세 자리. box 는 index.html 의 clip-path / hit 사각형과 같아야 한다. */
 const FRAMES = {
-  main: { box: { x: 250, y: 452, w: 500, h: 428 }, img: '#photoImg', hint: '#photoHint', hit: '#photoHit' },
-  c1:   { box: { x:  44, y: 452, w: 208, h: 208 }, img: '#c1Img',    hint: '#c1Hint',    hit: '#c1Hit'    },
-  c2:   { box: { x: 748, y: 452, w: 208, h: 208 }, img: '#c2Img',    hint: '#c2Hint',    hit: '#c2Hit'    },
+  main: { box: { x: 250, y: 440, w: 500, h: 440 }, img: '#photoImg', hint: '#photoHint', hit: '#photoHit' },
+  c1:   { box: { x:  44, y: 416, w: 208, h: 208 }, img: '#c1Img',    hint: '#c1Hint',    hit: '#c1Hit'    },
+  c2:   { box: { x: 748, y: 416, w: 208, h: 208 }, img: '#c2Img',    hint: '#c2Hint',    hit: '#c2Hit'    },
 };
 const framePic = k => (k === 'main' ? S.photo : S[k].img);
 
@@ -34,7 +34,7 @@ const framePic = k => (k === 'main' ? S.photo : S[k].img);
 const SLOTS = [
   { k: 'burger', name: '햄버거',     art: 'art/burger.png', box: { cx: 152, cy: 796,  w: 180, h: 148 } },
   { k: 'pizza',  name: '피자',       art: 'art/pizza.png',  box: { cx: 858, cy: 788,  w: 190, h: 141 } },
-  { k: 'shake',  name: '밀크셰이크', art: 'art/shake.png',  box: { cx: 846, cy: 1312, w:  96, h: 214 } },
+  { k: 'shake',  name: '밀크셰이크', art: 'art/shake.png',  box: { cx: 810, cy: 1318, w:  94, h: 210 } },
 ];
 const SLOT_BY_K = Object.fromEntries(SLOTS.map(s => [s.k, s]));
 
@@ -54,7 +54,7 @@ const PRESETS = [
 /* 메뉴판 본문은 고정값이다. SPECIAL PAIR SET 첫 줄만 두 사람 것으로 바뀐다.
    열마다 MENU_TOP 에서 시작해 같은 간격으로 쌓으므로 섹션 사이 여백이 항상 같다. */
 const COLS = [{ x0: 70, x1: 336 }, { x0: 364, x1: 636 }, { x0: 664, x1: 930 }];
-const MENU_TOP = 852, ROW_PITCH = 30, HEAD_GAP = 36, SEC_GAP = 44;
+const MENU_TOP = 852, ROW_PITCH = 33, HEAD_GAP = 36, SEC_GAP = 50;
 const MENU = [
   [ { title: 'MAIN DISHES', style: 'slant', dx: 22, rows: [
       ['CLASSIC BURGER','$8.5'], ['CHEESE BURGER','$9.5'], ['DOUBLE BURGER','$11.5'],
@@ -79,8 +79,7 @@ const newChar    = () => ({ name: '', img: newPic() });
 
 const defaults = () => ({
   pair: '', arch: '', pill: '',
-  scriptL: '', badge: '',
-  footL: '', footC: '',
+  badge: '',
   set: '', setp: '',
   c1: newChar(), c2: newChar(), photo: newPic(),
   stickers: Object.fromEntries(SLOTS.map(s => [s.k, newSticker()])),
@@ -91,10 +90,7 @@ let S = defaults();
 
 const PH = {
   pair: 'PAIR', arch: 'OUR SPECIAL', pill: 'MENU',
-  scriptL: 'Always / Better / Together',
   badge: 'TWO HEARTS / ONE / MENU',
-  footL: 'More Flavor / More Love!',
-  footC: 'Sweet / & Salty',
   c1: 'JUN', c2: 'HANA', setp: '$12.5',
 };
 
@@ -212,6 +208,17 @@ function lineBlock(gSel, str, { x, y, pitch, size, maxW, anchor = 'start', max =
   return { widest, lastY, count: lines.length };
 }
 
+/** 늘 같은 각도(NAME_ARC)로 휘는 호. 글자가 길어지면 반지름이 커진다 */
+const NAME_ARC = 21 * Math.PI / 180;
+function nameArc(sel, textW, apexY, dx, dy) {
+  const len = Math.max(textW, 120) * 1.06;
+  const R = len / NAME_ARC;
+  const half = NAME_ARC / 2;
+  const x = R * Math.sin(half), sag = R * (1 - Math.cos(half));
+  const y = apexY + sag;
+  $(sel).setAttribute('d', `M${CENTER - x + dx} ${y + dy} A ${R} ${R} 0 0 1 ${CENTER + x + dx} ${y + dy}`);
+}
+
 /** 글자 폭에 맞춰 크기가 정해지는 알약 */
 function pill(rectSel, textSel, cx, cy, h, padX, maxW, base) {
   const t = fitText($(textSel), maxW, base);
@@ -275,53 +282,36 @@ function render() {
   const pairText = S.pair.trim() || PH.pair;
   $('#pairName').textContent = $('#pairShadow').textContent = pairText;
   const nameT = $('#pairNameT');
-  // 아치 경로 길이 안에 들어오도록 맞춘다. 길어지면 곡선을 따라 눕는다
-  const arcLen = $('#arc-name').getTotalLength();
-  fitText(nameT, arcLen * 0.9, HANGUL.test(pairText) ? 152 : 186);
+  fitText(nameT, 800, HANGUL.test(pairText) ? 150 : 184);
   $('#pairShadowT').style.fontSize = nameT.style.fontSize;
+  // 글자 길이에 맞춰 반지름을 다시 잡는다. 그래야 짧든 길든 휘는 각도가 같다
+  nameArc('#arc-name', textWidth(nameT), 360, 0, 0);
+  nameArc('#arc-name-s', textWidth(nameT), 360, 7, 10);
 
   setText('#pillText', S.pill.trim() || PH.pill);
-  pill('#pillBg', '#pillText', CENTER, 418, 54, 30, 320, 27);
+  pill('#pillBg', '#pillText', CENTER, 400, 68, 40, 340, 34);
 
   /* --- 손글씨 덩어리 --- */
-  const sl = lineBlock('#scriptL', S.scriptL.trim() || PH.scriptL,
-    { x: 68, y: 112, pitch: 40, size: 36, maxW: 196, max: 3 });
-  $('#scriptLine').setAttribute('d',
-    `M70 ${sl.lastY + 18} q${sl.widest * 0.5} 14 ${sl.widest} 2`);
-
   const bd = splitLines(S.badge.trim() || PH.badge, 3);
   const bg = $('#badgeText');
   bg.textContent = '';
   bd.forEach((line, i) => {
-    const t = svgEl('text', { x: 872, y: 158 - (bd.length - 1) * 14 + i * 28 + 8, 'text-anchor': 'middle', 'letter-spacing': 1.6 });
+    const t = svgEl('text', { x: 878, y: 166 - (bd.length - 1) * 14 + i * 28 + 8, 'text-anchor': 'middle', 'letter-spacing': 1.6 });
     t.textContent = line;
     bg.appendChild(t);
     fitText(t, 118, 21);
   });
 
   /* --- 캐릭터 --- */
-  for (const [key, cx, def] of [['c1', 148, PH.c1], ['c2', 852, PH.c2]]) {
-    const c = S[key], n = key === 'c1' ? 1 : 2;
-    const nm = fitText(setText(`#c${n}Name`, c.name.trim() || def), 210, 28);
-    const bar = $(`#c${n}Bar`);
-    const w = textWidth(nm) + 44;
-    bar.setAttribute('x', cx - w / 2);
-    bar.setAttribute('width', w);
+  for (const [key, def] of [['c1', PH.c1], ['c2', PH.c2]]) {
+    const n = key === 'c1' ? 1 : 2;
+    fitText(setText(`#c${n}Name`, S[key].name.trim() || def), 140, 26);
   }
 
   /* --- 메뉴 --- */
   renderMenu(n1, n2);
 
   /* --- 바닥 손글씨 --- */
-  lineBlock('#footL', S.footL.trim() || PH.footL,
-    { x: 74, y: 1358, pitch: 46, size: 42, maxW: 258, max: 2 });
-
-  const fc = lineBlock('#footC', S.footC.trim() || PH.footC,
-    { x: CENTER, y: 1356, pitch: 48, size: 44, maxW: 214, anchor: 'middle', max: 2 });
-  const half = fc.widest / 2 + 30;
-  $('#footStarL').setAttribute('transform', `translate(${CENTER - half},1370) scale(1.3)`);
-  $('#footStarR').setAttribute('transform', `translate(${CENTER + half},1370) scale(1.3)`);
-
   Object.keys(FRAMES).forEach(placeFrame);
   SLOTS.forEach(s => placeSticker(s.k));
   save();
@@ -630,8 +620,9 @@ function initGestures() {
     });
   }
   for (const { k } of SLOTS) {
+    // 기본 그림은 고정. 사용자가 교체한 그림만 끌어 옮길 수 있다
     bindGesture($('#hit-' + k), {
-      active: () => true,
+      active: () => !!S.stickers[k].src,
       onDrag: (dx, dy) => { S.stickers[k].dx += dx; S.stickers[k].dy += dy; placeSticker(k); },
       onScale: r => setStickerScale(k, S.stickers[k].scale * r),
       onEnd: save,
@@ -877,7 +868,7 @@ function buildColorUI() {
 
 const syncColorInputs = () => COLORS.forEach(({ k }) => { $('#col-' + k).value = S.colors[k]; });
 
-const TEXT_FIELDS = ['pair', 'arch', 'pill', 'scriptL', 'badge', 'footL', 'footC'];
+const TEXT_FIELDS = ['pair', 'arch', 'pill', 'badge'];
 
 function syncInputs() {
   TEXT_FIELDS.forEach(k => { $('#in-' + k).value = S[k]; });
