@@ -25,8 +25,8 @@ const poster = $('#poster');
 /* 사진이 들어가는 세 자리. box 는 index.html 의 clip-path / hit 사각형과 같아야 한다. */
 const FRAMES = {
   main: { box: { x: 482, y: 280, w: 442, h: 294 }, img: '#photoImg', hint: '#photoHint', hit: '#photoHit' },
-  c1:   { box: { x:  64, y: 700, w: 152, h: 196 }, img: '#c1Img',    hint: '#c1Hint',    hit: '#c1Hit'    },
-  c2:   { box: { x: 784, y: 700, w: 152, h: 196 }, img: '#c2Img',    hint: '#c2Hint',    hit: '#c2Hit'    },
+  c1:   { box: { x:  64, y: 676, w: 186, h: 232 }, img: '#c1Img',    hint: '#c1Hint',    hit: '#c1Hit'    },
+  c2:   { box: { x: 748, y: 830, w: 188, h: 236 }, img: '#c2Img',    hint: '#c2Hint',    hit: '#c2Hit'    },
 };
 const framePic = k => (k === 'main' ? S.photo : S[k].img);
 
@@ -53,15 +53,9 @@ const PRESETS = [
   { name: '나이트', c: { paper:'#2A2A33', red:'#EFC7A8', green:'#8FC7A4', p1:'#EE8FA6', p2:'#7FB8E8', accent:'#F0C766' } },
 ];
 
-/* 페어 코너 : 이름·나이/직업은 가운데 홈통 쪽 열(폭 230),
-   LIKES / TODAY'S PICK 값은 공유 행 안에서 바깥 끝으로 정렬한다(폭 400) */
-const NAME_W = 230, ROW_W = 400;
+/* 페어 코너 : 두 사람의 글자 블록이 쓰는 폭. c2 는 오른쪽 끝(730)에 맞춰 정렬한다 */
+const NAME_W = 196, LIKE_W = 170, PICK_W = 196, C2_RIGHT = 730;
 const CHARS = [{ key: 'c1', n: 1 }, { key: 'c2', n: 2 }];
-/* 두 사람이 나눠 쓰는 행. cy 는 괘선, vy 는 값의 baseline */
-const PAIR_ROWS = [
-  { k: 'Like', cy: 926, vy: 978, iw: 14 },
-  { k: 'Pick', cy: 1026, vy: 1078, iw: 16 },
-];
 const MENU_DEF = ['LOVE', 'LAUGHTER', 'GOOD FOOD', 'YOU & ME'];
 
 const newSticker = () => ({ src: null, scale: 1, dx: 0, dy: 0 });
@@ -193,6 +187,7 @@ function fitText(el, maxW, baseSize) {
   el.style.fontSize = baseSize + 'px';
   const w = textWidth(el);
   if (w > maxW && w > 0) el.style.fontSize = Math.max(8, baseSize * maxW / w) + 'px';
+  return el;
 }
 
 const setText = (sel, str) => { $(sel).textContent = str; return $(sel); };
@@ -286,11 +281,13 @@ function render() {
     const meta = [c.age.trim(), c.job.trim()].filter(Boolean).join('  ·  ');
     fitText(setText(`#c${n}Meta`, meta || `${demo.age}  ·  ${demo.job}`), NAME_W, 15);
 
-    fitText(setText(`#c${n}Like`, c.like.trim() || demo.like), ROW_W, 28);
-    // TODAY'S PICK: 값이 비면 상대 이름이 들어간다
-    fitText(setText(`#c${n}Pick`, c.order.trim() || other), ROW_W, 28);
+    fitText(setText(`#c${n}Like`, c.like.trim() || demo.like), LIKE_W, 27);
+    // TODAY'S PICK: 값이 비면 상대 이름이 들어간다. 라벨 대신 손글씨 한 줄로 적는다
+    fitText(setText(`#c${n}Pick`, `today's pick: ${c.order.trim() || other}`), PICK_W, 19);
   }
-  pairRows();
+  // 오른쪽 사람의 하트는 글자가 오른쪽 끝에 맞춰 있으므로 폭을 재서 앞에 놓는다
+  $('#c2LikeI').setAttribute('transform',
+    `translate(${C2_RIGHT - textWidth($('#c2Like')) - 22},980) scale(.9)`);
 
   /* --- 오늘의 메뉴 --- */
   renderMenu();
@@ -312,25 +309,6 @@ function render() {
   SLOTS.forEach(s => placeSticker(s.k));
   save();
   ensureKrFonts();
-}
-
-/* 공유 행: 라벨을 홈통 가운데에 앉혀 괘선을 끊고, 두 값 사이를 점선으로 잇는다.
-   행이 지면을 가로질러야 "두 열"이 아니라 "한 쌍이 나눠 쓴 한 줄"로 읽힌다. */
-function pairRows() {
-  for (const { k, cy, vy, iw } of PAIR_ROWS) {
-    const t = $(`#row${k}T`);
-    const total = iw + 8 + textWidth(t);
-    const x0 = CENTER - total / 2;
-    $(`#row${k}I`).setAttribute('transform', `translate(${x0 + iw / 2},${cy}) scale(${iw / 16})`);
-    t.setAttribute('x', x0 + iw + 8);
-    const bg = $(`#row${k}Bg`);
-    bg.setAttribute('x', x0 - 16);
-    bg.setAttribute('width', total + 32);
-
-    const l = 64 + textWidth($(`#c1${k}`)) + 20;
-    const r = 936 - textWidth($(`#c2${k}`)) - 20;
-    $(`#row${k}D`).setAttribute('d', r - l > 60 ? `M${l} ${vy - 9} H${r}` : '');
-  }
 }
 
 /* 메뉴 4개를 하트로 이어 한 줄에 놓는다. 카드(상자)를 쓰지 않는다. */
