@@ -19,6 +19,7 @@
 
     <g id="ic-heart"><path d="M0 6.6C-1.4 5.4-7.6 1-7.6-2.8-7.6-5.9-5.1-7.7-2.8-7.7-1.2-7.7-.3-6.8 0-5.9 .3-6.8 1.2-7.7 2.8-7.7 5.1-7.7 7.6-5.9 7.6-2.8 7.6 1 1.4 5.4 0 6.6Z"/></g>
     <g id="ic-star"><path d="M0-10 2.9-3.4 10-2.7 4.6 2.1 6.2 9.2 0 5.4-6.2 9.2-4.6 2.1-10-2.7-2.9-3.4Z"/></g>
+    <path id="ic-spark" d="M0.0 -100.0 L14.5 -35.1 L70.7 -70.7 L35.1 -14.5 L100.0 0.0 L35.1 14.5 L70.7 70.7 L14.5 35.1 L0.0 100.0 L-14.5 35.1 L-70.7 70.7 L-35.1 14.5 L-100.0 0.0 L-35.1 -14.5 L-70.7 -70.7 L-14.5 -35.1 Z"/>
     <path id="ic-burst" d="M0.0 -86.0 L9.1 -63.3 L24.2 -82.5 L26.6 -58.2 L46.5 -72.3 L41.9 -48.4 L65.0 -56.3 L53.8 -34.6 L78.2 -35.7 L61.4 -18.0 L85.1 -12.2 L64.0 -0.0 L85.1 12.2 L61.4 18.0 L78.2 35.7 L53.8 34.6 L65.0 56.3 L41.9 48.4 L46.5 72.3 L26.6 58.2 L24.2 82.5 L9.1 63.3 L0.0 86.0 L-9.1 63.3 L-24.2 82.5 L-26.6 58.2 L-46.5 72.3 L-41.9 48.4 L-65.0 56.3 L-53.8 34.6 L-78.2 35.7 L-61.4 18.0 L-85.1 12.2 L-64.0 0.0 L-85.1 -12.2 L-61.4 -18.0 L-78.2 -35.7 L-53.8 -34.6 L-65.0 -56.3 L-41.9 -48.4 L-46.5 -72.3 L-26.6 -58.2 L-24.2 -82.5 L-9.1 -63.3 Z"/>
 
     <path id="arc-band" d="M292 150 A 228 62 0 0 1 708 150" fill="none"/>
@@ -45,9 +46,9 @@
       </g>
     </pattern>
 
-    <clipPath id="clip-photo"><rect x="286" y="392" width="428" height="384"/></clipPath>
-    <clipPath id="clip-c1"><circle cx="132" cy="504" r="72"/></clipPath>
-    <clipPath id="clip-c2"><circle cx="868" cy="504" r="72"/></clipPath>
+    <clipPath id="clip-photo"><rect x="300" y="424" width="400" height="352"/></clipPath>
+    <clipPath id="clip-c1"><circle cx="132" cy="572" r="88"/></clipPath>
+    <clipPath id="clip-c2"><circle cx="868" cy="572" r="88"/></clipPath>
   </defs>
 
   <rect width="1000" height="1500" class="f-paper"/>
@@ -65,12 +66,15 @@
     <textPath id="archText" href="#arc-text" startOffset="50%" text-anchor="middle">OUR SPECIAL</textPath>
   </text>
 
-  <text id="pairShadow" class="slab f-green" x="504" y="305" font-size="140" text-anchor="middle">PAIR</text>
-  <text id="pairName" class="slab f-red s-paper" x="500" y="300" font-size="140" text-anchor="middle"
-        paint-order="stroke" stroke-width="9" stroke-linejoin="round">PAIR</text>
+  <text id="pairShadow" class="slab f-green s-paper" x="509" y="346" font-size="186" text-anchor="middle"
+        paint-order="stroke" stroke-width="15" stroke-linejoin="round">PAIR</text>
+  <text id="pairName" class="slab f-red s-paper" x="500" y="336" font-size="186" text-anchor="middle"
+        paint-order="stroke" stroke-width="15" stroke-linejoin="round">PAIR</text>
 
-  <rect id="pillBg" class="f-green" y="330" height="52" rx="26"/>
-  <text id="pillText" class="cond f-on-green" x="500" y="366" font-size="27" text-anchor="middle" letter-spacing="4">MENU</text>
+  <rect id="pillBg" class="f-green" y="365" height="54" rx="27"/>
+  <text id="pillText" class="cond f-on-green" x="500" y="402" font-size="27" text-anchor="middle" letter-spacing="4">MENU</text>
+  <use id="sparkPL" href="#ic-spark" class="s-red" fill="none" stroke-width="9"/>
+  <use id="sparkPR" href="#ic-spark" class="s-red" fill="none" stroke-width="9"/>
 
   <!-- 왼쪽 위 손글씨 + 오른쪽 위 별폭발 배지 -->
   <g transform="rotate(-5 150 150)">
@@ -89,52 +93,49 @@
   </g>
   <g id="photoHint" class="s-red" fill="none" opacity=".5">
     <g stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
-      <rect x="452" y="520" width="96" height="76" rx="10"/>
-      <circle cx="478" cy="544" r="7"/>
-      <path d="M458 590 l26-30 18 18 14-14 24 22"/>
+      <rect x="452" y="548" width="96" height="76" rx="10"/>
+      <circle cx="478" cy="572" r="7"/>
+      <path d="M458 618 l26-30 18 18 14-14 24 22"/>
     </g>
-    <text class="script f-red" x="500" y="668" font-size="40" text-anchor="middle" stroke="none">two of us here!</text>
+    <text class="script f-red" x="500" y="698" font-size="40" text-anchor="middle" stroke="none">two of us here!</text>
   </g>
-  <rect id="photoHit" x="286" y="392" width="428" height="384" fill="none" pointer-events="all"/>
+  <rect id="photoHit" x="300" y="424" width="400" height="352" fill="none" pointer-events="all"/>
 
   <!-- 캐릭터 01 -->
-  <circle cx="132" cy="504" r="72" class="f-sheet"/>
+  <circle cx="132" cy="572" r="88" class="f-sheet"/>
   <g clip-path="url(#clip-c1)"><image id="c1Img" preserveAspectRatio="none" style="display:none"/></g>
-  <g id="c1Hint" class="s-red" fill="none" stroke-width="5" stroke-linecap="round" opacity=".4" transform="translate(132,504)">
+  <g id="c1Hint" class="s-red" fill="none" stroke-width="5" stroke-linecap="round" opacity=".4" transform="translate(132,572)">
     <circle cx="0" cy="-16" r="17"/>
     <path d="M-30 40 C-30 12 -15 2 0 2 C15 2 30 12 30 40"/>
   </g>
-  <circle cx="132" cy="504" r="72" class="s-red" fill="none" stroke-width="5"/>
-  <rect id="c1Hit" x="60" y="432" width="144" height="144" fill="none" pointer-events="all"/>
-  <g transform="rotate(-3 132 606)">
-    <rect id="c1Bar" class="f-red" y="586" height="38" rx="4"/>
-    <text id="c1Name" class="cond f-on-red" x="132" y="614" font-size="24" text-anchor="middle" letter-spacing="2.4">JUN</text>
+  <circle cx="132" cy="572" r="88" class="s-red" fill="none" stroke-width="6"/>
+  <rect id="c1Hit" x="44" y="484" width="176" height="176" fill="none" pointer-events="all"/>
+  <g transform="rotate(-3 132 654)">
+    <rect id="c1Bar" class="f-red" y="634" height="40" rx="4"/>
+    <text id="c1Name" class="cond f-on-red" x="132" y="663" font-size="26" text-anchor="middle" letter-spacing="2.4">JUN</text>
   </g>
-  <text id="c1Age" class="cond f-red" x="132" y="656" font-size="17" text-anchor="middle" letter-spacing="1.6">AGE. 19</text>
+  <text id="c1Age" class="cond f-red" x="132" y="712" font-size="18" text-anchor="middle" letter-spacing="1.6">AGE. 19</text>
 
   <!-- 캐릭터 02 -->
-  <circle cx="868" cy="504" r="72" class="f-sheet"/>
+  <circle cx="868" cy="572" r="88" class="f-sheet"/>
   <g clip-path="url(#clip-c2)"><image id="c2Img" preserveAspectRatio="none" style="display:none"/></g>
-  <g id="c2Hint" class="s-red" fill="none" stroke-width="5" stroke-linecap="round" opacity=".4" transform="translate(868,504)">
+  <g id="c2Hint" class="s-red" fill="none" stroke-width="5" stroke-linecap="round" opacity=".4" transform="translate(868,572)">
     <circle cx="0" cy="-16" r="17"/>
     <path d="M-30 40 C-30 12 -15 2 0 2 C15 2 30 12 30 40"/>
   </g>
-  <circle cx="868" cy="504" r="72" class="s-red" fill="none" stroke-width="5"/>
-  <rect id="c2Hit" x="796" y="432" width="144" height="144" fill="none" pointer-events="all"/>
-  <g transform="rotate(3 868 606)">
-    <rect id="c2Bar" class="f-red" y="586" height="38" rx="4"/>
-    <text id="c2Name" class="cond f-on-red" x="868" y="614" font-size="24" text-anchor="middle" letter-spacing="2.4">HANA</text>
+  <circle cx="868" cy="572" r="88" class="s-red" fill="none" stroke-width="6"/>
+  <rect id="c2Hit" x="780" y="484" width="176" height="176" fill="none" pointer-events="all"/>
+  <g transform="rotate(3 868 654)">
+    <rect id="c2Bar" class="f-red" y="634" height="40" rx="4"/>
+    <text id="c2Name" class="cond f-on-red" x="868" y="663" font-size="26" text-anchor="middle" letter-spacing="2.4">HANA</text>
   </g>
-  <text id="c2Age" class="cond f-red" x="868" y="656" font-size="17" text-anchor="middle" letter-spacing="1.6">AGE. 18</text>
+  <text id="c2Age" class="cond f-red" x="868" y="712" font-size="18" text-anchor="middle" letter-spacing="1.6">AGE. 18</text>
 
-  <!-- 가운데 아래 손글씨 두 덩어리 -->
-  <g transform="rotate(-4 130 730)">
-    <g id="midL" class="script f-green" font-size="36"></g>
-    <path id="midLine" class="s-green" fill="none" stroke-width="5" stroke-linecap="round" opacity=".9"/>
-  </g>
-  <g transform="rotate(4 878 730)">
-    <g id="midR" class="script f-red" font-size="36"></g>
-  </g>
+  <!-- 문구를 덜어낸 자리에 테두리만 있는 뾰족별 -->
+  <use href="#ic-spark" class="s-red" fill="none" stroke-width="8" transform="translate(268,470) scale(.19)"/>
+  <use href="#ic-spark" class="s-red" fill="none" stroke-width="8" transform="translate(732,470) scale(.19)"/>
+  <use href="#ic-spark" class="s-green" fill="none" stroke-width="8" transform="translate(252,704) scale(.15)"/>
+  <use href="#ic-spark" class="s-green" fill="none" stroke-width="8" transform="translate(748,704) scale(.15)"/>
 
   <!-- 메뉴 3단 -->
   <path d="M348 812 V1400 M652 812 V1400" class="s-red" fill="none" stroke-width="1.6" opacity=".4"/>
@@ -202,10 +203,6 @@
         <input id="in-scriptL" type="text" maxlength="40" placeholder="Always / Better / Together"></label>
       <label class="fld"><span>오른쪽 위 <b>배지</b> <code>/</code> 로 줄바꿈</span>
         <input id="in-badge" type="text" maxlength="34" placeholder="TWO HEARTS / ONE / MENU"></label>
-      <label class="fld"><span>왼쪽 가운데 <code>/</code> 로 줄바꿈</span>
-        <input id="in-midL" type="text" maxlength="40" placeholder="Good / Food / Good / Mood"></label>
-      <label class="fld"><span>오른쪽 가운데 <code>/</code> 로 줄바꿈</span>
-        <input id="in-midR" type="text" maxlength="44" placeholder="Diner / Makes / Everything / Better!"></label>
       <div class="grid2">
         <label class="fld"><span>왼쪽 아래</span>
           <input id="in-footL" type="text" maxlength="30" placeholder="More Flavor / More Love!"></label>

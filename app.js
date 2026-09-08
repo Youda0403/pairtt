@@ -24,17 +24,17 @@ const poster = $('#poster');
 
 /* 사진이 들어가는 세 자리. box 는 index.html 의 clip-path / hit 사각형과 같아야 한다. */
 const FRAMES = {
-  main: { box: { x: 286, y: 392, w: 428, h: 384 }, img: '#photoImg', hint: '#photoHint', hit: '#photoHit' },
-  c1:   { box: { x:  60, y: 432, w: 144, h: 144 }, img: '#c1Img',    hint: '#c1Hint',    hit: '#c1Hit'    },
-  c2:   { box: { x: 796, y: 432, w: 144, h: 144 }, img: '#c2Img',    hint: '#c2Hint',    hit: '#c2Hit'    },
+  main: { box: { x: 300, y: 424, w: 400, h: 352 }, img: '#photoImg', hint: '#photoHint', hit: '#photoHit' },
+  c1:   { box: { x:  44, y: 484, w: 176, h: 176 }, img: '#c1Img',    hint: '#c1Hint',    hit: '#c1Hit'    },
+  c2:   { box: { x: 780, y: 484, w: 176, h: 176 }, img: '#c2Img',    hint: '#c2Hint',    hit: '#c2Hit'    },
 };
 const framePic = k => (k === 'main' ? S.photo : S[k].img);
 
 /* 음식 그림. 기본값은 art/ 의 그림이고, 올리면 그 그림으로 바뀐다 */
 const SLOTS = [
-  { k: 'burger', name: '햄버거',     art: 'art/burger.png', box: { cx: 118, cy: 818,  w: 136, h: 112 } },
-  { k: 'pizza',  name: '피자',       art: 'art/pizza.png',  box: { cx: 882, cy: 812,  w: 130, h:  96 } },
-  { k: 'shake',  name: '밀크셰이크', art: 'art/shake.png',  box: { cx: 742, cy: 1322, w:  88, h: 196 } },
+  { k: 'burger', name: '햄버거',     art: 'art/burger.png', box: { cx: 100, cy: 788,  w: 130, h: 107 } },
+  { k: 'pizza',  name: '피자',       art: 'art/pizza.png',  box: { cx: 894, cy: 794,  w: 124, h:  92 } },
+  { k: 'shake',  name: '밀크셰이크', art: 'art/shake.png',  box: { cx: 726, cy: 1328, w:  84, h: 187 } },
 ];
 const SLOT_BY_K = Object.fromEntries(SLOTS.map(s => [s.k, s]));
 
@@ -51,26 +51,27 @@ const PRESETS = [
   { name: '나이트', c: { paper:'#2A2A33', red:'#E4705E', green:'#8FC7A4', accent:'#F0C766' } },
 ];
 
-/* 메뉴판 본문은 고정값이다. SPECIAL PAIR SET 첫 줄만 두 사람 것으로 바뀐다. */
+/* 메뉴판 본문은 고정값이다. SPECIAL PAIR SET 첫 줄만 두 사람 것으로 바뀐다.
+   열마다 MENU_TOP 에서 시작해 같은 간격으로 쌓으므로 섹션 사이 여백이 항상 같다. */
 const COLS = [{ x0: 70, x1: 336 }, { x0: 364, x1: 636 }, { x0: 664, x1: 930 }];
+const MENU_TOP = 800, ROW_PITCH = 30, HEAD_GAP = 22, SEC_GAP = 36;
 const MENU = [
-  { col: 0, cy: 880, title: 'MAIN DISHES', rows: [
-    ['CLASSIC BURGER','$8.5'], ['CHEESE BURGER','$9.5'], ['DOUBLE BURGER','$11.5'],
-    ['CHICKEN SANDWICH','$9.0'], ['FRENCH FRIES','$4.0'], ['ONION RINGS','$4.5']] },
-  { col: 0, cy: 1122, title: 'SIDE DISHES', rows: [
-    ['MOZZARELLA STICKS','$5.5'], ['CHICKEN NUGGETS','$5.0'], ['COLESLAW','$3.5'],
-    ['MAC & CHEESE','$4.5'], ['TATER TOTS','$4.0']] },
-  { col: 1, cy: 892, title: 'SPECIAL PAIR SET', big: true, rows: [
-    ['@pair','$12.5'], ['CHICKEN + DRINK','$12.0'], ['PASTA + SALAD','$13.5'], ['PIZZA + DRINK','$14.0']] },
-  { col: 1, cy: 1104, title: 'DRINKS', rows: [
-    ['COLA','$2.5'], ['SPRITE','$2.5'], ['ORANGE JUICE','$3.0'], ['ICED TEA','$2.5'], ['MILKSHAKE','$4.5']] },
-  { col: 2, cy: 880, title: 'DESSERTS', rows: [
-    ['APPLE PIE','$4.5'], ['CHOCOLATE CAKE','$5.0'], ['ICE CREAM (1 SCOOP)','$3.5'],
-    ['ICE CREAM (2 SCOOP)','$5.5'], ['BROWNIE','$4.5']] },
-  { col: 2, cy: 1080, title: 'EXTRA', rows: [
-    ['EXTRA CHEESE','$1.0'], ['BACON','$1.5'], ['AVOCADO','$1.5'], ['EGG','$1.0']] },
+  [ { title: 'MAIN DISHES', style: 'slant', dx: 54, rows: [
+      ['CLASSIC BURGER','$8.5'], ['CHEESE BURGER','$9.5'], ['DOUBLE BURGER','$11.5'],
+      ['CHICKEN SANDWICH','$9.0'], ['FRENCH FRIES','$4.0'], ['ONION RINGS','$4.5']] },
+    { title: 'SIDE DISHES', style: 'slant', rows: [
+      ['MOZZARELLA STICKS','$5.5'], ['CHICKEN NUGGETS','$5.0'], ['COLESLAW','$3.5'],
+      ['MAC & CHEESE','$4.5'], ['TATER TOTS','$4.0']] } ],
+  [ { title: 'SPECIAL / PAIR SET', style: 'oval', rows: [
+      ['@pair','$12.5'], ['CHICKEN + DRINK','$12.0'], ['PASTA + SALAD','$13.5'], ['PIZZA + DRINK','$14.0']] },
+    { title: 'DRINKS', style: 'band', rows: [
+      ['COLA','$2.5'], ['SPRITE','$2.5'], ['ORANGE JUICE','$3.0'], ['ICED TEA','$2.5'], ['MILKSHAKE','$4.5']] } ],
+  [ { title: 'DESSERTS', style: 'slant', dx: -54, rows: [
+      ['APPLE PIE','$4.5'], ['CHOCOLATE CAKE','$5.0'], ['ICE CREAM (1 SCOOP)','$3.5'],
+      ['ICE CREAM (2 SCOOP)','$5.5'], ['BROWNIE','$4.5']] },
+    { title: 'EXTRA', style: 'ribbon', rows: [
+      ['EXTRA CHEESE','$1.0'], ['BACON','$1.5'], ['AVOCADO','$1.5'], ['EGG','$1.0']] } ],
 ];
-const ROW_PITCH = 30;
 
 const newSticker = () => ({ src: null, scale: 1, dx: 0, dy: 0 });
 const newPic     = () => ({ src: null, nw: 0, nh: 0, zoom: 1, ox: 0, oy: 0 });
@@ -78,7 +79,7 @@ const newChar    = () => ({ name: '', age: '', img: newPic() });
 
 const defaults = () => ({
   pair: '', arch: '', pill: '',
-  scriptL: '', badge: '', midL: '', midR: '',
+  scriptL: '', badge: '',
   footL: '', footC: '', footR: '',
   set: '', setp: '',
   c1: newChar(), c2: newChar(), photo: newPic(),
@@ -92,8 +93,6 @@ const PH = {
   pair: 'PAIR', arch: 'OUR SPECIAL', pill: 'MENU',
   scriptL: 'Always / Better / Together',
   badge: 'TWO HEARTS / ONE / MENU',
-  midL: 'Good Food / Good Mood',
-  midR: 'Diner Makes / Everything Better!',
   footL: 'More Flavor / More Love!',
   footC: 'Sweet / & Salty',
   footR: 'Take Out / Also!',
@@ -275,12 +274,15 @@ function render() {
   $('#archText').textContent = S.arch.trim() || PH.arch;
 
   const main = $('#pairName'), shadow = $('#pairShadow');
-  main.textContent = shadow.textContent = S.pair.trim() || PH.pair;
-  fitText(main, 700, 140);
+  const pairText = S.pair.trim() || PH.pair;
+  main.textContent = shadow.textContent = pairText;
+  fitText(main, 780, HANGUL.test(pairText) ? 152 : 186);
   shadow.style.fontSize = main.style.fontSize;
 
   setText('#pillText', S.pill.trim() || PH.pill);
-  pill('#pillBg', '#pillText', CENTER, 356, 52, 30, 320, 27);
+  const pw = pill('#pillBg', '#pillText', CENTER, 392, 54, 30, 320, 27);
+  $('#sparkPL').setAttribute('transform', `translate(${CENTER - pw / 2 - 40},392) scale(.15)`);
+  $('#sparkPR').setAttribute('transform', `translate(${CENTER + pw / 2 + 40},392) scale(.15)`);
 
   /* --- 손글씨 덩어리 --- */
   const sl = lineBlock('#scriptL', S.scriptL.trim() || PH.scriptL,
@@ -298,23 +300,15 @@ function render() {
     fitText(t, 118, 21);
   });
 
-  const ml = lineBlock('#midL', S.midL.trim() || PH.midL,
-    { x: 68, y: 706, pitch: 40, size: 34, maxW: 216, max: 2 });
-  $('#midLine').setAttribute('d',
-    `M70 ${ml.lastY + 15} q${ml.widest * 0.5} 13 ${ml.widest} 2`);
-
-  lineBlock('#midR', S.midR.trim() || PH.midR,
-    { x: 932, y: 706, pitch: 40, size: 34, maxW: 216, anchor: 'end', max: 2 });
-
   /* --- 캐릭터 --- */
   for (const [key, cx, def, defAge] of [['c1', 132, PH.c1, PH.age1], ['c2', 868, PH.c2, PH.age2]]) {
     const c = S[key], n = key === 'c1' ? 1 : 2;
-    const nm = fitText(setText(`#c${n}Name`, c.name.trim() || def), 168, 24);
+    const nm = fitText(setText(`#c${n}Name`, c.name.trim() || def), 190, 26);
     const bar = $(`#c${n}Bar`);
-    const w = textWidth(nm) + 36;
+    const w = textWidth(nm) + 40;
     bar.setAttribute('x', cx - w / 2);
     bar.setAttribute('width', w);
-    fitText(setText(`#c${n}Age`, `AGE. ${c.age.trim() || defAge}`), 150, 17);
+    fitText(setText(`#c${n}Age`, `AGE. ${c.age.trim() || defAge}`), 160, 18);
   }
 
   /* --- 메뉴 --- */
@@ -343,56 +337,98 @@ function renderMenu(n1, n2) {
   const g = $('#menu');
   g.textContent = '';
 
-  for (const sec of MENU) {
-    const { x0, x1 } = COLS[sec.col];
+  MENU.forEach((col, ci) => {
+    const { x0, x1 } = COLS[ci];
     const cx = (x0 + x1) / 2;
+    let y = MENU_TOP;
 
-    // 섹션 머리 : 글자 폭에 맞춘 빨간 알약
-    const head = svgEl('text', {
-      class: 'cond f-on-red', x: cx, y: sec.cy + (sec.big ? 4 : 7),
-      'text-anchor': 'middle', 'letter-spacing': 2,
-    });
-    head.textContent = sec.title;
-    const bar = svgEl('rect', { class: 'f-red' });
-    g.appendChild(bar);
-    g.appendChild(head);
-    fitText(head, x1 - x0 - 40, sec.big ? 26 : 22);
-    const hw = textWidth(head) + (sec.big ? 44 : 34);
-    const hh = sec.big ? 46 : 36;
-    bar.setAttribute('x', cx - hw / 2);
-    bar.setAttribute('y', sec.cy - hh / 2);
-    bar.setAttribute('width', hw);
-    bar.setAttribute('height', hh);
-    bar.setAttribute('rx', hh / 2);
-    bar.setAttribute('transform', `rotate(${sec.col === 1 ? 0 : sec.col === 0 ? -1.2 : 1.2} ${cx} ${sec.cy})`);
-    head.setAttribute('transform', bar.getAttribute('transform'));
+    for (const sec of col) {
+      const hh = drawHead(g, sec, cx + (sec.dx || 0), x1 - x0 - 48, y, ci);
+      y += hh + HEAD_GAP;
 
-    // 항목 : 이름 · 점선 · 가격
-    sec.rows.forEach(([name, price], i) => {
-      const y = sec.cy + (sec.big ? 42 : 32) + 12 + i * ROW_PITCH;
-      const isPair = name === '@pair';
-      const label = isPair ? (S.set.trim() || `${n1} + ${n2}`) : name;
-      const cost  = isPair ? (S.setp.trim() || PH.setp) : price;
+      sec.rows.forEach(([name, price], i) => {
+        const by = y + i * ROW_PITCH;
+        const isPair = name === '@pair';
+        const label = isPair ? (S.set.trim() || `${n1} + ${n2}`) : name;
+        const cost  = isPair ? (S.setp.trim() || PH.setp) : price;
 
-      const nt = svgEl('text', { class: 'cond ' + (isPair ? 'f-red' : 'f-ink'), x: x0, y, 'letter-spacing': .6 });
-      nt.textContent = label;
-      g.appendChild(nt);
-      fitText(nt, x1 - x0 - 70, 19);
+        const nt = svgEl('text', { class: 'cond ' + (isPair ? 'f-red' : 'f-ink'), x: x0, y: by, 'letter-spacing': .6 });
+        nt.textContent = label;
+        g.appendChild(nt);
+        fitText(nt, x1 - x0 - 70, 19);
 
-      const pt = svgEl('text', { class: 'cond f-red', x: x1, y, 'text-anchor': 'end', 'letter-spacing': .6 });
-      pt.textContent = cost;
-      g.appendChild(pt);
-      fitText(pt, 64, 19);
+        const pt = svgEl('text', { class: 'cond f-red', x: x1, y: by, 'text-anchor': 'end', 'letter-spacing': .6 });
+        pt.textContent = cost;
+        g.appendChild(pt);
+        fitText(pt, 64, 19);
 
-      const l = x0 + textWidth(nt) + 8, r = x1 - textWidth(pt) - 8;
-      if (r - l > 14) {
-        g.appendChild(svgEl('path', {
-          class: 's-red', d: `M${l} ${y - 5} H${r}`, fill: 'none',
-          'stroke-width': 1.6, 'stroke-dasharray': '1.5 5', 'stroke-linecap': 'round', opacity: .55,
-        }));
-      }
-    });
+        const l = x0 + textWidth(nt) + 8, r = x1 - textWidth(pt) - 8;
+        if (r - l > 14) {
+          g.appendChild(svgEl('path', {
+            class: 's-red', d: `M${l} ${by - 5} H${r}`, fill: 'none',
+            'stroke-width': 1.6, 'stroke-dasharray': '1.5 5', 'stroke-linecap': 'round', opacity: .55,
+          }));
+        }
+      });
+
+      y += (sec.rows.length - 1) * ROW_PITCH + SEC_GAP;
+    }
+  });
+}
+
+/* 섹션 머리. 모양을 네 가지로 나눠 같은 알약이 여섯 번 반복되지 않게 한다.
+   glyph 는 글자 크기에서 baseline 을 잡는다(고정값을 쓰면 두 줄짜리가 위로 뜬다). */
+function drawHead(g, sec, cx, maxW, top, ci) {
+  const lines = sec.title.split('/').map(t => t.trim());
+  const two = lines.length > 1;
+  const h = sec.style === 'oval' ? 66 : sec.style === 'ribbon' ? 42 : 38;
+  const cy = top + h / 2;
+  const base = sec.style === 'oval' ? 27 : 22;
+
+  const shape = svgEl('path', { class: 'f-red' });
+  g.appendChild(shape);
+
+  const texts = lines.map((line, i) => {
+    const t = svgEl('text', { class: 'cond f-on-red', x: cx, 'text-anchor': 'middle', 'letter-spacing': 2 });
+    t.textContent = line;
+    g.appendChild(t);
+    fitText(t, maxW, base);
+    return t;
+  });
+  const fs = parseFloat(texts[0].style.fontSize);
+  texts.forEach((t, i) => {
+    const off = two ? (i - 0.5) * (fs + 6) : 0;
+    t.setAttribute('y', cy + off + fs * 0.35);
+  });
+
+  const tw = Math.max(...texts.map(textWidth));
+  const w = tw + (sec.style === 'oval' ? 56 : sec.style === 'ribbon' ? 52 : 36);
+  const x1 = cx - w / 2, x2 = cx + w / 2, y1 = cy - h / 2, y2 = cy + h / 2;
+  const rr = 5;
+
+  if (sec.style === 'oval') {
+    const rx = w / 2 + 10, ry = h / 2 + 4;
+    shape.setAttribute('d',
+      `M${cx - rx} ${cy} a${rx} ${ry} 0 1 0 ${rx * 2} 0 a${rx} ${ry} 0 1 0 ${-rx * 2} 0 Z`);
+    for (const sgn of [-1, 1]) {
+      const u = svgEl('use', { class: 'f-accent', transform: `translate(${cx + sgn * (tw / 2 + 16)},${cy}) scale(.62)` });
+      u.setAttribute('href', '#ic-star');
+      g.appendChild(u);
+    }
+  } else if (sec.style === 'ribbon') {
+    const n = 15;
+    shape.setAttribute('d',
+      `M${x1} ${y1} H${x2} L${x2 + n} ${cy} L${x2} ${y2} H${x1} L${x1 - n} ${cy} Z`);
+  } else {
+    shape.setAttribute('d',
+      `M${x1 + rr} ${y1} H${x2 - rr} q${rr} 0 ${rr} ${rr} V${y2 - rr} q0 ${rr} ${-rr} ${rr} H${x1 + rr} q${-rr} 0 ${-rr} ${-rr} V${y1 + rr} q0 ${-rr} ${rr} ${-rr} Z`);
+    if (sec.style === 'slant') {
+      const rot = `rotate(${ci === 0 ? -1.4 : 1.4} ${cx} ${cy})`;
+      shape.setAttribute('transform', rot);
+      texts.forEach(t => t.setAttribute('transform', rot));
+    }
   }
+  return h;
 }
 
 function placeFrame(key) {
@@ -851,7 +887,7 @@ function buildColorUI() {
 
 const syncColorInputs = () => COLORS.forEach(({ k }) => { $('#col-' + k).value = S.colors[k]; });
 
-const TEXT_FIELDS = ['pair', 'arch', 'pill', 'scriptL', 'badge', 'midL', 'midR', 'footL', 'footC', 'footR'];
+const TEXT_FIELDS = ['pair', 'arch', 'pill', 'scriptL', 'badge', 'footL', 'footC', 'footR'];
 
 function syncInputs() {
   TEXT_FIELDS.forEach(k => { $('#in-' + k).value = S[k]; });
