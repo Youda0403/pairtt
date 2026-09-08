@@ -24,16 +24,13 @@
 
     <path id="arc-band" d="M292 150 A 228 62 0 0 1 708 150" fill="none"/>
     <path id="arc-text" d="M292 161 A 228 62 0 0 1 708 161" fill="none"/>
+    <path id="arc-name"   d="M118 372 A 620 210 0 0 1 882 372" fill="none"/>
+    <path id="arc-name-s" d="M125 383 A 620 210 0 0 1 889 383" fill="none"/>
 
     <pattern id="pat-check" width="24" height="24" patternUnits="userSpaceOnUse">
       <rect width="24" height="24" class="f-paper"/>
       <rect width="12" height="12" class="f-red"/>
       <rect x="12" y="12" width="12" height="12" class="f-red"/>
-    </pattern>
-    <pattern id="pat-check-s" width="16" height="16" patternUnits="userSpaceOnUse">
-      <rect width="16" height="16" class="f-paper"/>
-      <rect width="8" height="8" class="f-red"/>
-      <rect x="8" y="8" width="8" height="8" class="f-red"/>
     </pattern>
 
     <pattern id="pat-grain" width="150" height="150" patternUnits="userSpaceOnUse">
@@ -46,13 +43,46 @@
       </g>
     </pattern>
 
-    <clipPath id="clip-photo"><rect x="300" y="424" width="400" height="352"/></clipPath>
-    <clipPath id="clip-c1"><circle cx="148" cy="506" r="104"/></clipPath>
-    <clipPath id="clip-c2"><circle cx="852" cy="506" r="104"/></clipPath>
+    <!-- 종이 섬유 : 잔 알갱이 -->
+    <filter id="fx-fiber" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" seed="7" result="t"/>
+      <feColorMatrix in="t" type="matrix" result="a"
+        values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  1.1 0 0 0 -0.42"/>
+      <feFlood flood-color="#6b4a2a" result="c"/>
+      <feComposite in="c" in2="a" operator="in"/>
+    </filter>
+    <!-- 오래된 종이 얼룩 : 넓고 성긴 무늬 -->
+    <filter id="fx-stain" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="3" seed="19" result="t"/>
+      <feColorMatrix in="t" type="matrix" result="a"
+        values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0.85 0 0 0 -0.38"/>
+      <feFlood flood-color="#8a6134" result="c"/>
+      <feComposite in="c" in2="a" operator="in"/>
+    </filter>
+    <!-- 올린 사진을 종이 톤에 맞춘다. 채도를 낮추고 따뜻하게, 검정을 들어 올린다 -->
+    <filter id="fx-tone" x="-2%" y="-2%" width="104%" height="104%" color-interpolation-filters="sRGB">
+      <feColorMatrix type="saturate" values="0.78"/>
+      <feComponentTransfer>
+        <feFuncR type="linear" slope="0.93" intercept="0.075"/>
+        <feFuncG type="linear" slope="0.91" intercept="0.055"/>
+        <feFuncB type="linear" slope="0.85" intercept="0.035"/>
+      </feComponentTransfer>
+    </filter>
+
+    <clipPath id="clip-photo"><rect x="250" y="452" width="500" height="428"/></clipPath>
+    <clipPath id="clip-c1"><circle cx="148" cy="556" r="104"/></clipPath>
+    <clipPath id="clip-c2"><circle cx="852" cy="556" r="104"/></clipPath>
   </defs>
 
   <rect width="1000" height="1500" class="f-paper"/>
   <rect width="1000" height="1500" fill="url(#pat-grain)"/>
+
+  <!-- 배경 무늬 : 커다란 뾰족별 세 개를 옅게 깐다 -->
+  <g class="s-red" fill="none" stroke-linejoin="round">
+    <use href="#ic-spark" stroke-width="3.4" opacity=".07" transform="translate(146,596) rotate(-12) scale(2.9)"/>
+    <use href="#ic-spark" stroke-width="4.2" opacity=".06" transform="translate(878,470) rotate(16) scale(2.1)"/>
+    <use href="#ic-spark" stroke-width="5"   opacity=".05"  transform="translate(560,238) rotate(-7) scale(1.6)"/>
+  </g>
 
   <!-- 인쇄 테두리 + 체커 띠 -->
   <rect x="15" y="15" width="970" height="1470" rx="16" class="s-red" fill="none" stroke-width="7"/>
@@ -60,23 +90,27 @@
   <rect x="40" y="40" width="920" height="24" fill="url(#pat-check)"/>
   <rect x="40" y="1436" width="920" height="24" fill="url(#pat-check)"/>
 
-  <!-- 간판 : 아치 문구 + 거대 페어명 + 알약 -->
+  <!-- 간판 : 아치 문구 + 아치로 휜 페어명 + 알약 -->
   <use href="#arc-band" class="s-red" stroke-width="52" stroke-linecap="round"/>
   <text class="cond f-on-red" font-size="30" letter-spacing="4">
     <textPath id="archText" href="#arc-text" startOffset="50%" text-anchor="middle">OUR SPECIAL</textPath>
   </text>
 
-  <text id="pairShadow" class="slab f-green s-paper" x="509" y="346" font-size="186" text-anchor="middle"
-        paint-order="stroke" stroke-width="15" stroke-linejoin="round">PAIR</text>
-  <text id="pairName" class="slab f-red s-paper" x="500" y="336" font-size="186" text-anchor="middle"
-        paint-order="stroke" stroke-width="15" stroke-linejoin="round">PAIR</text>
+  <text id="pairShadowT" class="slab f-green s-paper" font-size="186"
+        paint-order="stroke" stroke-width="15" stroke-linejoin="round">
+    <textPath id="pairShadow" href="#arc-name-s" startOffset="50%" text-anchor="middle">PAIR</textPath>
+  </text>
+  <text id="pairNameT" class="slab f-red s-paper" font-size="186"
+        paint-order="stroke" stroke-width="15" stroke-linejoin="round">
+    <textPath id="pairName" href="#arc-name" startOffset="50%" text-anchor="middle">PAIR</textPath>
+  </text>
 
-  <rect id="pillBg" class="f-green" y="365" height="54" rx="27"/>
-  <text id="pillText" class="cond f-on-green" x="500" y="402" font-size="27" text-anchor="middle" letter-spacing="4">MENU</text>
+  <rect id="pillBg" class="f-green" y="391" height="54" rx="27"/>
+  <text id="pillText" class="cond f-on-green" x="500" y="428" font-size="27" text-anchor="middle" letter-spacing="4">MENU</text>
 
   <!-- 왼쪽 위 손글씨 + 오른쪽 위 별폭발 배지 -->
   <g transform="rotate(-5 150 150)">
-    <g id="scriptL" class="script f-green" font-size="40"></g>
+    <g id="scriptL" class="script f-green" font-size="36"></g>
     <path id="scriptLine" class="s-green" fill="none" stroke-width="5" stroke-linecap="round" opacity=".9"/>
   </g>
 
@@ -85,75 +119,75 @@
     <g id="badgeText" class="cond f-on-green" font-size="21"></g>
   </g>
 
-  <!-- 가운데 그림 -->
+  <!-- 가운데 그림. 아래쪽은 메뉴 틀에 가려 잘린다 -->
   <g clip-path="url(#clip-photo)">
-    <image id="photoImg" preserveAspectRatio="none" style="display:none"/>
+    <image id="photoImg" preserveAspectRatio="none" filter="url(#fx-tone)" style="display:none"/>
   </g>
-  <g id="photoHint" class="s-red" fill="none" opacity=".5">
+  <g id="photoHint" class="s-red" fill="none" opacity=".45">
     <g stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
-      <rect x="452" y="548" width="96" height="76" rx="10"/>
-      <circle cx="478" cy="572" r="7"/>
-      <path d="M458 618 l26-30 18 18 14-14 24 22"/>
+      <rect x="452" y="560" width="96" height="76" rx="10"/>
+      <circle cx="478" cy="584" r="7"/>
+      <path d="M458 630 l26-30 18 18 14-14 24 22"/>
     </g>
-    <text class="script f-red" x="500" y="698" font-size="40" text-anchor="middle" stroke="none">two of us here!</text>
+    <text class="script f-red" x="500" y="710" font-size="40" text-anchor="middle" stroke="none">two of us here!</text>
   </g>
-  <rect id="photoHit" x="300" y="424" width="400" height="352" fill="none" pointer-events="all"/>
+  <rect id="photoHit" x="250" y="452" width="500" height="348" fill="none" pointer-events="all"/>
 
   <!-- 캐릭터 01 -->
-  <circle cx="148" cy="506" r="104" class="f-sheet"/>
-  <g clip-path="url(#clip-c1)"><image id="c1Img" preserveAspectRatio="none" style="display:none"/></g>
-  <g id="c1Hint" class="s-red" fill="none" stroke-width="5" stroke-linecap="round" opacity=".4" transform="translate(148,500) scale(1.25)">
+  <circle cx="148" cy="556" r="104" class="f-sheet"/>
+  <g clip-path="url(#clip-c1)">
+    <image id="c1Img" preserveAspectRatio="none" filter="url(#fx-tone)" style="display:none"/>
+  </g>
+  <g id="c1Hint" class="s-red" fill="none" stroke-width="5" stroke-linecap="round" opacity=".4"
+     transform="translate(148,550) scale(1.25)">
     <circle cx="0" cy="-16" r="17"/>
     <path d="M-30 40 C-30 12 -15 2 0 2 C15 2 30 12 30 40"/>
   </g>
-  <circle cx="148" cy="506" r="104" class="s-red" fill="none" stroke-width="7"/>
-  <rect id="c1Hit" x="44" y="402" width="208" height="208" fill="none" pointer-events="all"/>
-  <g transform="rotate(-3 148 610)">
-    <rect id="c1Bar" class="f-red" y="588" height="44" rx="4"/>
-    <text id="c1Name" class="cond f-on-red" x="148" y="620" font-size="28" text-anchor="middle" letter-spacing="2.4">JUN</text>
+  <circle cx="148" cy="556" r="104" class="s-red" fill="none" stroke-width="7"/>
+  <rect id="c1Hit" x="44" y="452" width="208" height="208" fill="none" pointer-events="all"/>
+  <g transform="rotate(-3 148 640)">
+    <rect id="c1Bar" class="f-red" y="618" height="44" rx="4"/>
+    <text id="c1Name" class="cond f-on-red" x="148" y="650" font-size="28" text-anchor="middle" letter-spacing="2.4">JUN</text>
   </g>
-  <text id="c1Age" class="cond f-red" x="148" y="672" font-size="19" text-anchor="middle" letter-spacing="1.6">AGE. 19</text>
 
   <!-- 캐릭터 02 -->
-  <circle cx="852" cy="506" r="104" class="f-sheet"/>
-  <g clip-path="url(#clip-c2)"><image id="c2Img" preserveAspectRatio="none" style="display:none"/></g>
-  <g id="c2Hint" class="s-red" fill="none" stroke-width="5" stroke-linecap="round" opacity=".4" transform="translate(852,500) scale(1.25)">
+  <circle cx="852" cy="556" r="104" class="f-sheet"/>
+  <g clip-path="url(#clip-c2)">
+    <image id="c2Img" preserveAspectRatio="none" filter="url(#fx-tone)" style="display:none"/>
+  </g>
+  <g id="c2Hint" class="s-red" fill="none" stroke-width="5" stroke-linecap="round" opacity=".4"
+     transform="translate(852,550) scale(1.25)">
     <circle cx="0" cy="-16" r="17"/>
     <path d="M-30 40 C-30 12 -15 2 0 2 C15 2 30 12 30 40"/>
   </g>
-  <circle cx="852" cy="506" r="104" class="s-red" fill="none" stroke-width="7"/>
-  <rect id="c2Hit" x="748" y="402" width="208" height="208" fill="none" pointer-events="all"/>
-  <g transform="rotate(3 852 610)">
-    <rect id="c2Bar" class="f-red" y="588" height="44" rx="4"/>
-    <text id="c2Name" class="cond f-on-red" x="852" y="620" font-size="28" text-anchor="middle" letter-spacing="2.4">HANA</text>
-  </g>
-  <text id="c2Age" class="cond f-red" x="852" y="672" font-size="19" text-anchor="middle" letter-spacing="1.6">AGE. 18</text>
-
-  <!-- 테두리만 있는 뾰족별. 크기·각도·자리를 일부러 어긋나게 흩뿌린다 -->
-  <g class="sparks" fill="none" stroke-linejoin="round">
-    <use href="#ic-spark" class="s-red"   stroke-width="7"  transform="translate(80,408) rotate(14) scale(.18)"/>
-    <use href="#ic-spark" class="s-green" stroke-width="9"  transform="translate(392,398) rotate(-9) scale(.12)"/>
-    <use href="#ic-spark" class="s-red"   stroke-width="8"  transform="translate(936,364) rotate(22) scale(.13)"/>
-    <use href="#ic-spark" class="s-green" stroke-width="6"  transform="translate(272,688) rotate(-16) scale(.21)"/>
-    <use href="#ic-spark" class="s-red"   stroke-width="9"  transform="translate(736,652) rotate(8) scale(.14)"/>
-    <use href="#ic-spark" class="s-green" stroke-width="8"  transform="translate(196,1288) rotate(18) scale(.15)"/>
-    <use href="#ic-spark" class="s-red"   stroke-width="10" transform="translate(568,1268) rotate(-12) scale(.11)"/>
+  <circle cx="852" cy="556" r="104" class="s-red" fill="none" stroke-width="7"/>
+  <rect id="c2Hit" x="748" y="452" width="208" height="208" fill="none" pointer-events="all"/>
+  <g transform="rotate(3 852 640)">
+    <rect id="c2Bar" class="f-red" y="618" height="44" rx="4"/>
+    <text id="c2Name" class="cond f-on-red" x="852" y="650" font-size="28" text-anchor="middle" letter-spacing="2.4">HANA</text>
   </g>
 
-  <!-- 음식 그림 : 메뉴보다 뒤에 그려 글자가 위로 올라오게 한다 -->
+  <!-- 메뉴 틀. 그림보다 뒤에 그려 사진 아랫부분을 덮는다 -->
+  <rect x="40" y="800" width="920" height="624" rx="14" class="f-paper"/>
+  <rect x="40" y="800" width="920" height="624" rx="14" class="s-red" fill="none" stroke-width="4"/>
+  <rect x="354" y="828" width="292" height="480" rx="10" class="s-red" fill="none" stroke-width="2.6"/>
+
+  <!-- 음식 그림 : 메뉴 글자보다 뒤에 그려 겹쳐도 글자가 읽히게 -->
   <g class="slot"><image id="img-burger" class="slot-img" preserveAspectRatio="xMidYMid meet"/><rect id="hit-burger" class="slot-hit" fill="none" pointer-events="all"/></g>
   <g class="slot"><image id="img-pizza"  class="slot-img" preserveAspectRatio="xMidYMid meet"/><rect id="hit-pizza"  class="slot-hit" fill="none" pointer-events="all"/></g>
   <g class="slot"><image id="img-shake"  class="slot-img" preserveAspectRatio="xMidYMid meet"/><rect id="hit-shake"  class="slot-hit" fill="none" pointer-events="all"/></g>
 
-  <!-- 메뉴 3단 -->
-  <path d="M348 812 V1400 M652 812 V1400" class="s-red" fill="none" stroke-width="1.6" opacity=".4"/>
   <g id="menu"></g>
 
   <!-- 바닥 손글씨 -->
-  <g transform="rotate(-3 190 1350)"><g id="footL" class="script f-green" font-size="34"></g></g>
-  <g id="footC" class="script f-red" font-size="34"></g>
+  <g transform="rotate(-3 190 1370)"><g id="footL" class="script f-green" font-size="42"></g></g>
+  <g id="footC" class="script f-red" font-size="44"></g>
   <use id="footStarL" href="#ic-star" class="f-red"/>
   <use id="footStarR" href="#ic-star" class="f-red"/>
+
+  <!-- 종이 질감 : 맨 위에서 전체를 덮는다(사진 포함) -->
+  <rect width="1000" height="1500" filter="url(#fx-stain)" opacity=".3" pointer-events="none"/>
+  <rect width="1000" height="1500" filter="url(#fx-fiber)" opacity=".38" pointer-events="none"/>
 
 </svg>
 

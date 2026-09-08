@@ -24,17 +24,17 @@ const poster = $('#poster');
 
 /* 사진이 들어가는 세 자리. box 는 index.html 의 clip-path / hit 사각형과 같아야 한다. */
 const FRAMES = {
-  main: { box: { x: 300, y: 424, w: 400, h: 352 }, img: '#photoImg', hint: '#photoHint', hit: '#photoHit' },
-  c1:   { box: { x:  44, y: 402, w: 208, h: 208 }, img: '#c1Img',    hint: '#c1Hint',    hit: '#c1Hit'    },
-  c2:   { box: { x: 748, y: 402, w: 208, h: 208 }, img: '#c2Img',    hint: '#c2Hint',    hit: '#c2Hit'    },
+  main: { box: { x: 250, y: 452, w: 500, h: 428 }, img: '#photoImg', hint: '#photoHint', hit: '#photoHit' },
+  c1:   { box: { x:  44, y: 452, w: 208, h: 208 }, img: '#c1Img',    hint: '#c1Hint',    hit: '#c1Hit'    },
+  c2:   { box: { x: 748, y: 452, w: 208, h: 208 }, img: '#c2Img',    hint: '#c2Hint',    hit: '#c2Hit'    },
 };
 const framePic = k => (k === 'main' ? S.photo : S[k].img);
 
 /* 음식 그림. 기본값은 art/ 의 그림이고, 올리면 그 그림으로 바뀐다 */
 const SLOTS = [
-  { k: 'burger', name: '햄버거',     art: 'art/burger.png', box: { cx: 150, cy: 778,  w: 208, h: 171 } },
-  { k: 'pizza',  name: '피자',       art: 'art/pizza.png',  box: { cx: 858, cy: 762,  w: 190, h: 141 } },
-  { k: 'shake',  name: '밀크셰이크', art: 'art/shake.png',  box: { cx: 828, cy: 1316, w:  98, h: 218 } },
+  { k: 'burger', name: '햄버거',     art: 'art/burger.png', box: { cx: 152, cy: 796,  w: 180, h: 148 } },
+  { k: 'pizza',  name: '피자',       art: 'art/pizza.png',  box: { cx: 858, cy: 788,  w: 190, h: 141 } },
+  { k: 'shake',  name: '밀크셰이크', art: 'art/shake.png',  box: { cx: 846, cy: 1312, w:  96, h: 214 } },
 ];
 const SLOT_BY_K = Object.fromEntries(SLOTS.map(s => [s.k, s]));
 
@@ -54,7 +54,7 @@ const PRESETS = [
 /* 메뉴판 본문은 고정값이다. SPECIAL PAIR SET 첫 줄만 두 사람 것으로 바뀐다.
    열마다 MENU_TOP 에서 시작해 같은 간격으로 쌓으므로 섹션 사이 여백이 항상 같다. */
 const COLS = [{ x0: 70, x1: 336 }, { x0: 364, x1: 636 }, { x0: 664, x1: 930 }];
-const MENU_TOP = 806, ROW_PITCH = 30, HEAD_GAP = 36, SEC_GAP = 44;
+const MENU_TOP = 852, ROW_PITCH = 30, HEAD_GAP = 36, SEC_GAP = 44;
 const MENU = [
   [ { title: 'MAIN DISHES', style: 'slant', dx: 22, rows: [
       ['CLASSIC BURGER','$8.5'], ['CHEESE BURGER','$9.5'], ['DOUBLE BURGER','$11.5'],
@@ -75,7 +75,7 @@ const MENU = [
 
 const newSticker = () => ({ src: null, scale: 1, dx: 0, dy: 0 });
 const newPic     = () => ({ src: null, nw: 0, nh: 0, zoom: 1, ox: 0, oy: 0 });
-const newChar    = () => ({ name: '', age: '', img: newPic() });
+const newChar    = () => ({ name: '', img: newPic() });
 
 const defaults = () => ({
   pair: '', arch: '', pill: '',
@@ -95,7 +95,7 @@ const PH = {
   badge: 'TWO HEARTS / ONE / MENU',
   footL: 'More Flavor / More Love!',
   footC: 'Sweet / & Salty',
-  c1: 'JUN', c2: 'HANA', age1: '19', age2: '18', setp: '$12.5',
+  c1: 'JUN', c2: 'HANA', setp: '$12.5',
 };
 
 /* ===================== 색 유틸 ===================== */
@@ -272,14 +272,16 @@ function render() {
   /* --- 간판 --- */
   $('#archText').textContent = S.arch.trim() || PH.arch;
 
-  const main = $('#pairName'), shadow = $('#pairShadow');
   const pairText = S.pair.trim() || PH.pair;
-  main.textContent = shadow.textContent = pairText;
-  fitText(main, 780, HANGUL.test(pairText) ? 152 : 186);
-  shadow.style.fontSize = main.style.fontSize;
+  $('#pairName').textContent = $('#pairShadow').textContent = pairText;
+  const nameT = $('#pairNameT');
+  // 아치 경로 길이 안에 들어오도록 맞춘다. 길어지면 곡선을 따라 눕는다
+  const arcLen = $('#arc-name').getTotalLength();
+  fitText(nameT, arcLen * 0.9, HANGUL.test(pairText) ? 152 : 186);
+  $('#pairShadowT').style.fontSize = nameT.style.fontSize;
 
   setText('#pillText', S.pill.trim() || PH.pill);
-  pill('#pillBg', '#pillText', CENTER, 392, 54, 30, 320, 27);
+  pill('#pillBg', '#pillText', CENTER, 418, 54, 30, 320, 27);
 
   /* --- 손글씨 덩어리 --- */
   const sl = lineBlock('#scriptL', S.scriptL.trim() || PH.scriptL,
@@ -298,14 +300,13 @@ function render() {
   });
 
   /* --- 캐릭터 --- */
-  for (const [key, cx, def, defAge] of [['c1', 148, PH.c1, PH.age1], ['c2', 852, PH.c2, PH.age2]]) {
+  for (const [key, cx, def] of [['c1', 148, PH.c1], ['c2', 852, PH.c2]]) {
     const c = S[key], n = key === 'c1' ? 1 : 2;
     const nm = fitText(setText(`#c${n}Name`, c.name.trim() || def), 210, 28);
     const bar = $(`#c${n}Bar`);
     const w = textWidth(nm) + 44;
     bar.setAttribute('x', cx - w / 2);
     bar.setAttribute('width', w);
-    fitText(setText(`#c${n}Age`, `AGE. ${c.age.trim() || defAge}`), 170, 19);
   }
 
   /* --- 메뉴 --- */
@@ -313,13 +314,13 @@ function render() {
 
   /* --- 바닥 손글씨 --- */
   lineBlock('#footL', S.footL.trim() || PH.footL,
-    { x: 70, y: 1348, pitch: 34, size: 30, maxW: 230, max: 2 });
+    { x: 74, y: 1358, pitch: 46, size: 42, maxW: 258, max: 2 });
 
   const fc = lineBlock('#footC', S.footC.trim() || PH.footC,
-    { x: CENTER, y: 1346, pitch: 36, size: 32, maxW: 200, anchor: 'middle', max: 2 });
-  const half = fc.widest / 2 + 24;
-  $('#footStarL').setAttribute('transform', `translate(${CENTER - half},1352) scale(1)`);
-  $('#footStarR').setAttribute('transform', `translate(${CENTER + half},1352) scale(1)`);
+    { x: CENTER, y: 1356, pitch: 48, size: 44, maxW: 214, anchor: 'middle', max: 2 });
+  const half = fc.widest / 2 + 30;
+  $('#footStarL').setAttribute('transform', `translate(${CENTER - half},1370) scale(1.3)`);
+  $('#footStarR').setAttribute('transform', `translate(${CENTER + half},1370) scale(1.3)`);
 
   Object.keys(FRAMES).forEach(placeFrame);
   SLOTS.forEach(s => placeSticker(s.k));
@@ -794,14 +795,9 @@ function buildCharUI() {
       </div>
       <label class="fld range"><span>사진 확대 <b data-zl="${key}">100%</b></span>
         <input type="range" min="100" max="400" step="1" value="100" data-zoom="${key}"></label>
-      <div class="grid2">
-        <label class="fld"><span>이름</span>
-          <input type="text" maxlength="14" data-f="${key}.name"
-                 placeholder="${key === 'c1' ? PH.c1 : PH.c2}"></label>
-        <label class="fld"><span>나이</span>
-          <input type="text" maxlength="6" data-f="${key}.age"
-                 placeholder="${key === 'c1' ? PH.age1 : PH.age2}"></label>
-      </div>`;
+      <label class="fld"><span>이름</span>
+        <input type="text" maxlength="14" data-f="${key}.name"
+               placeholder="${key === 'c1' ? PH.c1 : PH.c2}"></label>`;
   }
 }
 
