@@ -25,8 +25,8 @@ const poster = $('#poster');
 /* 사진이 들어가는 세 자리. box 는 index.html 의 clip-path / hit 사각형과 같아야 한다. */
 const FRAMES = {
   main: { box: { x: 482, y: 280, w: 442, h: 294 }, img: '#photoImg', hint: '#photoHint', hit: '#photoHit' },
-  c1:   { box: { x:  88, y: 850, w: 126, h: 166 }, img: '#c1Img',    hint: '#c1Hint',    hit: '#c1Hit'    },
-  c2:   { box: { x: 564, y: 850, w: 126, h: 166 }, img: '#c2Img',    hint: '#c2Hint',    hit: '#c2Hit'    },
+  c1:   { box: { x:  64, y: 700, w: 152, h: 196 }, img: '#c1Img',    hint: '#c1Hint',    hit: '#c1Hit'    },
+  c2:   { box: { x: 784, y: 700, w: 152, h: 196 }, img: '#c2Img',    hint: '#c2Hint',    hit: '#c2Hit'    },
 };
 const framePic = k => (k === 'main' ? S.photo : S[k].img);
 
@@ -53,11 +53,14 @@ const PRESETS = [
   { name: '나이트', c: { paper:'#2A2A33', red:'#EFC7A8', green:'#8FC7A4', p1:'#EE8FA6', p2:'#7FB8E8', accent:'#F0C766' } },
 ];
 
-/* 캐릭터 한 항목이 쓰는 폭. x 는 항목 시작, dx 는 초상 오른쪽 글자 블록의 시작 */
-const COL_W = 396, DET_W = 204;
-const CHARS = [
-  { key: 'c1', n: 1, x:  88, dx: 232 },
-  { key: 'c2', n: 2, x: 564, dx: 708 },
+/* 페어 코너 : 이름·나이/직업은 가운데 홈통 쪽 열(폭 230),
+   LIKES / TODAY'S PICK 값은 공유 행 안에서 바깥 끝으로 정렬한다(폭 400) */
+const NAME_W = 230, ROW_W = 400;
+const CHARS = [{ key: 'c1', n: 1 }, { key: 'c2', n: 2 }];
+/* 두 사람이 나눠 쓰는 행. cy 는 괘선, vy 는 값의 baseline */
+const PAIR_ROWS = [
+  { k: 'Like', cy: 926, vy: 978, iw: 14 },
+  { k: 'Pick', cy: 1026, vy: 1078, iw: 16 },
 ];
 const MENU_DEF = ['LOVE', 'LAUGHTER', 'GOOD FOOD', 'YOU & ME'];
 
@@ -272,21 +275,22 @@ function render() {
   tabLabel('#bn-mn-p', '#bn-mn-t', 64, 1140, 38, 110);
 
   /* --- 캐릭터 : 메뉴판의 한 항목처럼 --- */
-  for (const { key, n, x, dx } of CHARS) {
+  for (const { key, n } of CHARS) {
     const c = S[key], demo = PH.demo[key];
     const self  = key === 'c1' ? n1 : n2;
     const other = key === 'c1' ? n2 : n1;
 
-    fitText(setText(`#c${n}Name`, self), 320, 30);   // 이름 pill 안쪽 폭
+    fitText(setText(`#c${n}Name`, self), NAME_W, 40);
 
     // 나이와 직업은 한 줄로 붙인다. 둘 다 비면 예시를 보여 준다
     const meta = [c.age.trim(), c.job.trim()].filter(Boolean).join('  ·  ');
-    fitText(setText(`#c${n}Meta`, meta || `${demo.age}  ·  ${demo.job}`), DET_W, 24);
+    fitText(setText(`#c${n}Meta`, meta || `${demo.age}  ·  ${demo.job}`), NAME_W, 15);
 
-    fitText(setText(`#c${n}Like`, c.like.trim() || demo.like), DET_W, 24);
+    fitText(setText(`#c${n}Like`, c.like.trim() || demo.like), ROW_W, 28);
     // TODAY'S PICK: 값이 비면 상대 이름이 들어간다
-    fitText(setText(`#c${n}Pick`, c.order.trim() || other), DET_W, 24);
+    fitText(setText(`#c${n}Pick`, c.order.trim() || other), ROW_W, 28);
   }
+  pairRows();
 
   /* --- 오늘의 메뉴 --- */
   renderMenu();
@@ -308,6 +312,25 @@ function render() {
   SLOTS.forEach(s => placeSticker(s.k));
   save();
   ensureKrFonts();
+}
+
+/* 공유 행: 라벨을 홈통 가운데에 앉혀 괘선을 끊고, 두 값 사이를 점선으로 잇는다.
+   행이 지면을 가로질러야 "두 열"이 아니라 "한 쌍이 나눠 쓴 한 줄"로 읽힌다. */
+function pairRows() {
+  for (const { k, cy, vy, iw } of PAIR_ROWS) {
+    const t = $(`#row${k}T`);
+    const total = iw + 8 + textWidth(t);
+    const x0 = CENTER - total / 2;
+    $(`#row${k}I`).setAttribute('transform', `translate(${x0 + iw / 2},${cy}) scale(${iw / 16})`);
+    t.setAttribute('x', x0 + iw + 8);
+    const bg = $(`#row${k}Bg`);
+    bg.setAttribute('x', x0 - 16);
+    bg.setAttribute('width', total + 32);
+
+    const l = 64 + textWidth($(`#c1${k}`)) + 20;
+    const r = 936 - textWidth($(`#c2${k}`)) - 20;
+    $(`#row${k}D`).setAttribute('d', r - l > 60 ? `M${l} ${vy - 9} H${r}` : '');
+  }
 }
 
 /* 메뉴 4개를 하트로 이어 한 줄에 놓는다. 카드(상자)를 쓰지 않는다. */
