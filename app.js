@@ -24,17 +24,17 @@ const poster = $('#poster');
 
 /* 사진이 들어가는 세 자리. box 는 index.html 의 clip-path / hit 사각형과 같아야 한다. */
 const FRAMES = {
-  main: { box: { x: 250, y: 440, w: 500, h: 440 }, img: '#photoImg', hint: '#photoHint', hit: '#photoHit' },
-  c1:   { box: { x:  44, y: 416, w: 208, h: 208 }, img: '#c1Img',    hint: '#c1Hint',    hit: '#c1Hit'    },
-  c2:   { box: { x: 748, y: 416, w: 208, h: 208 }, img: '#c2Img',    hint: '#c2Hint',    hit: '#c2Hit'    },
+  main: { box: { x: 250, y: 414, w: 500, h: 440 }, img: '#photoImg', hint: '#photoHint', hit: '#photoHit' },
+  c1:   { box: { x:  44, y: 390, w: 208, h: 208 }, img: '#c1Img',    hint: '#c1Hint',    hit: '#c1Hit'    },
+  c2:   { box: { x: 748, y: 390, w: 208, h: 208 }, img: '#c2Img',    hint: '#c2Hint',    hit: '#c2Hit'    },
 };
 const framePic = k => (k === 'main' ? S.photo : S[k].img);
 
 /* 음식 그림. 기본값은 art/ 의 그림이고, 올리면 그 그림으로 바뀐다 */
 const SLOTS = [
-  { k: 'burger', name: '햄버거',     art: 'art/burger.png', box: { cx: 152, cy: 776,  w: 180, h: 148 } },
-  { k: 'pizza',  name: '피자',       art: 'art/pizza.png',  box: { cx: 858, cy: 788,  w: 190, h: 141 } },
-  { k: 'shake',  name: '밀크셰이크', art: 'art/shake.png',  box: { cx: 810, cy: 1318, w:  94, h: 210 } },
+  { k: 'burger', name: '햄버거',     art: 'art/burger.png', box: { cx: 152, cy: 750,  w: 180, h: 148 } },
+  { k: 'pizza',  name: '피자',       art: 'art/pizza.png',  box: { cx: 858, cy: 762,  w: 190, h: 141 } },
+  { k: 'shake',  name: '밀크셰이크', art: 'art/shake.png',  box: { cx: 810, cy: 1292, w:  94, h: 210 } },
 ];
 const SLOT_BY_K = Object.fromEntries(SLOTS.map(s => [s.k, s]));
 
@@ -54,7 +54,7 @@ const PRESETS = [
 /* 메뉴판 본문은 고정값이다. SPECIAL PAIR SET 첫 줄만 두 사람 것으로 바뀐다.
    열마다 MENU_TOP 에서 시작해 같은 간격으로 쌓으므로 섹션 사이 여백이 항상 같다. */
 const COLS = [{ x0: 70, x1: 336 }, { x0: 364, x1: 636 }, { x0: 664, x1: 930 }];
-const MENU_TOP = 852, ROW_PITCH = 33, HEAD_GAP = 36, SEC_GAP = 50;
+const MENU_TOP = 826, ROW_PITCH = 33, HEAD_GAP = 36, SEC_GAP = 50;
 const MENU = [
   [ { title: 'MAIN DISHES', style: 'slant', dx: 22, rows: [
       ['CLASSIC BURGER','$8.5'], ['CHEESE BURGER','$9.5'], ['DOUBLE BURGER','$11.5'],
@@ -296,17 +296,17 @@ function render() {
   nameArc('#arc-name-s', textWidth(nameT), 316, 9, 15);
 
   setText('#pillText', S.pill.trim() || PH.pill);
-  pill('#pillBg', '#pillText', CENTER, 382, 60, 38, 300, 32);
+  pill('#pillBg', '#pillText', CENTER, 372, 52, 34, 300, 28);
 
   /* --- 손글씨 덩어리 --- */
   const bd = splitLines(S.badge.trim() || PH.badge, 3);
   const bg = $('#badgeText');
   bg.textContent = '';
   bd.forEach((line, i) => {
-    const t = svgEl('text', { x: 874, y: 156 - (bd.length - 1) * 14 + i * 28 + 8, 'text-anchor': 'middle', 'letter-spacing': 1.6 });
+    const t = svgEl('text', { x: 866, y: 168 - (bd.length - 1) * 15 + i * 30 + 8, 'text-anchor': 'middle', 'letter-spacing': 1.6 });
     t.textContent = line;
     bg.appendChild(t);
-    fitText(t, 118, 21);
+    fitText(t, 132, 23);
   });
 
   /* --- 캐릭터 --- */
@@ -321,7 +321,7 @@ function render() {
   /* --- 바닥 장식 : 별은 글자 폭을 재서 양옆에 붙인다 --- */
   const footW = textWidth($('#footNote'));
   for (const [sel, sgn] of [['#footStarL', -1], ['#footStarR', 1]]) {
-    $(sel).setAttribute('transform', `translate(${CENTER + sgn * (footW / 2 + 28)},1409) scale(.8)`);
+    $(sel).setAttribute('transform', `translate(${CENTER + sgn * (footW / 2 + 30)},1394) scale(.9)`);
   }
 
   Object.keys(FRAMES).forEach(placeFrame);
