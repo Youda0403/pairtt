@@ -1,7 +1,7 @@
 /* ---------- 폰트 (로컬 서브셋: 저장 시 base64로 임베드됨) ---------- */
-@font-face { font-family: 'PFDisplay'; src: url('fonts/Pacifico-400.woff2') format('woff2'); font-display: block; }
-@font-face { font-family: 'PFHand';    src: url('fonts/Caveat-700.woff2')   format('woff2'); font-display: block; }
-@font-face { font-family: 'PFSans';    src: url('fonts/Nunito-800.woff2')   format('woff2'); font-display: block; }
+@font-face { font-family: 'PFSlab';   src: url('fonts/AlfaSlabOne-400.woff2') format('woff2'); font-display: block; }
+@font-face { font-family: 'PFScript'; src: url('fonts/Yellowtail-400.woff2')  format('woff2'); font-display: block; }
+@font-face { font-family: 'PFCond';   src: url('fonts/Oswald-600.woff2')      format('woff2'); font-display: block; }
 /* 한글 폰트. 라틴 폰트에 한글 글리프가 없어 한글을 쓸 때만 브라우저가 내려받는다. */
 @font-face { font-family: 'PFDisplayKR'; src: url('fonts/Jua-KR.woff2')      format('woff2'); font-display: swap; }
 @font-face { font-family: 'PFHandKR';    src: url('fonts/Gaegu-KR.woff2')    format('woff2'); font-display: swap; }
@@ -13,7 +13,7 @@ html, body { margin: 0; padding: 0; }
 body {
   background: #efe7d8;
   color: #43342b;
-  font-family: 'PFSans', system-ui, -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+  font-family: system-ui, -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
   font-size: 15px;
   -webkit-text-size-adjust: 100%;
 }
@@ -126,7 +126,6 @@ button, input { font: inherit; color: inherit; }
   margin-bottom: 6px; background: #faf4e8; border-radius: 6px; overflow: hidden;
 }
 .sticker .thumb img { max-width: 100%; max-height: 100%; }
-.sticker .thumb .none { font-size: 11px; opacity: .4; }
 .sticker .szrow { display: block; margin: 0 0 7px; }
 .sticker .szrow span { display: block; font-size: 11px; opacity: .55; margin-bottom: 2px; }
 .sticker .szrow input[type=range] { width: 100%; accent-color: #c4362c; }

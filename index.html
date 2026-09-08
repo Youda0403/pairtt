@@ -4,28 +4,25 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Pairframe — 페어 다이너 메뉴판 메이커</title>
-<meta name="description" content="사진 한 장과 두 사람의 정보로 레트로 다이너 메뉴판 스타일 페어 포스터를 만들고 고화질로 저장하세요.">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
 <div class="app">
 
-  <!-- ===================== 포스터 ===================== -->
-  <div class="stage">
-    <div class="stage-inner">
+<div class="stage">
+  <div class="stage-inner">
+
 <svg id="poster" viewBox="0 0 1000 1500" preserveAspectRatio="xMidYMid meet" role="img" aria-label="페어 메뉴판 미리보기">
 
   <defs>
-    <!-- 색상 + 폰트는 JS가 여기에 주입한다 (저장 시 그대로 직렬화됨) -->
     <style id="theme-style"></style>
 
     <g id="ic-heart"><path d="M0 6.6C-1.4 5.4-7.6 1-7.6-2.8-7.6-5.9-5.1-7.7-2.8-7.7-1.2-7.7-.3-6.8 0-5.9 .3-6.8 1.2-7.7 2.8-7.7 5.1-7.7 7.6-5.9 7.6-2.8 7.6 1 1.4 5.4 0 6.6Z"/></g>
     <g id="ic-star"><path d="M0-10 2.9-3.4 10-2.7 4.6 2.1 6.2 9.2 0 5.4-6.2 9.2-4.6 2.1-10-2.7-2.9-3.4Z"/></g>
+    <path id="ic-burst" d="M0.0 -86.0 L9.1 -63.3 L24.2 -82.5 L26.6 -58.2 L46.5 -72.3 L41.9 -48.4 L65.0 -56.3 L53.8 -34.6 L78.2 -35.7 L61.4 -18.0 L85.1 -12.2 L64.0 -0.0 L85.1 12.2 L61.4 18.0 L78.2 35.7 L53.8 34.6 L65.0 56.3 L41.9 48.4 L46.5 72.3 L26.6 58.2 L24.2 82.5 L9.1 63.3 L0.0 86.0 L-9.1 63.3 L-24.2 82.5 L-26.6 58.2 L-46.5 72.3 L-41.9 48.4 L-65.0 56.3 L-53.8 34.6 L-78.2 35.7 L-61.4 18.0 L-85.1 12.2 L-64.0 0.0 L-85.1 -12.2 L-61.4 -18.0 L-78.2 -35.7 L-53.8 -34.6 L-65.0 -56.3 L-41.9 -48.4 L-46.5 -72.3 L-26.6 -58.2 L-24.2 -82.5 L-9.1 -63.3 Z"/>
 
-    <filter id="lift" x="-10%" y="-10%" width="124%" height="124%">
-      <feDropShadow dx="2" dy="6" stdDeviation="6" flood-color="#4a3a24" flood-opacity=".2"/>
-    </filter>
+    <path id="arc-band" d="M292 150 A 228 62 0 0 1 708 150" fill="none"/>
+    <path id="arc-text" d="M292 161 A 228 62 0 0 1 708 161" fill="none"/>
 
     <pattern id="pat-check" width="24" height="24" patternUnits="userSpaceOnUse">
       <rect width="24" height="24" class="f-paper"/>
@@ -36,11 +33,6 @@
       <rect width="16" height="16" class="f-paper"/>
       <rect width="8" height="8" class="f-red"/>
       <rect x="8" y="8" width="8" height="8" class="f-red"/>
-    </pattern>
-    <pattern id="pat-tape" width="14" height="14" patternUnits="userSpaceOnUse">
-      <rect width="14" height="14" class="f-p1" fill-opacity=".18"/>
-      <rect width="7" height="7" class="f-p1" fill-opacity=".5"/>
-      <rect x="7" y="7" width="7" height="7" class="f-p1" fill-opacity=".5"/>
     </pattern>
 
     <pattern id="pat-grain" width="150" height="150" patternUnits="userSpaceOnUse">
@@ -53,326 +45,221 @@
       </g>
     </pattern>
 
-    <clipPath id="clip-photo"><rect x="482" y="280" width="442" height="294" rx="8"/></clipPath>
-    <clipPath id="clip-c1"><rect x="64"  y="676" width="186" height="232" rx="2"/></clipPath>
-    <clipPath id="clip-c2"><rect x="748" y="830" width="188" height="236" rx="2"/></clipPath>
-    <clipPath id="clip-shake"><path d="M18 46 H98 L86 196 Q85 208 74 208 H42 Q31 208 30 196 Z"/></clipPath>
+    <clipPath id="clip-photo"><rect x="286" y="392" width="428" height="384"/></clipPath>
+    <clipPath id="clip-c1"><circle cx="132" cy="504" r="72"/></clipPath>
+    <clipPath id="clip-c2"><circle cx="868" cy="504" r="72"/></clipPath>
   </defs>
 
   <rect width="1000" height="1500" class="f-paper"/>
   <rect width="1000" height="1500" fill="url(#pat-grain)"/>
 
-  <rect x="0" y="0" width="1000" height="24" fill="url(#pat-check)"/>
-  <rect x="0" y="1476" width="1000" height="24" fill="url(#pat-check)"/>
+  <!-- 인쇄 테두리 + 체커 띠 -->
+  <rect x="15" y="15" width="970" height="1470" rx="16" class="s-red" fill="none" stroke-width="7"/>
+  <rect x="30" y="30" width="940" height="1440" rx="10" class="s-red" fill="none" stroke-width="1.6" opacity=".45"/>
+  <rect x="40" y="40" width="920" height="24" fill="url(#pat-check)"/>
+  <rect x="40" y="1436" width="920" height="24" fill="url(#pat-check)"/>
 
-  <!-- 머리 괘선 : 상단 문구와 전표 번호를 한 줄에 묶는다 -->
-  <g>
-    <text id="tagLine" class="sans f-green" x="64" y="64" font-size="16" letter-spacing="3">GOOD FOOD • GOOD FRIENDS • BETTER DAYS</text>
-    <text class="sans f-red" x="936" y="64" font-size="13" text-anchor="end" letter-spacing="2.6">ORDER No. 042</text>
-    <path d="M64 84 H936" class="s-red" fill="none" stroke-width="2" opacity=".5"/>
+  <!-- 간판 : 아치 문구 + 거대 페어명 + 알약 -->
+  <use href="#arc-band" class="s-red" stroke-width="52" stroke-linecap="round"/>
+  <text class="cond f-on-red" font-size="30" letter-spacing="4">
+    <textPath id="archText" href="#arc-text" startOffset="50%" text-anchor="middle">OUR SPECIAL</textPath>
+  </text>
+
+  <text id="pairShadow" class="slab f-green" x="504" y="305" font-size="140" text-anchor="middle">PAIR</text>
+  <text id="pairName" class="slab f-red s-paper" x="500" y="300" font-size="140" text-anchor="middle"
+        paint-order="stroke" stroke-width="9" stroke-linejoin="round">PAIR</text>
+
+  <rect id="pillBg" class="f-green" y="330" height="52" rx="26"/>
+  <text id="pillText" class="cond f-on-green" x="500" y="366" font-size="27" text-anchor="middle" letter-spacing="4">MENU</text>
+
+  <!-- 왼쪽 위 손글씨 + 오른쪽 위 별폭발 배지 -->
+  <g transform="rotate(-5 150 150)">
+    <g id="scriptL" class="script f-green" font-size="40"></g>
+    <path id="scriptLine" class="s-green" fill="none" stroke-width="5" stroke-linecap="round" opacity=".9"/>
   </g>
 
-  <!-- 로고 락업 : 페어명 + 부제 + 오른쪽으로 뻗는 괘선 -->
-  <g>
-    <text id="pairShadow" class="disp f-green s-green" x="71" y="203" font-size="104"
-          paint-order="stroke" stroke-width="10" stroke-linejoin="round">Pairname</text>
-    <text id="pairName" class="disp f-red s-paper" x="64" y="196" font-size="104"
-          paint-order="stroke" stroke-width="12" stroke-linejoin="round">Pairname</text>
-    <text id="bn-sub-t" class="sans f-red" x="68" y="250" font-size="17" letter-spacing="6">DINER &amp; GRILL</text>
-    <path id="bn-sub-r" class="s-red" fill="none" stroke-width="1.6" opacity=".55"/>
+  <g transform="rotate(6 872 158)">
+    <use href="#ic-burst" class="f-green" transform="translate(872,158)"/>
+    <g id="badgeText" class="cond f-on-green" font-size="21"></g>
   </g>
 
-  <!-- EST 씰 : 머리 괘선을 뚫고 앉는다 -->
-  <g transform="rotate(-5 866 142)">
-    <circle cx="866" cy="142" r="56" class="f-paper"/>
-    <circle cx="866" cy="142" r="56" class="s-green" fill="none" stroke-width="2.6"/>
-    <circle cx="866" cy="142" r="47" class="s-green" fill="none" stroke-width="1.2" stroke-dasharray="2 6" stroke-linecap="round"/>
-    <text class="sans f-green" x="866" y="122" font-size="12" text-anchor="middle" letter-spacing="3">EST.</text>
-    <text id="estYear" class="sans f-green" x="866" y="160" font-size="30" text-anchor="middle" letter-spacing="1.4">20XX</text>
-    <use href="#ic-star" class="f-accent" transform="translate(866,178) scale(.62)"/>
+  <!-- 가운데 그림 -->
+  <g clip-path="url(#clip-photo)">
+    <image id="photoImg" preserveAspectRatio="none" style="display:none"/>
   </g>
-
-  <!-- 메인 사진 : 오른쪽에만 놓아 세로 지배력을 줄인다 -->
-  <g id="photoBlock">
-    <g filter="url(#lift)">
-      <rect x="470" y="268" width="466" height="318" rx="14" class="f-sheet"/>
+  <g id="photoHint" class="s-red" fill="none" opacity=".5">
+    <g stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="452" y="520" width="96" height="76" rx="10"/>
+      <circle cx="478" cy="544" r="7"/>
+      <path d="M458 590 l26-30 18 18 14-14 24 22"/>
     </g>
-    <rect x="470" y="268" width="466" height="318" rx="14" class="s-red" fill="none" stroke-width="3.5"/>
-    <rect x="477" y="275" width="452" height="304" rx="10" class="s-red" fill="none" stroke-width="1.2" opacity=".7"/>
-    <rect x="482" y="280" width="442" height="294" rx="8" class="f-glight"/>
-    <g clip-path="url(#clip-photo)">
-      <image id="photoImg" preserveAspectRatio="none" style="display:none"/>
-    </g>
-    <g id="photoHint">
-      <g class="s-green" fill="none" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity=".8">
-        <rect x="669" y="404" width="68" height="56" rx="8"/>
-        <circle cx="688" cy="422" r="5"/>
-        <path d="M673 453 l19-21 13 13 10-10 17 15"/>
-        <path d="M647 412 l-13-8 M645 436 l-15 3 M653 456 l-12 10 M759 412 l13-8 M761 436 l15 3 M753 456 l12 10"/>
-      </g>
-      <text class="hand f-green" x="703" y="504" font-size="34" text-anchor="middle">photo here!</text>
-      <use href="#ic-heart" class="f-green" transform="translate(703,524) scale(1.1)"/>
-    </g>
-    <rect x="482" y="280" width="442" height="294" rx="8" class="s-red" fill="none" stroke-width="2.4"/>
-    <rect id="photoHit" x="482" y="280" width="442" height="294" rx="8" fill="none" pointer-events="all"/>
+    <text class="script f-red" x="500" y="668" font-size="40" text-anchor="middle" stroke="none">two of us here!</text>
+  </g>
+  <rect id="photoHit" x="286" y="392" width="428" height="384" fill="none" pointer-events="all"/>
+
+  <!-- 캐릭터 01 -->
+  <circle cx="132" cy="504" r="72" class="f-sheet"/>
+  <g clip-path="url(#clip-c1)"><image id="c1Img" preserveAspectRatio="none" style="display:none"/></g>
+  <g id="c1Hint" class="s-red" fill="none" stroke-width="5" stroke-linecap="round" opacity=".4" transform="translate(132,504)">
+    <circle cx="0" cy="-16" r="17"/>
+    <path d="M-30 40 C-30 12 -15 2 0 2 C15 2 30 12 30 40"/>
+  </g>
+  <circle cx="132" cy="504" r="72" class="s-red" fill="none" stroke-width="5"/>
+  <rect id="c1Hit" x="60" y="432" width="144" height="144" fill="none" pointer-events="all"/>
+  <g transform="rotate(-3 132 606)">
+    <rect id="c1Bar" class="f-red" y="586" height="38" rx="4"/>
+    <text id="c1Name" class="cond f-on-red" x="132" y="614" font-size="24" text-anchor="middle" letter-spacing="2.4">JUN</text>
+  </g>
+  <text id="c1Age" class="cond f-red" x="132" y="656" font-size="17" text-anchor="middle" letter-spacing="1.6">AGE. 19</text>
+
+  <!-- 캐릭터 02 -->
+  <circle cx="868" cy="504" r="72" class="f-sheet"/>
+  <g clip-path="url(#clip-c2)"><image id="c2Img" preserveAspectRatio="none" style="display:none"/></g>
+  <g id="c2Hint" class="s-red" fill="none" stroke-width="5" stroke-linecap="round" opacity=".4" transform="translate(868,504)">
+    <circle cx="0" cy="-16" r="17"/>
+    <path d="M-30 40 C-30 12 -15 2 0 2 C15 2 30 12 30 40"/>
+  </g>
+  <circle cx="868" cy="504" r="72" class="s-red" fill="none" stroke-width="5"/>
+  <rect id="c2Hit" x="796" y="432" width="144" height="144" fill="none" pointer-events="all"/>
+  <g transform="rotate(3 868 606)">
+    <rect id="c2Bar" class="f-red" y="586" height="38" rx="4"/>
+    <text id="c2Name" class="cond f-on-red" x="868" y="614" font-size="24" text-anchor="middle" letter-spacing="2.4">HANA</text>
+  </g>
+  <text id="c2Age" class="cond f-red" x="868" y="656" font-size="17" text-anchor="middle" letter-spacing="1.6">AGE. 18</text>
+
+  <!-- 가운데 아래 손글씨 두 덩어리 -->
+  <g transform="rotate(-4 130 730)">
+    <g id="midL" class="script f-green" font-size="36"></g>
+    <path id="midLine" class="s-green" fill="none" stroke-width="5" stroke-linecap="round" opacity=".9"/>
+  </g>
+  <g transform="rotate(4 878 730)">
+    <g id="midR" class="script f-red" font-size="36"></g>
   </g>
 
-  <!-- 마스킹 테이프 : 사진 오른쪽 위 모서리를 물고 기둥 밖으로 나간다 -->
-  <g transform="rotate(24 928 272)">
-    <rect x="878" y="258" width="100" height="26" fill="url(#pat-tape)"/>
-    <rect x="878" y="258" width="100" height="26" class="s-p1" fill="none" stroke-width="1" opacity=".45"/>
-  </g>
+  <!-- 메뉴 3단 -->
+  <path d="M348 812 V1400 M652 812 V1400" class="s-red" fill="none" stroke-width="1.6" opacity=".4"/>
+  <g id="menu"></g>
 
-  <!-- TODAY'S SPECIAL 깃발 : 끝이 사진 테두리에 닿는다 -->
-  <g>
-    <path id="bn-sp-p" class="f-red"/>
-    <use id="bn-sp-i" href="#ic-star" class="f-accent" transform="translate(88,318) scale(.85)"/>
-    <text id="bn-sp-t" class="sans f-on-red" x="110" y="325" font-size="21" letter-spacing="4">TODAY'S SPECIAL</text>
-  </g>
+  <!-- 음식 그림 : 메뉴 위에 얹힌다 -->
+  <g class="slot"><image id="img-burger" class="slot-img" preserveAspectRatio="xMidYMid meet"/><rect id="hit-burger" class="slot-hit" fill="none" pointer-events="all"/></g>
+  <g class="slot"><image id="img-pizza"  class="slot-img" preserveAspectRatio="xMidYMid meet"/><rect id="hit-pizza"  class="slot-hit" fill="none" pointer-events="all"/></g>
+  <g class="slot"><image id="img-shake"  class="slot-img" preserveAspectRatio="xMidYMid meet"/><rect id="hit-shake"  class="slot-hit" fill="none" pointer-events="all"/></g>
 
-  <!-- 사진 왼쪽 빈 열 : 손글씨 메모 -->
-  <g>
-    <text class="sans f-red" x="68" y="392" font-size="12" letter-spacing="3.4">HOUSE FAVORITE</text>
-    <path d="M68 402 H240" class="s-red" fill="none" stroke-width="1.4" opacity=".5"/>
-    <g id="noteLines" class="hand f-red" font-size="30"></g>
-    <path d="M70 542 q86 12 176 1" class="s-red" fill="none" stroke-width="3" stroke-linecap="round" opacity=".85"/>
-  </g>
-
-  <!-- 페어 괘선 + 가운데 하트 메달 -->
-  <g>
-    <path d="M64 640 H936" class="s-green" fill="none" stroke-width="2" opacity=".55"/>
-    <path id="bn-pr-p" class="f-green"/>
-    <use id="bn-pr-i" href="#ic-star" class="f-accent" transform="translate(88,640) scale(.85)"/>
-    <text id="bn-pr-t" class="sans f-on-green" x="110" y="647" font-size="19" letter-spacing="4">OUR SPECIAL PAIR</text>
-    <text class="sans f-green" x="936" y="632" font-size="12" text-anchor="end" letter-spacing="2.6">TABLE 02 · SERVES 2</text>
-
-  </g>
-
-  <!-- 페어 : 표가 아니라 종이에 손으로 앉힌 인쇄면.
-       좌우 대칭을 일부러 깨고(대각선 배치) 괘선과 라벨을 쓰지 않는다 -->
-  <g transform="rotate(-2 157 792)">
-    <rect x="64" y="676" width="186" height="232" rx="2" class="f-p1" fill-opacity=".14"/>
-    <g clip-path="url(#clip-c1)"><image id="c1Img" preserveAspectRatio="none" style="display:none"/></g>
-    <g id="c1Hint" class="s-p1" fill="none" stroke-width="5" stroke-linecap="round" opacity=".45"
-       transform="translate(157,792)">
-      <circle cx="0" cy="-30" r="19"/>
-      <path d="M-34 36 C-34 9 -17 -2 0 -2 C17 -2 34 9 34 36"/>
-    </g>
-    <rect x="64" y="676" width="186" height="232" rx="2" class="s-p1" fill="none" stroke-width="2.6"/>
-    <rect id="c1Hit" x="64" y="676" width="186" height="232" rx="2" fill="none" pointer-events="all"/>
-  </g>
-
-  <text id="c1Name" class="disp f-ink" x="280" y="760" font-size="44">character 1</text>
-  <text id="c1Meta" class="sans f-p1" x="282" y="792" font-size="14" letter-spacing="2.6">26 · BARISTA</text>
-  <use href="#ic-heart" class="f-p1" transform="translate(288,824) scale(.9)"/>
-  <text id="c1Like" class="hand f-ink" x="308" y="834" font-size="27">Cheeseburger</text>
-  <text id="c1Pick" class="hand f-p1" x="282" y="876" font-size="19" opacity=".9">today's pick: character 2</text>
-
-  <use href="#ic-heart" class="f-red" transform="translate(500,906) scale(2.4)"/>
-
-  <g transform="rotate(2 842 948)">
-    <rect x="748" y="830" width="188" height="236" rx="2" class="f-p2" fill-opacity=".14"/>
-    <g clip-path="url(#clip-c2)"><image id="c2Img" preserveAspectRatio="none" style="display:none"/></g>
-    <g id="c2Hint" class="s-p2" fill="none" stroke-width="5" stroke-linecap="round" opacity=".45"
-       transform="translate(842,948)">
-      <circle cx="0" cy="-30" r="19"/>
-      <path d="M-34 36 C-34 9 -17 -2 0 -2 C17 -2 34 9 34 36"/>
-    </g>
-    <rect x="748" y="830" width="188" height="236" rx="2" class="s-p2" fill="none" stroke-width="2.6"/>
-    <rect id="c2Hit" x="748" y="830" width="188" height="236" rx="2" fill="none" pointer-events="all"/>
-  </g>
-
-  <text id="c2Name" class="disp f-ink" x="730" y="916" font-size="44" text-anchor="end">character 2</text>
-  <text id="c2Meta" class="sans f-p2" x="728" y="948" font-size="14" text-anchor="end" letter-spacing="2.6">28 · DESIGNER</text>
-  <use id="c2LikeI" href="#ic-heart" class="f-p2"/>
-  <text id="c2Like" class="hand f-ink" x="730" y="990" font-size="27" text-anchor="end">Strawberry shake</text>
-  <text id="c2Pick" class="hand f-p2" x="728" y="1032" font-size="19" text-anchor="end" opacity=".9">today's pick: character 1</text>
-
-  <!-- 오늘의 메뉴 : 상자를 없애고 괘선 + 한 줄로 압축 -->
-  <g>
-    <path d="M64 1140 H936" class="s-green" fill="none" stroke-width="2" opacity=".55"/>
-    <path id="bn-mn-p" class="f-green"/>
-    <use id="bn-mn-i" href="#ic-star" class="f-accent" transform="translate(88,1140) scale(.85)"/>
-    <text id="bn-mn-t" class="sans f-on-green" x="110" y="1147" font-size="19" letter-spacing="4">TODAY'S MENU</text>
-    <g id="menu-rows"></g>
-  </g>
-
-  <!-- 바닥 괘선 : 문구가 괘선 위에 앉고, 왼쪽 버거와 오른쪽 도장이 괘선을 가로지른다 -->
-  <g>
-    <path d="M64 1300 H936" class="s-red" fill="none" stroke-width="1.6" stroke-dasharray="3 8" stroke-linecap="round" opacity=".6"/>
-    <rect id="atBg" class="f-paper" x="380" y="1286" width="240" height="28"/>
-    <use id="atL" href="#ic-heart" class="f-red" transform="translate(410,1300) scale(1.1)"/>
-    <text id="atText" class="sans f-red" x="500" y="1306" font-size="17" text-anchor="middle" letter-spacing="5">ALWAYS TOGETHER</text>
-    <use id="atR" href="#ic-heart" class="f-red" transform="translate(590,1300) scale(1.1)"/>
-
-    <text id="footText" class="sans f-green" x="268" y="1352" font-size="15" letter-spacing="3.4">ALWAYS TOGETHER, ALWAYS HUNGRY</text>
-    <g transform="rotate(-8 876 1320)">
-      <circle cx="876" cy="1320" r="36" class="f-paper"/>
-      <circle cx="876" cy="1320" r="36" class="s-red" fill="none" stroke-width="2.6"/>
-      <circle cx="876" cy="1320" r="30" class="s-red" fill="none" stroke-width="1.2" stroke-dasharray="2 6" stroke-linecap="round"/>
-      <text class="hand f-red" x="876" y="1331" font-size="32" text-anchor="middle">xoxo</text>
-    </g>
-  </g>
-
-  <!-- 스티커 3종. 옮긴 스티커가 다른 요소 뒤로 숨지 않도록 가장 위에 그린다 -->
-  <g class="slot">
-    <g id="art-shake" transform="translate(384,375)">
-      <path d="M52 42 L36 -8" class="s-red" stroke-width="7" stroke-linecap="round" fill="none"/>
-      <path d="M70 42 L88 -4" class="s-red" stroke-width="7" stroke-linecap="round" fill="none"/>
-      <circle cx="60" cy="6" r="10" class="f-red"/>
-      <path d="M60 -3 Q66 -16 80 -18" class="s-green" fill="none" stroke-width="3" stroke-linecap="round"/>
-      <path d="M20 48 C20 30 33 21 44 26 C47 11 68 9 74 22 C89 18 99 31 94 48 Z" class="f-sheet s-red" stroke-width="3"/>
-      <g clip-path="url(#clip-shake)">
-        <rect x="18" y="46" width="80" height="164" class="f-sheet"/>
-        <rect x="20" y="46" width="15" height="164" class="f-red"/>
-        <rect x="52" y="46" width="15" height="164" class="f-red"/>
-        <rect x="84" y="46" width="15" height="164" class="f-red"/>
-        <rect x="18" y="96" width="80" height="60" class="f-sheet"/>
-      </g>
-      <path d="M18 46 H98 L86 196 Q85 208 74 208 H42 Q31 208 30 196 Z" class="s-red" fill="none" stroke-width="3.4"/>
-      <path d="M18 96 H97 M20 156 H95" class="s-red" stroke-width="2" opacity=".5"/>
-      <text class="hand f-red" x="58" y="124" font-size="21" text-anchor="middle">Sweet</text>
-      <text class="hand f-red" x="58" y="148" font-size="21" text-anchor="middle">&amp; Cool</text>
-    </g>
-    <image id="img-shake" class="slot-img" preserveAspectRatio="xMidYMid meet"/>
-    <rect id="hit-shake" class="slot-hit" fill="none" pointer-events="all"/>
-  </g>
-
-  <g class="slot">
-    <g id="art-fries" transform="translate(867,519) scale(.68)">
-      <g class="f-fry s-food" stroke-width="2.4">
-        <rect x="13" y="8" width="14" height="52" rx="4" transform="rotate(-12 20 34)"/>
-        <rect x="53" y="8" width="14" height="52" rx="4" transform="rotate(12 60 34)"/>
-        <rect x="24" y="14" width="13" height="48" rx="4" transform="rotate(-5 30 38)"/>
-        <rect x="45" y="12" width="13" height="50" rx="4" transform="rotate(6 51 37)"/>
-        <rect x="34" y="0" width="14" height="62" rx="4"/>
-      </g>
-      <path d="M2 52 H82 L72 128 q-1 9 -10 9 H22 q-9 0-10-9 Z" fill="url(#pat-check-s)" class="s-red" stroke-width="3.4"/>
-      <path d="M2 52 H82" class="s-red" stroke-width="3.4"/>
-    </g>
-    <image id="img-fries" class="slot-img" preserveAspectRatio="xMidYMid meet"/>
-    <rect id="hit-fries" class="slot-hit" fill="none" pointer-events="all"/>
-  </g>
-
-  <g class="slot">
-    <g id="art-burger" transform="translate(83,1226) scale(.85)">
-      <ellipse cx="84" cy="158" rx="82" ry="15" class="f-sheet s-red" stroke-width="3"/>
-      <g transform="translate(84,100)">
-        <path d="M-50 40 H50 C50 51 42 58 31 58 H-31 C-42 58 -50 51 -50 40 Z" class="f-bun s-food" stroke-width="2.8"/>
-        <rect x="-53" y="26" width="106" height="18" rx="9" class="f-patty s-food" stroke-width="2.8"/>
-        <path d="M-57 12 H57 L52 21 L46 33 L35 21 L25 34 L14 21 L2 33 L-10 21 L-22 34 L-33 21 L-44 33 L-52 21 Z" class="f-cheese s-food" stroke-width="2.4" stroke-linejoin="round"/>
-        <path d="M-55 -2 C-47 -11 -39 3 -31 -5 C-23 -13 -15 1 -7 -6 C1 -13 9 1 17 -6 C25 -13 33 2 41 -5 C47 -10 53 -6 55 -1 C54 9 46 13 39 9 C31 15 23 8 17 12 C9 17 1 10 -7 13 C-15 16 -23 9 -31 12 C-39 15 -47 9 -55 -2 Z" class="f-lettuce s-food" stroke-width="2.4" stroke-linejoin="round"/>
-        <path d="M-50 2 C-50 -26 -28 -42 0 -42 C28 -42 50 -26 50 2 Z" class="f-bun s-food" stroke-width="2.8"/>
-        <g class="f-sesame">
-          <ellipse cx="-30" cy="-16" rx="4.8" ry="2.7" transform="rotate(-30 -30 -16)"/>
-          <ellipse cx="-12" cy="-28" rx="4.8" ry="2.7" transform="rotate(-12 -12 -28)"/>
-          <ellipse cx="8" cy="-29" rx="4.8" ry="2.7" transform="rotate(10 8 -29)"/>
-          <ellipse cx="26" cy="-19" rx="4.8" ry="2.7" transform="rotate(28 26 -19)"/>
-          <ellipse cx="-41" cy="-4" rx="4.4" ry="2.5" transform="rotate(-54 -41 -4)"/>
-          <ellipse cx="41" cy="-4" rx="4.4" ry="2.5" transform="rotate(54 41 -4)"/>
-          <ellipse cx="-2" cy="-14" rx="4.4" ry="2.5" transform="rotate(-6 -2 -14)"/>
-          <ellipse cx="18" cy="-8" rx="4.2" ry="2.4" transform="rotate(36 18 -8)"/>
-          <ellipse cx="-21" cy="-6" rx="4.2" ry="2.4" transform="rotate(-38 -21 -6)"/>
-        </g>
-      </g>
-    </g>
-    <image id="img-burger" class="slot-img" preserveAspectRatio="xMidYMid meet"/>
-    <rect id="hit-burger" class="slot-hit" fill="none" pointer-events="all"/>
-  </g>
+  <!-- 바닥 손글씨 -->
+  <g transform="rotate(-3 190 1350)"><g id="footL" class="script f-green" font-size="34"></g></g>
+  <g id="footC" class="script f-red" font-size="36"></g>
+  <use id="footStarL" href="#ic-star" class="f-red"/>
+  <use id="footStarR" href="#ic-star" class="f-red"/>
+  <g transform="rotate(4 856 1348)"><g id="footR" class="script f-red" font-size="32"></g></g>
 
 </svg>
-    </div>
-  </div>
 
-  <!-- ===================== 편집 패널 ===================== -->
-  <div class="panel">
-    <header class="brand">
-      <h1>Pair<em>frame</em></h1>
-      <p>우리 둘을 다이너 메뉴판의 오늘의 스페셜로</p>
-    </header>
-
-    <details class="sec" open>
-      <summary>간판</summary>
-      <div class="body">
-        <label class="fld"><span>페어 이름</span>
-          <input id="in-pair" type="text" maxlength="18" placeholder="Pairname"></label>
-        <div class="grid2">
-          <label class="fld"><span>부제</span>
-            <input id="in-sub" type="text" maxlength="20" placeholder="DINER &amp; GRILL"></label>
-          <label class="fld"><span>설립 연도</span>
-            <input id="in-est" type="text" maxlength="6" placeholder="20XX"></label>
-        </div>
-        <label class="fld"><span>상단 문구</span>
-          <input id="in-tag" type="text" maxlength="46" placeholder="GOOD FOOD • GOOD FRIENDS • BETTER DAYS"></label>
-      </div>
-    </details>
-
-    <details class="sec" open>
-      <summary>메인 사진</summary>
-      <div class="body">
-        <div class="btn-row">
-          <button class="btn" id="btn-photo-pick" type="button">사진 올리기</button>
-          <button class="btn ghost" id="btn-photo-clear" type="button">지우기</button>
-        </div>
-        <input id="in-photo" type="file" accept="image/*" hidden>
-        <label class="fld range"><span>확대 <b id="lbl-zoom">100%</b></span>
-          <input id="in-zoom" type="range" min="100" max="400" step="1" value="100"></label>
-        <button class="btn ghost wide" id="btn-photo-reset" type="button">위치·확대 초기화</button>
-        <p class="hint">사진을 끌어 위치를 맞추고, 두 손가락 또는 휠로 확대할 수 있어요.
-          캐릭터 사진도 같은 방법으로 조정합니다.</p>
-      </div>
-    </details>
-
-    <details class="sec">
-      <summary>캐릭터 01</summary>
-      <div class="body" data-char="c1"></div>
-    </details>
-
-    <details class="sec">
-      <summary>캐릭터 02</summary>
-      <div class="body" data-char="c2"></div>
-    </details>
-
-    <details class="sec">
-      <summary>오늘의 메뉴</summary>
-      <div class="body">
-        <div class="grid2" id="menu-inputs"></div>
-        <label class="fld"><span>오른쪽 메모 (<code>/</code> 로 줄바꿈, 3줄까지)</span>
-          <input id="in-note" type="text" maxlength="60" placeholder="Same table / Different worlds / One story"></label>
-        <label class="fld"><span>가운데 문구</span>
-          <input id="in-always" type="text" maxlength="30" placeholder="ALWAYS TOGETHER"></label>
-        <label class="fld"><span>맨 아래 문구</span>
-          <input id="in-foot" type="text" maxlength="46" placeholder="ALWAYS TOGETHER, ALWAYS HUNGRY"></label>
-      </div>
-    </details>
-
-    <details class="sec">
-      <summary>스티커 바꾸기</summary>
-      <div class="body">
-        <p class="hint">배경이 지워진 PNG를 올리면 해당 자리의 일러스트가 교체됩니다.
-          올린 뒤에는 포스터 위에서 끌어 옮기고, 슬라이더로 크기를 맞출 수 있어요.</p>
-        <div class="stickers" id="sticker-list"></div>
-        <input id="in-sticker" type="file" accept="image/*" hidden>
-      </div>
-    </details>
-
-    <details class="sec">
-      <summary>색상</summary>
-      <div class="body">
-        <div class="presets" id="presets"></div>
-        <div class="colors" id="color-list"></div>
-        <button class="btn ghost wide" id="btn-color-reset" type="button">색상 초기화</button>
-      </div>
-    </details>
-
-    <div class="actions">
-      <button class="btn primary" id="btn-save" type="button">고화질 PNG로 저장</button>
-      <button class="btn ghost small" id="btn-reset-all" type="button">전체 초기화</button>
-    </div>
   </div>
 </div>
 
-<div class="toast" id="toast" hidden></div>
+<div class="panel">
+  <div class="brand">
+    <h1>Pair<em>frame</em></h1>
+    <p>우리 둘을 다이너 메뉴판의 오늘의 스페셜로</p>
+  </div>
+
+  <details class="sec" open>
+    <summary>간판</summary>
+    <div class="body">
+      <label class="fld"><span>페어 이름 <b>(가운데 큰 글씨)</b></span>
+        <input id="in-pair" type="text" maxlength="18" placeholder="PAIR"></label>
+      <div class="grid2">
+        <label class="fld"><span>아치 문구</span>
+          <input id="in-arch" type="text" maxlength="18" placeholder="OUR SPECIAL"></label>
+        <label class="fld"><span>알약 문구</span>
+          <input id="in-pill" type="text" maxlength="12" placeholder="MENU"></label>
+      </div>
+    </div>
+  </details>
+
+  <details class="sec">
+    <summary>가운데 그림</summary>
+    <div class="body">
+      <div class="btn-row">
+        <button class="btn" id="btn-photo-pick" type="button">그림 올리기</button>
+        <button class="btn ghost" id="btn-photo-clear" type="button">지우기</button>
+        <button class="btn ghost" id="btn-photo-reset" type="button">가운데로</button>
+      </div>
+      <label class="fld range"><span>확대 <b id="lbl-zoom">100%</b></span>
+        <input id="in-zoom" type="range" min="100" max="400" step="1" value="100"></label>
+      <p class="hint">배경이 투명한 PNG를 올리면 종이에 인쇄된 것처럼 보입니다.
+        포스터 위에서 끌어 옮길 수 있어요.</p>
+    </div>
+  </details>
+
+  <details class="sec"><summary>캐릭터 01</summary><div class="body" data-char="c1"></div></details>
+  <details class="sec"><summary>캐릭터 02</summary><div class="body" data-char="c2"></div></details>
+
+  <details class="sec">
+    <summary>문구</summary>
+    <div class="body">
+      <label class="fld"><span>왼쪽 위 <b>손글씨</b> <code>/</code> 로 줄바꿈</span>
+        <input id="in-scriptL" type="text" maxlength="40" placeholder="Always / Better / Together"></label>
+      <label class="fld"><span>오른쪽 위 <b>배지</b> <code>/</code> 로 줄바꿈</span>
+        <input id="in-badge" type="text" maxlength="34" placeholder="TWO HEARTS / ONE / MENU"></label>
+      <label class="fld"><span>왼쪽 가운데 <code>/</code> 로 줄바꿈</span>
+        <input id="in-midL" type="text" maxlength="40" placeholder="Good / Food / Good / Mood"></label>
+      <label class="fld"><span>오른쪽 가운데 <code>/</code> 로 줄바꿈</span>
+        <input id="in-midR" type="text" maxlength="44" placeholder="Diner / Makes / Everything / Better!"></label>
+      <div class="grid2">
+        <label class="fld"><span>왼쪽 아래</span>
+          <input id="in-footL" type="text" maxlength="30" placeholder="More Flavor / More Love!"></label>
+        <label class="fld"><span>가운데 아래</span>
+          <input id="in-footC" type="text" maxlength="24" placeholder="Sweet / & Salty"></label>
+      </div>
+      <label class="fld"><span>오른쪽 아래</span>
+        <input id="in-footR" type="text" maxlength="26" placeholder="Take Out / Also!"></label>
+    </div>
+  </details>
+
+  <details class="sec">
+    <summary>스페셜 페어 세트</summary>
+    <div class="body">
+      <p class="hint">메뉴판의 나머지 줄은 고정입니다. 이 한 줄만 두 사람 것으로 바뀝니다.</p>
+      <div class="grid2">
+        <label class="fld"><span>메뉴 이름</span>
+          <input id="in-set" type="text" maxlength="22" placeholder="비우면 두 이름이 들어갑니다"></label>
+        <label class="fld"><span>가격</span>
+          <input id="in-setp" type="text" maxlength="7" placeholder="$12.5"></label>
+      </div>
+    </div>
+  </details>
+
+  <details class="sec">
+    <summary>음식 그림 바꾸기</summary>
+    <div class="body">
+      <div id="sticker-list" class="stickers"></div>
+      <p class="hint">배경이 투명한 PNG를 올리면 기본 그림 대신 들어갑니다.
+        포스터 위에서 끌어 옮기고 크기를 조절할 수 있어요.</p>
+    </div>
+  </details>
+
+  <details class="sec">
+    <summary>색상</summary>
+    <div class="body">
+      <div id="presets" class="presets"></div>
+      <div id="color-list" class="colors"></div>
+      <button class="btn ghost wide" id="btn-color-reset" type="button">기본 색으로</button>
+      <p class="hint">음식 그림은 그려진 색 그대로라 테마를 따르지 않습니다.</p>
+    </div>
+  </details>
+
+  <div class="actions">
+    <button class="btn primary" id="btn-save" type="button">고화질 PNG로 저장</button>
+    <button class="btn ghost small" id="btn-reset-all" type="button">전체 초기화</button>
+  </div>
+</div>
+
+</div>
+
+<input id="in-photo" type="file" accept="image/*" hidden>
+<input id="in-sticker" type="file" accept="image/*" hidden>
+<div id="toast" class="toast" hidden></div>
 
 <script src="app.js"></script>
 </body>
