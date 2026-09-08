@@ -25,16 +25,16 @@ const poster = $('#poster');
 /* 사진이 들어가는 세 자리. box 는 index.html 의 clip-path / hit 사각형과 같아야 한다. */
 const FRAMES = {
   main: { box: { x: 300, y: 424, w: 400, h: 352 }, img: '#photoImg', hint: '#photoHint', hit: '#photoHit' },
-  c1:   { box: { x:  44, y: 484, w: 176, h: 176 }, img: '#c1Img',    hint: '#c1Hint',    hit: '#c1Hit'    },
-  c2:   { box: { x: 780, y: 484, w: 176, h: 176 }, img: '#c2Img',    hint: '#c2Hint',    hit: '#c2Hit'    },
+  c1:   { box: { x:  44, y: 402, w: 208, h: 208 }, img: '#c1Img',    hint: '#c1Hint',    hit: '#c1Hit'    },
+  c2:   { box: { x: 748, y: 402, w: 208, h: 208 }, img: '#c2Img',    hint: '#c2Hint',    hit: '#c2Hit'    },
 };
 const framePic = k => (k === 'main' ? S.photo : S[k].img);
 
 /* 음식 그림. 기본값은 art/ 의 그림이고, 올리면 그 그림으로 바뀐다 */
 const SLOTS = [
-  { k: 'burger', name: '햄버거',     art: 'art/burger.png', box: { cx: 100, cy: 788,  w: 130, h: 107 } },
-  { k: 'pizza',  name: '피자',       art: 'art/pizza.png',  box: { cx: 894, cy: 794,  w: 124, h:  92 } },
-  { k: 'shake',  name: '밀크셰이크', art: 'art/shake.png',  box: { cx: 726, cy: 1328, w:  84, h: 187 } },
+  { k: 'burger', name: '햄버거',     art: 'art/burger.png', box: { cx: 150, cy: 778,  w: 208, h: 171 } },
+  { k: 'pizza',  name: '피자',       art: 'art/pizza.png',  box: { cx: 858, cy: 762,  w: 190, h: 141 } },
+  { k: 'shake',  name: '밀크셰이크', art: 'art/shake.png',  box: { cx: 828, cy: 1316, w:  98, h: 218 } },
 ];
 const SLOT_BY_K = Object.fromEntries(SLOTS.map(s => [s.k, s]));
 
@@ -54,9 +54,9 @@ const PRESETS = [
 /* 메뉴판 본문은 고정값이다. SPECIAL PAIR SET 첫 줄만 두 사람 것으로 바뀐다.
    열마다 MENU_TOP 에서 시작해 같은 간격으로 쌓으므로 섹션 사이 여백이 항상 같다. */
 const COLS = [{ x0: 70, x1: 336 }, { x0: 364, x1: 636 }, { x0: 664, x1: 930 }];
-const MENU_TOP = 800, ROW_PITCH = 30, HEAD_GAP = 22, SEC_GAP = 36;
+const MENU_TOP = 806, ROW_PITCH = 30, HEAD_GAP = 36, SEC_GAP = 44;
 const MENU = [
-  [ { title: 'MAIN DISHES', style: 'slant', dx: 54, rows: [
+  [ { title: 'MAIN DISHES', style: 'slant', dx: 22, rows: [
       ['CLASSIC BURGER','$8.5'], ['CHEESE BURGER','$9.5'], ['DOUBLE BURGER','$11.5'],
       ['CHICKEN SANDWICH','$9.0'], ['FRENCH FRIES','$4.0'], ['ONION RINGS','$4.5']] },
     { title: 'SIDE DISHES', style: 'slant', rows: [
@@ -66,7 +66,7 @@ const MENU = [
       ['@pair','$12.5'], ['CHICKEN + DRINK','$12.0'], ['PASTA + SALAD','$13.5'], ['PIZZA + DRINK','$14.0']] },
     { title: 'DRINKS', style: 'band', rows: [
       ['COLA','$2.5'], ['SPRITE','$2.5'], ['ORANGE JUICE','$3.0'], ['ICED TEA','$2.5'], ['MILKSHAKE','$4.5']] } ],
-  [ { title: 'DESSERTS', style: 'slant', dx: -54, rows: [
+  [ { title: 'DESSERTS', style: 'slant', dx: -22, rows: [
       ['APPLE PIE','$4.5'], ['CHOCOLATE CAKE','$5.0'], ['ICE CREAM (1 SCOOP)','$3.5'],
       ['ICE CREAM (2 SCOOP)','$5.5'], ['BROWNIE','$4.5']] },
     { title: 'EXTRA', style: 'ribbon', rows: [
@@ -80,7 +80,7 @@ const newChar    = () => ({ name: '', age: '', img: newPic() });
 const defaults = () => ({
   pair: '', arch: '', pill: '',
   scriptL: '', badge: '',
-  footL: '', footC: '', footR: '',
+  footL: '', footC: '',
   set: '', setp: '',
   c1: newChar(), c2: newChar(), photo: newPic(),
   stickers: Object.fromEntries(SLOTS.map(s => [s.k, newSticker()])),
@@ -95,7 +95,6 @@ const PH = {
   badge: 'TWO HEARTS / ONE / MENU',
   footL: 'More Flavor / More Love!',
   footC: 'Sweet / & Salty',
-  footR: 'Take Out / Also!',
   c1: 'JUN', c2: 'HANA', age1: '19', age2: '18', setp: '$12.5',
 };
 
@@ -280,13 +279,11 @@ function render() {
   shadow.style.fontSize = main.style.fontSize;
 
   setText('#pillText', S.pill.trim() || PH.pill);
-  const pw = pill('#pillBg', '#pillText', CENTER, 392, 54, 30, 320, 27);
-  $('#sparkPL').setAttribute('transform', `translate(${CENTER - pw / 2 - 40},392) scale(.15)`);
-  $('#sparkPR').setAttribute('transform', `translate(${CENTER + pw / 2 + 40},392) scale(.15)`);
+  pill('#pillBg', '#pillText', CENTER, 392, 54, 30, 320, 27);
 
   /* --- 손글씨 덩어리 --- */
   const sl = lineBlock('#scriptL', S.scriptL.trim() || PH.scriptL,
-    { x: 68, y: 108, pitch: 44, size: 40, maxW: 210 });
+    { x: 68, y: 112, pitch: 40, size: 36, maxW: 196, max: 3 });
   $('#scriptLine').setAttribute('d',
     `M70 ${sl.lastY + 18} q${sl.widest * 0.5} 14 ${sl.widest} 2`);
 
@@ -301,14 +298,14 @@ function render() {
   });
 
   /* --- 캐릭터 --- */
-  for (const [key, cx, def, defAge] of [['c1', 132, PH.c1, PH.age1], ['c2', 868, PH.c2, PH.age2]]) {
+  for (const [key, cx, def, defAge] of [['c1', 148, PH.c1, PH.age1], ['c2', 852, PH.c2, PH.age2]]) {
     const c = S[key], n = key === 'c1' ? 1 : 2;
-    const nm = fitText(setText(`#c${n}Name`, c.name.trim() || def), 190, 26);
+    const nm = fitText(setText(`#c${n}Name`, c.name.trim() || def), 210, 28);
     const bar = $(`#c${n}Bar`);
-    const w = textWidth(nm) + 40;
+    const w = textWidth(nm) + 44;
     bar.setAttribute('x', cx - w / 2);
     bar.setAttribute('width', w);
-    fitText(setText(`#c${n}Age`, `AGE. ${c.age.trim() || defAge}`), 160, 18);
+    fitText(setText(`#c${n}Age`, `AGE. ${c.age.trim() || defAge}`), 170, 19);
   }
 
   /* --- 메뉴 --- */
@@ -316,16 +313,13 @@ function render() {
 
   /* --- 바닥 손글씨 --- */
   lineBlock('#footL', S.footL.trim() || PH.footL,
-    { x: 70, y: 1332, pitch: 38, size: 34, maxW: 250 });
+    { x: 70, y: 1348, pitch: 34, size: 30, maxW: 230, max: 2 });
 
   const fc = lineBlock('#footC', S.footC.trim() || PH.footC,
-    { x: CENTER, y: 1330, pitch: 40, size: 36, maxW: 210, anchor: 'middle' });
-  const half = fc.widest / 2 + 26;
-  $('#footStarL').setAttribute('transform', `translate(${CENTER - half},1338) scale(1.1)`);
-  $('#footStarR').setAttribute('transform', `translate(${CENTER + half},1338) scale(1.1)`);
-
-  lineBlock('#footR', S.footR.trim() || PH.footR,
-    { x: 932, y: 1330, pitch: 36, size: 32, maxW: 200, anchor: 'end' });
+    { x: CENTER, y: 1346, pitch: 36, size: 32, maxW: 200, anchor: 'middle', max: 2 });
+  const half = fc.widest / 2 + 24;
+  $('#footStarL').setAttribute('transform', `translate(${CENTER - half},1352) scale(1)`);
+  $('#footStarR').setAttribute('transform', `translate(${CENTER + half},1352) scale(1)`);
 
   Object.keys(FRAMES).forEach(placeFrame);
   SLOTS.forEach(s => placeSticker(s.k));
@@ -887,7 +881,7 @@ function buildColorUI() {
 
 const syncColorInputs = () => COLORS.forEach(({ k }) => { $('#col-' + k).value = S.colors[k]; });
 
-const TEXT_FIELDS = ['pair', 'arch', 'pill', 'scriptL', 'badge', 'footL', 'footC', 'footR'];
+const TEXT_FIELDS = ['pair', 'arch', 'pill', 'scriptL', 'badge', 'footL', 'footC'];
 
 function syncInputs() {
   TEXT_FIELDS.forEach(k => { $('#in-' + k).value = S[k]; });
