@@ -32,7 +32,7 @@ const framePic = k => (k === 'main' ? S.photo : S[k].img);
 
 /* 음식 그림. 기본값은 art/ 의 그림이고, 올리면 그 그림으로 바뀐다 */
 const SLOTS = [
-  { k: 'burger', name: '햄버거',     art: 'art/burger.png', box: { cx: 152, cy: 796,  w: 180, h: 148 } },
+  { k: 'burger', name: '햄버거',     art: 'art/burger.png', box: { cx: 152, cy: 776,  w: 180, h: 148 } },
   { k: 'pizza',  name: '피자',       art: 'art/pizza.png',  box: { cx: 858, cy: 788,  w: 190, h: 141 } },
   { k: 'shake',  name: '밀크셰이크', art: 'art/shake.png',  box: { cx: 810, cy: 1318, w:  94, h: 210 } },
 ];
@@ -208,16 +208,18 @@ function lineBlock(gSel, str, { x, y, pitch, size, maxW, anchor = 'start', max =
   return { widest, lastY, count: lines.length };
 }
 
-/** 늘 같은 각도(NAME_ARC)로 휘는 호. 글자가 길어지면 반지름이 커진다 */
-const NAME_ARC = 21 * Math.PI / 180;
-function nameArc(sel, textW, apexY, dx, dy) {
-  const len = Math.max(textW, 120) * 1.06;
-  const R = len / NAME_ARC;
-  const half = NAME_ARC / 2;
-  const x = R * Math.sin(half), sag = R * (1 - Math.cos(half));
-  const y = apexY + sag;
+/** 늘 같은 각도로 휘는 호. 길이가 길어지면 반지름이 커져 곡률이 유지된다.
+    apexY 는 호의 꼭대기(가운데) 높이다. */
+function arcPath(sel, len, angle, apexY, dx = 0, dy = 0) {
+  const R = len / angle, half = angle / 2;
+  const x = R * Math.sin(half), y = apexY + R * (1 - Math.cos(half));
   $(sel).setAttribute('d', `M${CENTER - x + dx} ${y + dy} A ${R} ${R} 0 0 1 ${CENTER + x + dx} ${y + dy}`);
 }
+
+const NAME_ARC = 21 * Math.PI / 180;   // 페어명
+const ARCH_ARC = 26 * Math.PI / 180;   // 아치 띠
+const nameArc = (sel, textW, apexY, dx, dy) =>
+  arcPath(sel, Math.max(textW, 120) * 1.06, NAME_ARC, apexY, dx, dy);
 
 /** 글자 폭에 맞춰 크기가 정해지는 알약 */
 function pill(rectSel, textSel, cx, cy, h, padX, maxW, base) {
@@ -276,27 +278,32 @@ function render() {
   const n1 = S.c1.name.trim() || PH.c1;
   const n2 = S.c2.name.trim() || PH.c2;
 
-  /* --- 간판 --- */
-  $('#archText').textContent = S.arch.trim() || PH.arch;
+  /* --- 간판 : 아치 띠 → 페어명 → 알약 순으로 아래로 쌓인다 --- */
+  // 띠도 글자 폭에 맞춰 길이를 잡는다. 고정 길이로 두면 짧은 문구가 붉은 소시지 위에 뜬다
+  const archT = $('#archText');
+  archT.textContent = S.arch.trim() || PH.arch;
+  const archW = textWidth(archT.parentNode);
+  arcPath('#arc-band', Math.max(archW, 150) + 118, ARCH_ARC, 120);
+  arcPath('#arc-text', Math.max(archW, 150) + 118, ARCH_ARC, 131);
 
   const pairText = S.pair.trim() || PH.pair;
   $('#pairName').textContent = $('#pairShadow').textContent = pairText;
   const nameT = $('#pairNameT');
-  fitText(nameT, 800, HANGUL.test(pairText) ? 150 : 184);
+  fitText(nameT, 700, HANGUL.test(pairText) ? 140 : 172);
   $('#pairShadowT').style.fontSize = nameT.style.fontSize;
   // 글자 길이에 맞춰 반지름을 다시 잡는다. 그래야 짧든 길든 휘는 각도가 같다
-  nameArc('#arc-name', textWidth(nameT), 360, 0, 0);
-  nameArc('#arc-name-s', textWidth(nameT), 360, 7, 10);
+  nameArc('#arc-name', textWidth(nameT), 316, 0, 0);
+  nameArc('#arc-name-s', textWidth(nameT), 316, 9, 15);
 
   setText('#pillText', S.pill.trim() || PH.pill);
-  pill('#pillBg', '#pillText', CENTER, 400, 68, 40, 340, 34);
+  pill('#pillBg', '#pillText', CENTER, 382, 60, 38, 300, 32);
 
   /* --- 손글씨 덩어리 --- */
   const bd = splitLines(S.badge.trim() || PH.badge, 3);
   const bg = $('#badgeText');
   bg.textContent = '';
   bd.forEach((line, i) => {
-    const t = svgEl('text', { x: 878, y: 166 - (bd.length - 1) * 14 + i * 28 + 8, 'text-anchor': 'middle', 'letter-spacing': 1.6 });
+    const t = svgEl('text', { x: 874, y: 156 - (bd.length - 1) * 14 + i * 28 + 8, 'text-anchor': 'middle', 'letter-spacing': 1.6 });
     t.textContent = line;
     bg.appendChild(t);
     fitText(t, 118, 21);
@@ -311,7 +318,12 @@ function render() {
   /* --- 메뉴 --- */
   renderMenu(n1, n2);
 
-  /* --- 바닥 손글씨 --- */
+  /* --- 바닥 장식 : 별은 글자 폭을 재서 양옆에 붙인다 --- */
+  const footW = textWidth($('#footNote'));
+  for (const [sel, sgn] of [['#footStarL', -1], ['#footStarR', 1]]) {
+    $(sel).setAttribute('transform', `translate(${CENTER + sgn * (footW / 2 + 28)},1409) scale(.8)`);
+  }
+
   Object.keys(FRAMES).forEach(placeFrame);
   SLOTS.forEach(s => placeSticker(s.k));
   save();

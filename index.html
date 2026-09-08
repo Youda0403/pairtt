@@ -22,8 +22,8 @@
     <path id="ic-spark" d="M0.0 -100.0 L14.5 -35.1 L70.7 -70.7 L35.1 -14.5 L100.0 0.0 L35.1 14.5 L70.7 70.7 L14.5 35.1 L0.0 100.0 L-14.5 35.1 L-70.7 70.7 L-35.1 14.5 L-100.0 0.0 L-35.1 -14.5 L-70.7 -70.7 L-14.5 -35.1 Z"/>
     <path id="ic-burst" d="M0.0 -86.0 L9.1 -63.3 L24.2 -82.5 L26.6 -58.2 L46.5 -72.3 L41.9 -48.4 L65.0 -56.3 L53.8 -34.6 L78.2 -35.7 L61.4 -18.0 L85.1 -12.2 L64.0 -0.0 L85.1 12.2 L61.4 18.0 L78.2 35.7 L53.8 34.6 L65.0 56.3 L41.9 48.4 L46.5 72.3 L26.6 58.2 L24.2 82.5 L9.1 63.3 L0.0 86.0 L-9.1 63.3 L-24.2 82.5 L-26.6 58.2 L-46.5 72.3 L-41.9 48.4 L-65.0 56.3 L-53.8 34.6 L-78.2 35.7 L-61.4 18.0 L-85.1 12.2 L-64.0 0.0 L-85.1 -12.2 L-61.4 -18.0 L-78.2 -35.7 L-53.8 -34.6 L-65.0 -56.3 L-41.9 -48.4 L-46.5 -72.3 L-26.6 -58.2 L-24.2 -82.5 L-9.1 -63.3 Z"/>
 
-    <path id="arc-band" d="M172 176 A 350 80 0 0 1 792 176" fill="none"/>
-    <path id="arc-text" d="M172 189 A 350 80 0 0 1 792 189" fill="none"/>
+    <path id="arc-band" fill="none"/>
+    <path id="arc-text" fill="none"/>
     <path id="arc-name"   fill="none"/>
     <path id="arc-name-s" fill="none"/>
 
@@ -91,28 +91,28 @@
   <rect x="40" y="1436" width="920" height="24" fill="url(#pat-check)"/>
 
   <!-- 간판 : 아치 문구 + 아치로 휜 페어명 + 알약 -->
-  <use href="#arc-band" class="s-red" stroke-width="58" stroke-linecap="round"/>
-  <text class="cond f-on-red" font-size="32" letter-spacing="4">
+  <use href="#arc-band" class="s-red" stroke-width="46" stroke-linecap="round"/>
+  <text class="cond f-on-red" font-size="30" letter-spacing="4">
     <textPath id="archText" href="#arc-text" startOffset="50%" text-anchor="middle">OUR SPECIAL</textPath>
   </text>
 
-  <text id="pairShadowT" class="slab f-green s-paper" font-size="186"
-        paint-order="stroke" stroke-width="15" stroke-linejoin="round">
+  <!-- 오른쪽 위 별폭발 배지. 페어명보다 먼저 그려 긴 이름이 배지에 가리지 않게 한다 -->
+  <g transform="rotate(6 874 156)">
+    <use href="#ic-burst" class="f-green" transform="translate(874,156)"/>
+    <g id="badgeText" class="cond f-on-green" font-size="21"></g>
+  </g>
+
+  <!-- 그림자는 통색이어야 그림자로 읽힌다. 테두리를 두르면 조각처럼 부서져 보인다 -->
+  <text id="pairShadowT" class="slab f-green" font-size="172">
     <textPath id="pairShadow" href="#arc-name-s" startOffset="50%" text-anchor="middle">PAIR</textPath>
   </text>
-  <text id="pairNameT" class="slab f-red s-paper" font-size="186"
-        paint-order="stroke" stroke-width="15" stroke-linejoin="round">
+  <text id="pairNameT" class="slab f-red s-paper" font-size="172"
+        paint-order="stroke" stroke-width="12" stroke-linejoin="round">
     <textPath id="pairName" href="#arc-name" startOffset="50%" text-anchor="middle">PAIR</textPath>
   </text>
 
-  <rect id="pillBg" class="f-green" y="366" height="68" rx="34"/>
-  <text id="pillText" class="cond f-on-green" x="500" y="412" font-size="34" text-anchor="middle" letter-spacing="5">MENU</text>
-
-  <!-- 오른쪽 위 별폭발 배지 -->
-  <g transform="rotate(6 878 166)">
-    <use href="#ic-burst" class="f-green" transform="translate(878,166)"/>
-    <g id="badgeText" class="cond f-on-green" font-size="21"></g>
-  </g>
+  <rect id="pillBg" class="f-green" y="352" height="60" rx="30"/>
+  <text id="pillText" class="cond f-on-green" x="500" y="393" font-size="32" text-anchor="middle" letter-spacing="5">MENU</text>
 
   <!-- 가운데 그림. 아래쪽은 메뉴 틀에 가려 잘린다 -->
   <g clip-path="url(#clip-photo)">
@@ -128,35 +128,40 @@
   </g>
   <rect id="photoHit" x="250" y="440" width="500" height="360" fill="none" pointer-events="all"/>
 
-  <!-- 캐릭터 01. 이름은 원 안쪽을 가로지르는 띠에 넣어 섹션 머리와 헷갈리지 않게 한다 -->
-  <circle cx="148" cy="520" r="104" class="f-sheet"/>
-  <g clip-path="url(#clip-c1)">
-    <image id="c1Img" preserveAspectRatio="none" filter="url(#fx-tone)" style="display:none"/>
-    <g id="c1Hint" class="s-red" fill="none" stroke-width="5" stroke-linecap="round" opacity=".4"
-       transform="translate(148,506) scale(1.25)">
-      <circle cx="0" cy="-16" r="17"/>
-      <path d="M-30 40 C-30 12 -15 2 0 2 C15 2 30 12 30 40"/>
+  <!-- 캐릭터 01. 원 전체를 살짝 기울인다. 이름은 원 안쪽을 가로지르는 띠에 넣어
+       섹션 머리와 헷갈리지 않게 한다 -->
+  <g transform="rotate(-4 148 520)">
+    <circle cx="148" cy="520" r="104" class="f-sheet"/>
+    <g clip-path="url(#clip-c1)">
+      <image id="c1Img" preserveAspectRatio="none" filter="url(#fx-tone)" style="display:none"/>
+      <g id="c1Hint" class="s-red" fill="none" stroke-width="5" stroke-linecap="round" opacity=".4"
+         transform="translate(148,506) scale(1.25)">
+        <circle cx="0" cy="-16" r="17"/>
+        <path d="M-30 40 C-30 12 -15 2 0 2 C15 2 30 12 30 40"/>
+      </g>
+      <rect x="44" y="556" width="208" height="44" class="f-red"/>
     </g>
-    <rect x="44" y="556" width="208" height="44" class="f-red"/>
+    <text id="c1Name" class="cond f-on-red" x="148" y="588" font-size="26" text-anchor="middle" letter-spacing="2.4">JUN</text>
+    <circle cx="148" cy="520" r="104" class="s-red" fill="none" stroke-width="7"/>
+    <rect id="c1Hit" x="44" y="416" width="208" height="208" fill="none" pointer-events="all"/>
   </g>
-  <text id="c1Name" class="cond f-on-red" x="148" y="588" font-size="26" text-anchor="middle" letter-spacing="2.4">JUN</text>
-  <circle cx="148" cy="520" r="104" class="s-red" fill="none" stroke-width="7"/>
-  <rect id="c1Hit" x="44" y="416" width="208" height="208" fill="none" pointer-events="all"/>
 
   <!-- 캐릭터 02 -->
-  <circle cx="852" cy="520" r="104" class="f-sheet"/>
-  <g clip-path="url(#clip-c2)">
-    <image id="c2Img" preserveAspectRatio="none" filter="url(#fx-tone)" style="display:none"/>
-    <g id="c2Hint" class="s-red" fill="none" stroke-width="5" stroke-linecap="round" opacity=".4"
-       transform="translate(852,506) scale(1.25)">
-      <circle cx="0" cy="-16" r="17"/>
-      <path d="M-30 40 C-30 12 -15 2 0 2 C15 2 30 12 30 40"/>
+  <g transform="rotate(4 852 520)">
+    <circle cx="852" cy="520" r="104" class="f-sheet"/>
+    <g clip-path="url(#clip-c2)">
+      <image id="c2Img" preserveAspectRatio="none" filter="url(#fx-tone)" style="display:none"/>
+      <g id="c2Hint" class="s-red" fill="none" stroke-width="5" stroke-linecap="round" opacity=".4"
+         transform="translate(852,506) scale(1.25)">
+        <circle cx="0" cy="-16" r="17"/>
+        <path d="M-30 40 C-30 12 -15 2 0 2 C15 2 30 12 30 40"/>
+      </g>
+      <rect x="748" y="556" width="208" height="44" class="f-red"/>
     </g>
-    <rect x="748" y="556" width="208" height="44" class="f-red"/>
+    <text id="c2Name" class="cond f-on-red" x="852" y="588" font-size="26" text-anchor="middle" letter-spacing="2.4">HANA</text>
+    <circle cx="852" cy="520" r="104" class="s-red" fill="none" stroke-width="7"/>
+    <rect id="c2Hit" x="748" y="416" width="208" height="208" fill="none" pointer-events="all"/>
   </g>
-  <text id="c2Name" class="cond f-on-red" x="852" y="588" font-size="26" text-anchor="middle" letter-spacing="2.4">HANA</text>
-  <circle cx="852" cy="520" r="104" class="s-red" fill="none" stroke-width="7"/>
-  <rect id="c2Hit" x="748" y="416" width="208" height="208" fill="none" pointer-events="all"/>
 
   <!-- 메뉴 틀. 그림보다 뒤에 그려 사진 아랫부분을 덮는다 -->
   <rect x="40" y="800" width="920" height="590" rx="14" class="f-paper"/>
@@ -169,6 +174,21 @@
   <g class="slot"><image id="img-shake"  class="slot-img" preserveAspectRatio="xMidYMid meet"/><rect id="hit-shake"  class="slot-hit" fill="none" pointer-events="all"/></g>
 
   <g id="menu"></g>
+
+  <!-- 장식 손글씨 : 배지가 없는 왼쪽 위 구석과 메뉴 틀 아래 빈 띠, 두 군데만 -->
+  <g transform="rotate(-6 148 166)">
+    <g class="script f-green" text-anchor="middle" font-size="38">
+      <text x="148" y="148">Always</text>
+      <text x="148" y="192">Fresh</text>
+    </g>
+    <path class="s-green" d="M82 210 q64 16 128 -5" fill="none" stroke-width="4.5"
+          stroke-linecap="round" opacity=".85"/>
+  </g>
+
+  <text id="footNote" class="script f-red" x="500" y="1421" font-size="36"
+        text-anchor="middle">Thanks for stopping by!</text>
+  <use id="footStarL" href="#ic-star" class="f-accent"/>
+  <use id="footStarR" href="#ic-star" class="f-accent"/>
 
   <!-- 종이 질감 : 맨 위에서 전체를 덮는다(사진 포함) -->
   <rect width="1000" height="1500" filter="url(#fx-stain)" opacity=".3" pointer-events="none"/>
