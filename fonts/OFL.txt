@@ -7,6 +7,12 @@
   (https://github.com/googlefonts/caveat)
 - Nunito-800.woff2 — Copyright 2014 The Nunito Project Authors
   (https://github.com/googlefonts/nunito)
+- AlfaSlabOne-400.woff2 — Copyright 2011 The Alfa Slab One Project Authors
+  (https://github.com/googlefonts/AlfaSlabOne)
+- Yellowtail-400.woff2 — Copyright 2011 The Yellowtail Project Authors
+  (https://github.com/googlefonts/Yellowtail)
+- Oswald-600.woff2 — Copyright 2016 The Oswald Project Authors
+  (https://github.com/googlefonts/OswaldFont)
 
 한글 폰트(한글 음절·자모만 남긴 서브셋):
 - Jua-KR.woff2 — Copyright The Jua Project Authors
