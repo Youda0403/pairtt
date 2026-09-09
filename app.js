@@ -265,11 +265,12 @@ function arcPath(sel, len, angle, apexY, dx = 0, dy = 0) {
 }
 
 const NAME_ARC = 21 * Math.PI / 180;   // 페어명
-const ARCH_CY = 127;                  // 띠 한가운데 (띠는 92~162). 띠는 혼자 위에 선다
-/* 아래 두 값은 **고정**이다. 알약이 움직이지 않아야 알약~영수증 간격도, 알약이 페어명을
-   덮는 면적도 이름 길이와 무관하게 늘 같다. 대신 이름이 짧아지면 띠와의 간격이 벌어진다. */
-const PILL_CY = 358;                  // 알약 중심 (알약 332~384, 영수증 414 까지 30)
-const PILL_DROP = 18;                 // 페어명 baseline 은 알약 중심에서 이만큼 위
+const ARCH_CY = 127, ARCH_H = 70;     // 띠 한가운데 / 높이 (띠는 92~162)
+const PILL_CY = 358;                  // 알약 중심 **고정** (알약 332~384, 영수증 414 까지 30)
+/* 페어명은 **띠 아랫변과 알약 중심의 한가운데**에 세로로 놓는다. 글자가 작아져도 위아래로
+   똑같이 줄어들어 늘 가운데에 남는다 — 아래(알약)에 매달면 짧은 이름일수록 위가 텅 빈다. */
+const NAME_MID = (ARCH_CY + ARCH_H / 2 + PILL_CY) / 2;
+const CAP_LAT = 0.786, CAP_KR = 0.782;   // 글자 크기 대비 잉크 높이 (픽셀로 재서 얻은 값)
 /* 짧은 이름은 **글자 크기**(200/156)가, 긴 이름은 **폭**(850)이 한계다.
    폭만 조이면 8글자가 확 쪼그라들고, 크기만 키우면 4글자가 배지와 띠를 덮는다. 둘 다 둬야 한다. */
 const NAME_MAX_W = 850, NAME_LAT = 200, NAME_KR = 156;
@@ -334,12 +335,11 @@ function render() {
   const pairText = S.pair.trim() || PH.pair;
   $('#pairName').textContent = $('#pairShadow').textContent = pairText;
   const nameT = $('#pairNameT');
-  fitText(nameT, NAME_MAX_W, HANGUL.test(pairText) ? NAME_KR : NAME_LAT);
+  const kr = HANGUL.test(pairText);
+  fitText(nameT, NAME_MAX_W, kr ? NAME_KR : NAME_LAT);
   $('#pairShadowT').style.fontSize = nameT.style.fontSize;
-  /* **baseline 을 고정한다.** 이름이 짧아 글자가 커지면 위로만 자란다 —
-     알약과 겹치는 면적도, 알약과 영수증 사이 간격도 그대로 남는다.
-     글자 크기 상한(NAME_LAT/NAME_KR)은 제일 큰 이름도 띠에 닿지 않도록 잡은 값이다. */
-  const nameBase = PILL_CY - PILL_DROP;
+  // 잉크 높이의 절반을 더해 baseline 을 잡는다 → 잉크 한가운데가 늘 NAME_MID 에 온다
+  const nameBase = NAME_MID + (kr ? CAP_KR : CAP_LAT) * parseFloat(nameT.style.fontSize) / 2;
   // 글자 길이에 맞춰 반지름을 다시 잡는다. 그래야 짧든 길든 휘는 각도가 같다
   nameArc('#arc-name', textWidth(nameT), nameBase, 0, 0);
   nameArc('#arc-name-s', textWidth(nameT), nameBase, 10, 16);
