@@ -57,7 +57,8 @@ const PRESETS = [
 /* 메뉴판 본문은 고정값이다. SPECIAL PAIR SET 첫 줄만 두 사람 것으로 바뀐다.
    열마다 MENU_TOP 에서 시작해 같은 간격으로 쌓으므로 섹션 사이 여백이 항상 같다. */
 const COLS = [{ x0: 70, x1: 336 }, { x0: 364, x1: 636 }, { x0: 664, x1: 930 }];
-const MENU_TOP = 826, ROW_PITCH = 33, HEAD_GAP = 36, SEC_GAP = 50, MID_PAD = 26;
+const MENU_TOP = 826, ROW_PITCH = 33, HEAD_GAP = 36, SEC_GAP = 50;
+const MID_INSET = 30, MID_TOP_PAD = 12;   // 가운데 상자: 틀에서 띄우는 양 / 그 안에서 내용 위 여백
 const FRAME_TOP = 774, FRAME_BOT = 1364;   // 메뉴 틀. index.html 의 사각형과 같아야 한다
 const MENU = [
   [ { title: 'MAIN DISHES', style: 'slant', dx: 22, rows: [
@@ -241,19 +242,16 @@ function pill(rectSel, textSel, cx, cy, h, padX, maxW, base) {
   return w;
 }
 
-/** 가장자리가 반원으로 물결지는 사각형. 봉우리가 상자 선에 닿고 골은 안쪽으로 들어간다.
-    네 모서리에도 대각선으로 반원을 하나씩 넣는다 — 없으면 모서리에 직각 홈이 파여
-    "물결이 그러다 만" 것처럼 보인다. 변마다 봉우리를 2r 씩 놓고 모서리 몫으로 양끝에 2r 을 비운다. */
-function scallopPath({ x, y, w, h }, nx, ny) {
-  const rx = w / (2 * nx + 4), ry = h / (2 * ny + 4);
-  const cr = Math.hypot(rx, ry) / 2;                       // 모서리 반원(대각선 현의 절반)
-  const arc = (r, dx, dy) => ` a${r} ${r} 0 0 1 ${dx} ${dy}`;
-  const run = (n, r, dx, dy) => Array.from({ length: n }, () => arc(r, dx, dy)).join('');
-  return `M${x + 2 * rx} ${y + ry}` +
-    run(nx, rx, rx * 2, 0)  + arc(cr,  rx,  ry) +
-    run(ny, ry, 0, ry * 2)  + arc(cr, -rx,  ry) +
-    run(nx, rx, -rx * 2, 0) + arc(cr, -rx, -ry) +
-    run(ny, ry, 0, -ry * 2) + arc(cr,  rx, -ry) + 'Z';
+/** 영수증 종이. 위아래 변만 톱니로 뜯기고 좌우는 곧다.
+    톱니 끝이 상자 선에 닿고 골은 d 만큼 안으로 들어간다 — 바깥 크기는 상자 그대로다. */
+function receiptPath({ x, y, w, h }, n, d) {
+  const t = w / n;
+  let top = '', bottom = '';
+  for (let i = 0; i < n; i++) {
+    top    += ` L${x + t * i + t / 2} ${y} L${x + t * (i + 1)} ${y + d}`;
+    bottom += ` L${x + w - t * i - t / 2} ${y + h} L${x + w - t * (i + 1)} ${y + h - d}`;
+  }
+  return `M${x} ${y + d}${top} L${x + w} ${y + h - d}${bottom} Z`;
 }
 
 /** 늘 같은 각도로 휘는 호. 길이가 길어지면 반지름이 커져 곡률이 유지된다.
@@ -265,7 +263,7 @@ function arcPath(sel, len, angle, apexY, dx = 0, dy = 0) {
 }
 
 const NAME_ARC = 21 * Math.PI / 180;   // 페어명
-const ARCH_CY = 111, NAME_BASE = 328, PILL_CY = 770;   // 띠 · 페어명 · 알약의 세로 자리
+const ARCH_CY = 111, NAME_BASE = 312, PILL_CY = 330;   // 띠 · 페어명 · 알약의 세로 자리
 const FOOT_CY = (FRAME_BOT + 1436) / 2;                // 메뉴 틀 아래 빈 띠(1364~1436)의 한가운데
 const nameArc = (sel, textW, apexY, dx, dy) =>
   arcPath(sel, Math.max(textW, 120) * 1.06, NAME_ARC, apexY, dx, dy);
@@ -334,7 +332,7 @@ function render() {
   nameArc('#arc-name-s', textWidth(nameT), NAME_BASE, 10, 16);
 
   const pillT = setText('#pillText', S.pill.trim() || PH.pill);
-  pill('#pillBg', '#pillText', CENTER, PILL_CY, 52, 36, 260, 30);
+  pill('#pillBg', '#pillText', CENTER, PILL_CY, 52, 42, 300, 34);
   $('#pillBg').setAttribute('rx', 26);
   pillT.setAttribute('y', PILL_CY + parseFloat(pillT.style.fontSize) * 0.35);
 
@@ -368,22 +366,17 @@ function render() {
   box.y = PHOTO_BOX.y + inset;
   box.w = PHOTO_BOX.w - inset * 2;
   box.h = PHOTO_BOX.h - inset * 2;
-  const clipR = $('#clip-photo').firstElementChild;
-  setRect(clipR, box);
+  setRect($('#clip-photo').firstElementChild, box);
   setRect($('#photoHit'), { ...box, h: FRAME_TOP - box.y });   // 메뉴 틀에 가린 데는 끌 수 없다
   setRect($('#photoKey'), box);
-  // 액자를 켜면 사진 모서리도 둥글려 물결 모서리와 맞물리게 한다
-  for (const el of [clipR, $('#photoKey')]) el.setAttribute('rx', S.frame ? 16 : 0);
-  const outer = scallopPath(PHOTO_BOX, 9, 8);
-  $('#photoScallop').setAttribute('d', outer);
-  $('#photoScallopSh').setAttribute('d', outer);   // 종이 매트가 떠 보이게 하는 옅은 그림자
-  // 안쪽 겹선은 같은 path 를 상자 한가운데 기준으로 줄인 것이다.
-  // 작은 상자에 다시 그리면 봉우리 반지름이 달라져 바깥선과 어긋난다. 실제로 그랬다
-  const inn = $('#photoScallopIn');
-  const mx = PHOTO_BOX.x + PHOTO_BOX.w / 2, my = PHOTO_BOX.y + PHOTO_BOX.h / 2;
-  inn.setAttribute('d', outer);
-  inn.setAttribute('transform', `translate(${mx} ${my}) scale(.962) translate(${-mx} ${-my})`);
-  for (const sel of ['#photoScallopSh', '#photoScallop', '#photoScallopIn', '#photoKey'])
+  const TOOTH = 10;
+  const matD = receiptPath(PHOTO_BOX, 22, TOOTH);
+  $('#photoMat').setAttribute('d', matD);
+  $('#photoMatSh').setAttribute('d', matD);        // 영수증이 종이에서 떠 보이게 하는 옅은 그림자
+  // 뜯긴 자리 바로 아래의 점선 — 영수증이라는 신호는 이 한 줄이 제일 크다
+  const py = PHOTO_BOX.y + TOOTH + 11;
+  $('#photoPerf').setAttribute('d', `M${PHOTO_BOX.x + 16} ${py} H${PHOTO_BOX.x + PHOTO_BOX.w - 16}`);
+  for (const sel of ['#photoMatSh', '#photoMat', '#photoPerf', '#photoKey'])
     $(sel).style.display = fr;
 
   /* --- 바닥 장식 : 별은 글자 폭을 재서 양옆에 붙인다 --- */
@@ -446,16 +439,17 @@ function renderMenu(n1, n2) {
       y += (sec.rows.length - 1) * ROW_PITCH + SEC_GAP;
     }
 
-    /* 가운데 열과 그 상자는 메뉴 틀 한가운데에 놓는다.
-       가운데 열은 좌우 열보다 짧아서, 위를 맞추면 상자가 틀 안에서 위로 쏠린다.
-       그려 놓고 실제 높이를 재서 통째로 내리는 편이 값을 박는 것보다 안전하다. */
+    /* 가운데 상자는 메뉴 틀에서 위아래 같은 양(MID_INSET)만큼 띄운 고정 크기다 —
+       내용 높이에서 만들면 상자가 늘 틀 한가운데에 오는 대신, 머리(간판)가 좌우 열의
+       머리보다 한참 아래로 처진다. 상자를 고정하고 열을 상자 위쪽에 붙이는 편이 낫다.
+       (내용을 상자 한가운데 두면 간판 중심은 언제나 874 로 고정된다. 계산해 봤다) */
     if (ci === 1) {
-      const b = g.getBBox();
-      const dy = Math.round((FRAME_TOP + FRAME_BOT) / 2 - (b.y + b.height / 2));
-      g.setAttribute('transform', `translate(0 ${dy})`);
+      const boxTop = FRAME_TOP + MID_INSET;
       const box = $('#midBox');
-      box.setAttribute('y', b.y + dy - MID_PAD);
-      box.setAttribute('height', b.height + MID_PAD * 2);
+      box.setAttribute('y', boxTop);
+      box.setAttribute('height', FRAME_BOT - FRAME_TOP - MID_INSET * 2);
+      const b = g.getBBox();
+      g.setAttribute('transform', `translate(0 ${Math.round(boxTop + MID_TOP_PAD - b.y)})`);
     }
   });
 }

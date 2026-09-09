@@ -115,15 +115,20 @@
     <textPath id="pairName" href="#arc-name" startOffset="50%" text-anchor="middle">PAIR</textPath>
   </text>
 
+  <!-- 알약은 맨 나중에 그려 페어명의 밑동·초록 그림자·종이색 테두리를 통째로 덮는다 -->
+  <rect id="pillBg" class="f-green s-paper" y="304" height="52" rx="26"
+        paint-order="stroke" stroke-width="7"/>
+  <text id="pillText" class="cond f-on-green" x="500" y="342" font-size="34"
+        text-anchor="middle" letter-spacing="6">MENU</text>
+
   <!-- 가운데 그림. 아래쪽은 메뉴 틀에 가려 잘린다.
-       액자를 켜면 가장자리가 물결인 종이 매트가 깔리고 사진이 그만큼 안으로 들어간다.
-       50년대 인화지의 스캘럽 컷 — 곧은 선이라 원 테두리와 부딪히던 문제를 없앤다 -->
-  <path id="photoScallopSh" class="f-ink" opacity=".13" transform="translate(5,6)"
+       액자를 켜면 위아래가 톱니로 뜯긴 영수증 종이가 깔리고 사진이 그만큼 안으로 들어간다 -->
+  <path id="photoMatSh" class="f-ink" opacity=".13" transform="translate(5,6)"
         style="display:none"/>
-  <path id="photoScallop" class="f-sheet s-red" stroke-width="4.5" stroke-linejoin="round"
+  <path id="photoMat" class="f-sheet s-red" stroke-width="3" stroke-linejoin="round"
         style="display:none"/>
-  <path id="photoScallopIn" class="s-red" fill="none" stroke-width="1.5" opacity=".45"
-        style="display:none"/>
+  <path id="photoPerf" class="s-red" fill="none" stroke-width="1.6" opacity=".5"
+        stroke-dasharray="2 7" stroke-linecap="round" style="display:none"/>
   <g clip-path="url(#clip-photo)">
     <image id="photoImg" preserveAspectRatio="none" filter="url(#fx-tone)" style="display:none"/>
   </g>
@@ -179,12 +184,6 @@
   <rect x="40" y="774" width="920" height="590" rx="14" class="f-paper"/>
   <rect x="40" y="774" width="920" height="590" rx="14" class="s-red" fill="none" stroke-width="4"/>
   <rect id="midBox" x="354" width="292" rx="10" class="s-red" fill="none" stroke-width="2.6"/>
-
-  <!-- MENU 알약. 간판에 두면 페어명과 부딪히므로 메뉴 틀 윗선에 얹었다 -->
-  <rect id="pillBg" class="f-green s-paper" y="746" height="48" rx="24"
-        paint-order="stroke" stroke-width="7"/>
-  <text id="pillText" class="cond f-on-green" x="500" y="780" font-size="28"
-        text-anchor="middle" letter-spacing="6">MENU</text>
 
   <!-- 음식 그림 : 메뉴 글자보다 뒤에 그려 겹쳐도 글자가 읽히게 -->
   <g class="slot"><image id="img-burger" class="slot-img" preserveAspectRatio="xMidYMid meet"/><rect id="hit-burger" class="slot-hit" fill="none" pointer-events="all"/></g>
