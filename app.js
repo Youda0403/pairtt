@@ -69,7 +69,8 @@ const MENU = [
       ['MOZZARELLA STICKS','$5.5'], ['CHICKEN NUGGETS','$5.0'], ['COLESLAW','$3.5'],
       ['MAC & CHEESE','$4.5'], ['TATER TOTS','$4.0']] } ],
   [ { title: 'SPECIAL / PAIR SET', style: 'plaque', box: true, rows: [
-      ['@pair','$12.5'], ['CHICKEN + DRINK','$12.0'], ['PASTA + SALAD','$13.5'], ['PIZZA + DRINK','$14.0']] },
+      ['@pair','$12.5'], ['BURGER + FRIES','$11.0'], ['CHICKEN + DRINK','$12.0'],
+      ['PASTA + SALAD','$13.5'], ['PIZZA + DRINK','$14.0']] },
     { title: 'DRINKS', style: 'band', rows: [
       ['COLA','$2.5'], ['SPRITE','$2.5'], ['ORANGE JUICE','$3.0'], ['ICED TEA','$2.5'], ['MILKSHAKE','$4.5']] } ],
   [ { title: 'DESSERTS', style: 'slant', dx: -22, rows: [
@@ -264,10 +265,13 @@ function arcPath(sel, len, angle, apexY, dx = 0, dy = 0) {
 }
 
 const NAME_ARC = 21 * Math.PI / 180;   // 페어명
-const ARCH_CY = 116;                  // 띠 한가운데 (띠는 78~154)
-const NAME_TOP = 136;                 // 페어명 잉크 꼭대기 — 여기서 띠 아랫변을 18 밟는다
-const CAP_LAT = 0.814, CAP_KR = 0.835;   // 글자 크기 대비 잉크 높이 (재서 얻은 값)
+const ARCH_CY = 127;                  // 띠 한가운데 (띠는 92~162)
+const NAME_TOP = 141;                 // 페어명 잉크 꼭대기 — 여기서 띠 아랫변을 21 밟는다
+const CAP_LAT = 0.842, CAP_KR = 0.874;   // 글자 크기 대비 잉크 높이 (픽셀로 재서 얻은 값)
 const PILL_DROP = 18;                 // 알약 중심은 페어명 baseline 에서 이만큼 아래
+/* 짧은 이름은 **글자 크기**(208/156)가, 긴 이름은 **폭**(850)이 한계다.
+   폭만 조이면 8글자가 확 쪼그라들고, 크기만 키우면 4글자가 배지를 덮는다. 둘 다 둬야 한다. */
+const NAME_MAX_W = 850;
 const FOOT_CY = (FRAME_BOT + 1436) / 2;                // 메뉴 틀 아래 빈 띠(1364~1436)의 한가운데
 const nameArc = (sel, textW, apexY, dx, dy) =>
   arcPath(sel, Math.max(textW, 120) * 1.06, NAME_ARC, apexY, dx, dy);
@@ -319,7 +323,7 @@ function render() {
   /* --- 간판 : 띠 · 페어명 · 알약이 서로 물려 한 덩어리로 읽힌다 --- */
   // 띠 길이는 글자 폭에서 잡는다. 고정 길이로 두면 짧은 문구가 붉은 소시지 위에 뜬다
   const archT = setText('#archText', S.arch.trim() || PH.arch);
-  pill('#archBg', '#archText', CENTER, ARCH_CY, 76, 96, 540, 40);
+  pill('#archBg', '#archText', CENTER, ARCH_CY, 70, 96, 540, 40);
   // baseline 은 실제 글자 크기에서 잡는다. 고정값을 쓰면 글자가 줄었을 때 위로 뜬다
   archT.setAttribute('y', ARCH_CY + parseFloat(archT.style.fontSize) * 0.35);
   const starX = textWidth(archT) / 2 + 28;
@@ -330,7 +334,7 @@ function render() {
   $('#pairName').textContent = $('#pairShadow').textContent = pairText;
   const nameT = $('#pairNameT');
   const kr = HANGUL.test(pairText);
-  fitText(nameT, 700, kr ? 162 : 224);
+  fitText(nameT, NAME_MAX_W, kr ? 156 : 208);
   $('#pairShadowT').style.fontSize = nameT.style.fontSize;
   /* baseline 이 아니라 **잉크 꼭대기**를 고정한다. 그래야 한글이든 긴 이름이든
      띠를 밟는 깊이가 같다. 알약은 baseline 을 따라다니므로 밑동도 늘 덮인다. */
