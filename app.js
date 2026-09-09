@@ -22,9 +22,12 @@ const poster = $('#poster');
 
 /* ===================== 정의 ===================== */
 
-/* 사진이 들어가는 세 자리. box 는 index.html 의 clip-path / hit 사각형과 같아야 한다. */
+/* 사진이 들어가는 세 자리. box 는 index.html 의 clip-path / hit 사각형과 같아야 한다.
+   가운데 그림만은 액자를 켜면 상자가 안으로 들어가므로 render() 가 다시 써넣는다. */
+const PHOTO_BOX = { x: 268, y: 414, w: 464, h: 440 };
+const PHOTO_INSET = 20;                      // 액자를 켰을 때 사진이 들어가는 깊이
 const FRAMES = {
-  main: { box: { x: 268, y: 414, w: 464, h: 440 }, img: '#photoImg', hint: '#photoHint', hit: '#photoHit' },
+  main: { box: { ...PHOTO_BOX }, img: '#photoImg', hint: '#photoHint', hit: '#photoHit' },
   c1:   { box: { x:  50, y: 396, w: 196, h: 196 }, img: '#c1Img',    hint: '#c1Hint',    hit: '#c1Hit'    },
   c2:   { box: { x: 754, y: 396, w: 196, h: 196 }, img: '#c2Img',    hint: '#c2Hint',    hit: '#c2Hit'    },
 };
@@ -63,7 +66,7 @@ const MENU = [
     { title: 'SIDE DISHES', style: 'slant', rows: [
       ['MOZZARELLA STICKS','$5.5'], ['CHICKEN NUGGETS','$5.0'], ['COLESLAW','$3.5'],
       ['MAC & CHEESE','$4.5'], ['TATER TOTS','$4.0']] } ],
-  [ { title: 'SPECIAL / PAIR SET', style: 'oval', rows: [
+  [ { title: 'SPECIAL / PAIR SET', style: 'plaque', rows: [
       ['@pair','$12.5'], ['CHICKEN + DRINK','$12.0'], ['PASTA + SALAD','$13.5'], ['PIZZA + DRINK','$14.0']] },
     { title: 'DRINKS', style: 'band', rows: [
       ['COLA','$2.5'], ['SPRITE','$2.5'], ['ORANGE JUICE','$3.0'], ['ICED TEA','$2.5'], ['MILKSHAKE','$4.5']] } ],
@@ -79,7 +82,7 @@ const newPic     = () => ({ src: null, nw: 0, nh: 0, zoom: 1, ox: 0, oy: 0 });
 const newChar    = () => ({ name: '', img: newPic() });
 
 const defaults = () => ({
-  pair: '', arch: '',
+  pair: '', arch: '', pill: '',
   badge: '',
   set: '', setp: '',
   c1: newChar(), c2: newChar(), photo: newPic(), frame: false,
@@ -90,7 +93,7 @@ const defaults = () => ({
 let S = defaults();
 
 const PH = {
-  pair: 'PAIR', arch: 'OUR SPECIAL',
+  pair: 'PAIR', arch: 'OUR SPECIAL', pill: 'MENU',
   badge: 'TWO HEARTS / ONE / MENU',
   c1: 'JUN', c2: 'HANA', setp: '$12.5',
 };
@@ -188,6 +191,11 @@ function fitText(el, maxW, baseSize) {
 
 const setText = (sel, str) => { $(sel).textContent = str; return $(sel); };
 
+const setRect = (el, { x, y, w, h }) => {
+  el.setAttribute('x', x); el.setAttribute('y', y);
+  el.setAttribute('width', w); el.setAttribute('height', h);
+};
+
 const splitLines = (str, max) =>
   str.split('/').map(s => s.trim()).filter(Boolean).slice(0, max);
 
@@ -209,6 +217,30 @@ function lineBlock(gSel, str, { x, y, pitch, size, maxW, anchor = 'start', max =
   return { widest, lastY, count: lines.length };
 }
 
+/** 글자 폭에 맞춰 크기가 정해지는 알약. 섹션 머리와 간판 띠가 같이 쓴다 */
+function pill(rectSel, textSel, cx, cy, h, padX, maxW, base) {
+  const t = fitText($(textSel), maxW, base);
+  const w = textWidth(t) + padX * 2;
+  const r = $(rectSel);
+  r.setAttribute('x', cx - w / 2);
+  r.setAttribute('y', cy - h / 2);
+  r.setAttribute('width', w);
+  r.setAttribute('height', h);
+  return w;
+}
+
+/** 가장자리가 반원으로 물결지는 사각형. 봉우리가 상자 선에 닿고 골은 안쪽으로 들어간다 */
+function scallopPath({ x, y, w, h }, nx, ny) {
+  const rx = w / (2 * nx + 2), ry = h / (2 * ny + 2);
+  const arc = (r, dx, dy) => ` a${r} ${r} 0 0 1 ${dx} ${dy}`;
+  let d = `M${x + rx} ${y + ry}`;
+  for (let i = 0; i < nx; i++) d += arc(rx, rx * 2, 0);
+  for (let i = 0; i < ny; i++) d += arc(ry, 0, ry * 2);
+  for (let i = 0; i < nx; i++) d += arc(rx, -rx * 2, 0);
+  for (let i = 0; i < ny; i++) d += arc(ry, 0, -ry * 2);
+  return d + 'Z';
+}
+
 /** 늘 같은 각도로 휘는 호. 길이가 길어지면 반지름이 커져 곡률이 유지된다.
     apexY 는 호의 꼭대기(가운데) 높이다. */
 function arcPath(sel, len, angle, apexY, dx = 0, dy = 0) {
@@ -218,7 +250,6 @@ function arcPath(sel, len, angle, apexY, dx = 0, dy = 0) {
 }
 
 const NAME_ARC = 21 * Math.PI / 180;   // 페어명
-const ARCH_ARC = 26 * Math.PI / 180;   // 아치 띠
 const nameArc = (sel, textW, apexY, dx, dy) =>
   arcPath(sel, Math.max(textW, 120) * 1.06, NAME_ARC, apexY, dx, dy);
 
@@ -266,22 +297,31 @@ function render() {
   const n1 = S.c1.name.trim() || PH.c1;
   const n2 = S.c2.name.trim() || PH.c2;
 
-  /* --- 간판 : 아치 띠 → 페어명 → 알약 순으로 아래로 쌓인다 --- */
-  // 띠도 글자 폭에 맞춰 길이를 잡는다. 고정 길이로 두면 짧은 문구가 붉은 소시지 위에 뜬다
-  const archT = $('#archText');
-  archT.textContent = S.arch.trim() || PH.arch;
-  const archW = textWidth(archT.parentNode);
-  arcPath('#arc-band', Math.max(archW, 150) + 118, ARCH_ARC, 142);
-  arcPath('#arc-text', Math.max(archW, 150) + 118, ARCH_ARC, 153);
+  /* --- 간판 : 띠 · 페어명 · 알약이 서로 물려 한 덩어리로 읽힌다 --- */
+  // 띠 길이는 글자 폭에서 잡는다. 고정 길이로 두면 짧은 문구가 붉은 소시지 위에 뜬다
+  setText('#archText', S.arch.trim() || PH.arch);
+  const archW = pill('#archBg', '#archText', CENTER, 112, 76, 84, 540, 42);
+  const key = $('#archKey');
+  key.setAttribute('x', CENTER - archW / 2 + 9);
+  key.setAttribute('y', 83);
+  key.setAttribute('width', archW - 18);
+  key.setAttribute('height', 58);
+  const starX = textWidth($('#archText')) / 2 + 26;
+  $('#archStarL').setAttribute('transform', `translate(${CENTER - starX},112) scale(.78)`);
+  $('#archStarR').setAttribute('transform', `translate(${CENTER + starX},112) scale(.78)`);
+
+  setText('#pillText', S.pill.trim() || PH.pill);
+  pill('#pillBg', '#pillText', CENTER, 336, 58, 42, 300, 34);
+  $('#pillBg').setAttribute('rx', 29);
 
   const pairText = S.pair.trim() || PH.pair;
   $('#pairName').textContent = $('#pairShadow').textContent = pairText;
   const nameT = $('#pairNameT');
-  fitText(nameT, 700, HANGUL.test(pairText) ? 140 : 172);
+  fitText(nameT, 700, HANGUL.test(pairText) ? 152 : 210);
   $('#pairShadowT').style.fontSize = nameT.style.fontSize;
   // 글자 길이에 맞춰 반지름을 다시 잡는다. 그래야 짧든 길든 휘는 각도가 같다
-  nameArc('#arc-name', textWidth(nameT), 338, 0, 0);
-  nameArc('#arc-name-s', textWidth(nameT), 338, 9, 15);
+  nameArc('#arc-name', textWidth(nameT), 302, 0, 0);
+  nameArc('#arc-name-s', textWidth(nameT), 302, 10, 16);
 
   /* --- 손글씨 덩어리 --- */
   const bd = splitLines(S.badge.trim() || PH.badge, 3);
@@ -304,11 +344,21 @@ function render() {
   /* --- 메뉴 --- */
   renderMenu(n1, n2);
 
-  /* --- 가운데 그림 액자 --- */
+  /* --- 가운데 그림 액자 : 물결 매트를 깔고 사진을 그만큼 안으로 넣는다 --- */
   // display 는 반드시 값으로 지정한다. ''(인라인 해제)로 두면 스타일시트 규칙이 이긴다
   const fr = S.frame ? 'inline' : 'none';
-  $('#photoMat').style.display = fr;
-  $('#photoFrame').style.display = fr;
+  const inset = S.frame ? PHOTO_INSET : 0;
+  const box = FRAMES.main.box;
+  box.x = PHOTO_BOX.x + inset;
+  box.y = PHOTO_BOX.y + inset;
+  box.w = PHOTO_BOX.w - inset * 2;
+  box.h = PHOTO_BOX.h - inset * 2;
+  setRect($('#clip-photo').firstElementChild, box);
+  setRect($('#photoHit'), { ...box, h: FRAME_TOP - box.y });   // 메뉴 틀에 가린 데는 끌 수 없다
+  setRect($('#photoKey'), box);
+  $('#photoScallop').setAttribute('d', scallopPath(PHOTO_BOX, 13, 12));
+  $('#photoScallop').style.display = fr;
+  $('#photoKey').style.display = fr;
 
   /* --- 바닥 장식 : 별은 글자 폭을 재서 양옆에 붙인다 --- */
   const footW = textWidth($('#footNote'));
@@ -379,14 +429,27 @@ function renderMenu(n1, n2) {
   });
 }
 
+/** 간판 모양 : 모서리는 둥글고 위아래 변이 bow 만큼 부푼 사각형 */
+function plaque(x1, y1, x2, y2, bow) {
+  const cx = (x1 + x2) / 2, r = 9;
+  return `M${x1} ${y1 + r}` +
+    ` Q${x1} ${y1} ${x1 + r} ${y1}` +
+    ` Q${cx} ${y1 - bow} ${x2 - r} ${y1}` +
+    ` Q${x2} ${y1} ${x2} ${y1 + r}` +
+    ` L${x2} ${y2 - r}` +
+    ` Q${x2} ${y2} ${x2 - r} ${y2}` +
+    ` Q${cx} ${y2 + bow} ${x1 + r} ${y2}` +
+    ` Q${x1} ${y2} ${x1} ${y2 - r} Z`;
+}
+
 /* 섹션 머리. 모양을 네 가지로 나눠 같은 알약이 여섯 번 반복되지 않게 한다.
    glyph 는 글자 크기에서 baseline 을 잡는다(고정값을 쓰면 두 줄짜리가 위로 뜬다). */
 function drawHead(g, sec, cx, maxW, top, ci) {
   const lines = sec.title.split('/').map(t => t.trim());
   const two = lines.length > 1;
-  const h = sec.style === 'oval' ? 66 : sec.style === 'ribbon' ? 42 : 38;
+  const h = sec.style === 'plaque' ? 68 : sec.style === 'ribbon' ? 42 : 38;
   const cy = top + h / 2;
-  const base = sec.style === 'oval' ? 27 : 22;
+  const base = sec.style === 'plaque' ? 27 : 22;
 
   const shape = svgEl('path', { class: 'f-red' });
   g.appendChild(shape);
@@ -405,16 +468,18 @@ function drawHead(g, sec, cx, maxW, top, ci) {
   });
 
   const tw = Math.max(...texts.map(textWidth));
-  const w = tw + (sec.style === 'oval' ? 56 : sec.style === 'ribbon' ? 52 : 36);
+  const w = tw + (sec.style === 'plaque' ? 72 : sec.style === 'ribbon' ? 52 : 36);
   const x1 = cx - w / 2, x2 = cx + w / 2, y1 = cy - h / 2, y2 = cy + h / 2;
   const rr = 5;
 
-  if (sec.style === 'oval') {
-    const rx = w / 2 + 10, ry = h / 2 + 4;
-    shape.setAttribute('d',
-      `M${cx - rx} ${cy} a${rx} ${ry} 0 1 0 ${rx * 2} 0 a${rx} ${ry} 0 1 0 ${-rx * 2} 0 Z`);
+  if (sec.style === 'plaque') {
+    // 위아래가 살짝 부푼 간판. 안쪽에 종이색 괘선을 한 줄 더 둘러 간판처럼 보이게 한다
+    shape.setAttribute('d', plaque(x1, y1, x2, y2, 8));
+    const inner = svgEl('path', { class: 's-paper', fill: 'none', 'stroke-width': 2, opacity: .5 });
+    inner.setAttribute('d', plaque(x1 + 7, y1 + 6, x2 - 7, y2 - 6, 6));
+    g.appendChild(inner);
     for (const sgn of [-1, 1]) {
-      const u = svgEl('use', { class: 'f-accent', transform: `translate(${cx + sgn * (tw / 2 + 16)},${cy}) scale(.62)` });
+      const u = svgEl('use', { class: 'f-accent', transform: `translate(${cx + sgn * (w / 2 - 20)},${cy}) scale(.58)` });
       u.setAttribute('href', '#ic-star');
       g.appendChild(u);
     }
@@ -886,7 +951,7 @@ function buildColorUI() {
 
 const syncColorInputs = () => COLORS.forEach(({ k }) => { $('#col-' + k).value = S.colors[k]; });
 
-const TEXT_FIELDS = ['pair', 'arch', 'badge'];
+const TEXT_FIELDS = ['pair', 'arch', 'pill', 'badge'];
 
 function syncInputs() {
   TEXT_FIELDS.forEach(k => { $('#in-' + k).value = S[k]; });
