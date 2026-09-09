@@ -24,12 +24,12 @@ const poster = $('#poster');
 
 /* 사진이 들어가는 세 자리. box 는 index.html 의 clip-path / hit 사각형과 같아야 한다.
    가운데 그림만은 액자를 켜면 상자가 안으로 들어가므로 render() 가 다시 써넣는다. */
-const PHOTO_BOX = { x: 268, y: 414, w: 464, h: 440 };
-const PHOTO_INSET = 20;                      // 액자를 켰을 때 사진이 들어가는 깊이
+const PHOTO_BOX = { x: 258, y: 414, w: 484, h: 440 };
+const PHOTO_INSET = 32;                      // 액자를 켰을 때 사진이 들어가는 깊이(= 매트 폭)
 const FRAMES = {
   main: { box: { ...PHOTO_BOX }, img: '#photoImg', hint: '#photoHint', hit: '#photoHit' },
-  c1:   { box: { x:  50, y: 396, w: 196, h: 196 }, img: '#c1Img',    hint: '#c1Hint',    hit: '#c1Hit'    },
-  c2:   { box: { x: 754, y: 396, w: 196, h: 196 }, img: '#c2Img',    hint: '#c2Hint',    hit: '#c2Hit'    },
+  c1:   { box: { x:  60, y: 406, w: 176, h: 176 }, img: '#c1Img',    hint: '#c1Hint',    hit: '#c1Hit'    },
+  c2:   { box: { x: 764, y: 406, w: 176, h: 176 }, img: '#c2Img',    hint: '#c2Hint',    hit: '#c2Hit'    },
 };
 const framePic = k => (k === 'main' ? S.photo : S[k].img);
 
@@ -176,7 +176,19 @@ function themeCss() {
 `;
 }
 
-function applyTheme() { $('#theme-style').textContent = themeCss(); }
+const TONE_MIX = 0.16;                     // 사진 위에 덮는 종이 색의 양
+
+function applyTheme() {
+  $('#theme-style').textContent = themeCss();
+  // 종이 색이 바뀌면 사진에 덮는 색도 같이 바뀌어야 한다.
+  // out = (1-k)*in + k*paper — feComponentTransfer 의 linear 가 그대로 이 식이다
+  const rgb = hex2rgb(S.colors.paper);
+  ['#tone-r', '#tone-g', '#tone-b'].forEach((sel, i) => {
+    const f = $(sel);
+    f.setAttribute('slope', (1 - TONE_MIX).toFixed(3));
+    f.setAttribute('intercept', (rgb[i] / 255 * TONE_MIX).toFixed(3));
+  });
+}
 
 /* ===================== 텍스트 ===================== */
 
@@ -250,6 +262,7 @@ function arcPath(sel, len, angle, apexY, dx = 0, dy = 0) {
 }
 
 const NAME_ARC = 21 * Math.PI / 180;   // 페어명
+const ARCH_CY = 112, NAME_BASE = 314, PILL_CY = 348;   // 간판 세 덩어리의 세로 자리
 const nameArc = (sel, textW, apexY, dx, dy) =>
   arcPath(sel, Math.max(textW, 120) * 1.06, NAME_ARC, apexY, dx, dy);
 
@@ -299,20 +312,13 @@ function render() {
 
   /* --- 간판 : 띠 · 페어명 · 알약이 서로 물려 한 덩어리로 읽힌다 --- */
   // 띠 길이는 글자 폭에서 잡는다. 고정 길이로 두면 짧은 문구가 붉은 소시지 위에 뜬다
-  setText('#archText', S.arch.trim() || PH.arch);
-  const archW = pill('#archBg', '#archText', CENTER, 112, 76, 84, 540, 42);
-  const key = $('#archKey');
-  key.setAttribute('x', CENTER - archW / 2 + 9);
-  key.setAttribute('y', 83);
-  key.setAttribute('width', archW - 18);
-  key.setAttribute('height', 58);
-  const starX = textWidth($('#archText')) / 2 + 26;
-  $('#archStarL').setAttribute('transform', `translate(${CENTER - starX},112) scale(.78)`);
-  $('#archStarR').setAttribute('transform', `translate(${CENTER + starX},112) scale(.78)`);
-
-  setText('#pillText', S.pill.trim() || PH.pill);
-  pill('#pillBg', '#pillText', CENTER, 336, 58, 42, 300, 34);
-  $('#pillBg').setAttribute('rx', 29);
+  const archT = setText('#archText', S.arch.trim() || PH.arch);
+  pill('#archBg', '#archText', CENTER, ARCH_CY, 80, 84, 540, 42);
+  // baseline 은 실제 글자 크기에서 잡는다. 고정값을 쓰면 글자가 줄었을 때 위로 뜬다
+  archT.setAttribute('y', ARCH_CY + parseFloat(archT.style.fontSize) * 0.35);
+  const starX = textWidth(archT) / 2 + 28;
+  $('#archStarL').setAttribute('transform', `translate(${CENTER - starX},${ARCH_CY}) scale(.8)`);
+  $('#archStarR').setAttribute('transform', `translate(${CENTER + starX},${ARCH_CY}) scale(.8)`);
 
   const pairText = S.pair.trim() || PH.pair;
   $('#pairName').textContent = $('#pairShadow').textContent = pairText;
@@ -320,8 +326,13 @@ function render() {
   fitText(nameT, 700, HANGUL.test(pairText) ? 152 : 210);
   $('#pairShadowT').style.fontSize = nameT.style.fontSize;
   // 글자 길이에 맞춰 반지름을 다시 잡는다. 그래야 짧든 길든 휘는 각도가 같다
-  nameArc('#arc-name', textWidth(nameT), 302, 0, 0);
-  nameArc('#arc-name-s', textWidth(nameT), 302, 10, 16);
+  nameArc('#arc-name', textWidth(nameT), NAME_BASE, 0, 0);
+  nameArc('#arc-name-s', textWidth(nameT), NAME_BASE, 10, 16);
+
+  const pillT = setText('#pillText', S.pill.trim() || PH.pill);
+  pill('#pillBg', '#pillText', CENTER, PILL_CY, 58, 42, 300, 34);
+  $('#pillBg').setAttribute('rx', 29);
+  pillT.setAttribute('y', PILL_CY + parseFloat(pillT.style.fontSize) * 0.35);
 
   /* --- 손글씨 덩어리 --- */
   const bd = splitLines(S.badge.trim() || PH.badge, 3);
@@ -338,7 +349,7 @@ function render() {
   for (const [key, def] of [['c1', PH.c1], ['c2', PH.c2]]) {
     const n = key === 'c1' ? 1 : 2;
     setText(`#c${n}Name`, S[key].name.trim() || def);
-    fitText($(`#c${n}NameT`), 188, 32);   // 호 길이(212)를 넘지 않게
+    fitText($(`#c${n}NameT`), 172, 30);   // 호 길이(196)를 넘지 않게
   }
 
   /* --- 메뉴 --- */
@@ -356,9 +367,16 @@ function render() {
   setRect($('#clip-photo').firstElementChild, box);
   setRect($('#photoHit'), { ...box, h: FRAME_TOP - box.y });   // 메뉴 틀에 가린 데는 끌 수 없다
   setRect($('#photoKey'), box);
-  $('#photoScallop').setAttribute('d', scallopPath(PHOTO_BOX, 13, 12));
-  $('#photoScallop').style.display = fr;
-  $('#photoKey').style.display = fr;
+  const pad = 15;
+  const outer = scallopPath(PHOTO_BOX, 10, 9);
+  $('#photoScallop').setAttribute('d', outer);
+  $('#photoScallopSh').setAttribute('d', outer);   // 종이 매트가 떠 보이게 하는 옅은 그림자
+  $('#photoScallopIn').setAttribute('d', scallopPath({
+    x: PHOTO_BOX.x + pad, y: PHOTO_BOX.y + pad,
+    w: PHOTO_BOX.w - pad * 2, h: PHOTO_BOX.h - pad * 2,
+  }, 10, 9));
+  for (const sel of ['#photoScallopSh', '#photoScallop', '#photoScallopIn', '#photoKey'])
+    $(sel).style.display = fr;
 
   /* --- 바닥 장식 : 별은 글자 폭을 재서 양옆에 붙인다 --- */
   const footW = textWidth($('#footNote'));
@@ -447,7 +465,7 @@ function plaque(x1, y1, x2, y2, bow) {
 function drawHead(g, sec, cx, maxW, top, ci) {
   const lines = sec.title.split('/').map(t => t.trim());
   const two = lines.length > 1;
-  const h = sec.style === 'plaque' ? 68 : sec.style === 'ribbon' ? 42 : 38;
+  const h = sec.style === 'plaque' ? 90 : sec.style === 'ribbon' ? 42 : 38;
   const cy = top + h / 2;
   const base = sec.style === 'plaque' ? 27 : 22;
 
@@ -463,20 +481,20 @@ function drawHead(g, sec, cx, maxW, top, ci) {
   });
   const fs = parseFloat(texts[0].style.fontSize);
   texts.forEach((t, i) => {
-    const off = two ? (i - 0.5) * (fs + 6) : 0;
+    const off = two ? (i - 0.5) * (fs + 11) : 0;
     t.setAttribute('y', cy + off + fs * 0.35);
   });
 
   const tw = Math.max(...texts.map(textWidth));
-  const w = tw + (sec.style === 'plaque' ? 72 : sec.style === 'ribbon' ? 52 : 36);
+  const w = tw + (sec.style === 'plaque' ? 84 : sec.style === 'ribbon' ? 52 : 36);
   const x1 = cx - w / 2, x2 = cx + w / 2, y1 = cy - h / 2, y2 = cy + h / 2;
   const rr = 5;
 
   if (sec.style === 'plaque') {
     // 위아래가 살짝 부푼 간판. 안쪽에 종이색 괘선을 한 줄 더 둘러 간판처럼 보이게 한다
-    shape.setAttribute('d', plaque(x1, y1, x2, y2, 8));
-    const inner = svgEl('path', { class: 's-paper', fill: 'none', 'stroke-width': 2, opacity: .5 });
-    inner.setAttribute('d', plaque(x1 + 7, y1 + 6, x2 - 7, y2 - 6, 6));
+    shape.setAttribute('d', plaque(x1, y1, x2, y2, 10));
+    const inner = svgEl('path', { class: 's-paper', fill: 'none', 'stroke-width': 2.4, opacity: .55 });
+    inner.setAttribute('d', plaque(x1 + 8, y1 + 7, x2 - 8, y2 - 7, 8));
     g.appendChild(inner);
     for (const sgn of [-1, 1]) {
       const u = svgEl('use', { class: 'f-accent', transform: `translate(${cx + sgn * (w / 2 - 20)},${cy}) scale(.58)` });

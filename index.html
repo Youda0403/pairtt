@@ -24,8 +24,8 @@
 
     <path id="arc-name"   fill="none"/>
     <path id="arc-name-s" fill="none"/>
-    <path id="arc-c1" d="M53.0 585.7 A 132 132 0 0 0 243.0 585.7" fill="none"/>
-    <path id="arc-c2" d="M757.0 585.7 A 132 132 0 0 0 947.0 585.7" fill="none"/>
+    <path id="arc-c1" d="M60.2 578.8 A 122 122 0 0 0 235.8 578.8" fill="none"/>
+    <path id="arc-c2" d="M764.2 578.8 A 122 122 0 0 0 939.8 578.8" fill="none"/>
 
     <pattern id="pat-check" width="24" height="24" patternUnits="userSpaceOnUse">
       <rect width="24" height="24" class="f-paper"/>
@@ -59,19 +59,20 @@
       <feFlood flood-color="#8a6134" result="c"/>
       <feComposite in="c" in2="a" operator="in"/>
     </filter>
-    <!-- 올린 사진을 종이 톤에 맞춘다. 채도를 낮추고 따뜻하게, 검정을 들어 올린다 -->
+    <!-- 올린 사진을 종이 톤에 맞춘다. 채도를 낮추고, 종이 색을 옅게 덮는다.
+         slope / intercept 는 종이 색에서 계산해 applyTheme() 이 써넣는다 -->
     <filter id="fx-tone" x="-2%" y="-2%" width="104%" height="104%" color-interpolation-filters="sRGB">
       <feColorMatrix type="saturate" values="0.78"/>
       <feComponentTransfer>
-        <feFuncR type="linear" slope="0.93" intercept="0.075"/>
-        <feFuncG type="linear" slope="0.91" intercept="0.055"/>
-        <feFuncB type="linear" slope="0.85" intercept="0.035"/>
+        <feFuncR id="tone-r" type="linear" slope="0.84" intercept="0.155"/>
+        <feFuncG id="tone-g" type="linear" slope="0.84" intercept="0.150"/>
+        <feFuncB id="tone-b" type="linear" slope="0.84" intercept="0.138"/>
       </feComponentTransfer>
     </filter>
 
-    <clipPath id="clip-photo"><rect x="268" y="414" width="464" height="440"/></clipPath>
-    <clipPath id="clip-c1"><circle cx="148" cy="494" r="98"/></clipPath>
-    <clipPath id="clip-c2"><circle cx="852" cy="494" r="98"/></clipPath>
+    <clipPath id="clip-photo"><rect x="258" y="414" width="484" height="440"/></clipPath>
+    <clipPath id="clip-c1"><circle cx="148" cy="494" r="88"/></clipPath>
+    <clipPath id="clip-c2"><circle cx="852" cy="494" r="88"/></clipPath>
   </defs>
 
   <rect width="1000" height="1500" class="f-paper"/>
@@ -79,9 +80,9 @@
 
   <!-- 배경 무늬 : 커다란 뾰족별 세 개를 옅게 깐다 -->
   <g class="s-red" fill="none" stroke-linejoin="round">
-    <use href="#ic-spark" stroke-width="2.2" opacity=".10" transform="translate(146,596) rotate(-12) scale(2.9)"/>
-    <use href="#ic-spark" stroke-width="2.6" opacity=".09" transform="translate(878,470) rotate(16) scale(2.1)"/>
-    <use href="#ic-spark" stroke-width="3"   opacity=".08" transform="translate(560,238) rotate(-7) scale(1.6)"/>
+    <use href="#ic-spark" stroke-width="2.2" opacity=".075" transform="translate(146,596) rotate(-12) scale(2.9)"/>
+    <use href="#ic-spark" stroke-width="2.6" opacity=".065" transform="translate(878,470) rotate(16) scale(2.1)"/>
+    <use href="#ic-spark" stroke-width="3"   opacity=".055" transform="translate(560,238) rotate(-7) scale(1.6)"/>
   </g>
 
   <!-- 인쇄 테두리 + 체커 띠 -->
@@ -92,16 +93,12 @@
 
   <!-- 간판. 시안처럼 띠 → 페어명 → 알약이 서로 물려 한 덩어리로 읽힌다.
        페어명이 맨 위라 띠·알약을 밟고 지나간다 -->
-  <rect id="archBg" class="f-red" y="74" height="76" rx="38"/>
-  <rect id="archKey" class="s-paper" fill="none" stroke-width="2" opacity=".5" rx="30"/>
+  <rect id="archBg" class="f-red s-paper" y="72" height="80" rx="40"
+        paint-order="stroke" stroke-width="7"/>
   <use id="archStarL" href="#ic-star" class="f-paper" opacity=".9"/>
   <use id="archStarR" href="#ic-star" class="f-paper" opacity=".9"/>
-  <text id="archText" class="cond f-on-red" x="500" y="122" font-size="42"
+  <text id="archText" class="cond f-on-red" x="500" y="127" font-size="42"
         text-anchor="middle" letter-spacing="5">OUR SPECIAL</text>
-
-  <rect id="pillBg" class="f-green" y="307" height="58" rx="29"/>
-  <text id="pillText" class="cond f-on-green" x="500" y="348" font-size="34"
-        text-anchor="middle" letter-spacing="6">MENU</text>
 
   <!-- 오른쪽 위 별폭발 배지. 페어명보다 먼저 그려 긴 이름이 배지에 가리지 않게 한다 -->
   <g transform="rotate(6 872 160)">
@@ -118,15 +115,25 @@
     <textPath id="pairName" href="#arc-name" startOffset="50%" text-anchor="middle">PAIR</textPath>
   </text>
 
+  <!-- 알약은 페어명 위에 얹는다. 종이색 테두리가 있어야 이름·그림자와 겹쳐도 지저분하지 않다 -->
+  <rect id="pillBg" class="f-green s-paper" y="319" height="58" rx="29"
+        paint-order="stroke" stroke-width="8"/>
+  <text id="pillText" class="cond f-on-green" x="500" y="360" font-size="34"
+        text-anchor="middle" letter-spacing="6">MENU</text>
+
   <!-- 가운데 그림. 아래쪽은 메뉴 틀에 가려 잘린다.
        액자를 켜면 가장자리가 물결인 종이 매트가 깔리고 사진이 그만큼 안으로 들어간다.
        50년대 인화지의 스캘럽 컷 — 곧은 선이라 원 테두리와 부딪히던 문제를 없앤다 -->
-  <path id="photoScallop" class="f-sheet s-red" stroke-width="3.5" stroke-linejoin="round"
+  <path id="photoScallopSh" class="f-ink" opacity=".13" transform="translate(5,6)"
+        style="display:none"/>
+  <path id="photoScallop" class="f-sheet s-red" stroke-width="4.5" stroke-linejoin="round"
+        style="display:none"/>
+  <path id="photoScallopIn" class="s-red" fill="none" stroke-width="1.6" opacity=".45"
         style="display:none"/>
   <g clip-path="url(#clip-photo)">
     <image id="photoImg" preserveAspectRatio="none" filter="url(#fx-tone)" style="display:none"/>
   </g>
-  <rect id="photoKey" class="s-red" fill="none" stroke-width="2" opacity=".5" style="display:none"/>
+  <rect id="photoKey" class="s-red" fill="none" stroke-width="2.6" opacity=".7" style="display:none"/>
   <g id="photoHint" class="s-red" fill="none" opacity=".45">
     <g stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
       <rect x="452" y="526" width="96" height="76" rx="10"/>
@@ -140,7 +147,7 @@
   <!-- 캐릭터 01. 원 전체를 살짝 기울인다. 이름은 원 바깥 아래를 도는 호에 얹어
        얼굴을 가리지도, 섹션 머리처럼 보이지도 않게 한다 -->
   <g transform="rotate(-4 148 494)">
-    <circle cx="148" cy="494" r="98" class="f-sheet"/>
+    <circle cx="148" cy="494" r="88" class="f-sheet"/>
     <g clip-path="url(#clip-c1)">
       <image id="c1Img" preserveAspectRatio="none" filter="url(#fx-tone)" style="display:none"/>
       <g id="c1Hint" class="s-red" fill="none" stroke-width="5" stroke-linecap="round" opacity=".4"
@@ -149,16 +156,16 @@
         <path d="M-30 40 C-30 12 -15 2 0 2 C15 2 30 12 30 40"/>
       </g>
     </g>
-    <circle cx="148" cy="494" r="98" class="s-red" fill="none" stroke-width="7"/>
+    <circle cx="148" cy="494" r="88" class="s-red" fill="none" stroke-width="6.5"/>
     <text id="c1NameT" class="cond f-red" font-size="32" letter-spacing="2.6">
       <textPath id="c1Name" href="#arc-c1" startOffset="50%" text-anchor="middle">JUN</textPath>
     </text>
-    <rect id="c1Hit" x="50" y="396" width="196" height="196" fill="none" pointer-events="all"/>
+    <rect id="c1Hit" x="60" y="406" width="176" height="176" fill="none" pointer-events="all"/>
   </g>
 
   <!-- 캐릭터 02 -->
   <g transform="rotate(4 852 494)">
-    <circle cx="852" cy="494" r="98" class="f-sheet"/>
+    <circle cx="852" cy="494" r="88" class="f-sheet"/>
     <g clip-path="url(#clip-c2)">
       <image id="c2Img" preserveAspectRatio="none" filter="url(#fx-tone)" style="display:none"/>
       <g id="c2Hint" class="s-red" fill="none" stroke-width="5" stroke-linecap="round" opacity=".4"
@@ -167,11 +174,11 @@
         <path d="M-30 40 C-30 12 -15 2 0 2 C15 2 30 12 30 40"/>
       </g>
     </g>
-    <circle cx="852" cy="494" r="98" class="s-red" fill="none" stroke-width="7"/>
+    <circle cx="852" cy="494" r="88" class="s-red" fill="none" stroke-width="6.5"/>
     <text id="c2NameT" class="cond f-red" font-size="32" letter-spacing="2.6">
       <textPath id="c2Name" href="#arc-c2" startOffset="50%" text-anchor="middle">HANA</textPath>
     </text>
-    <rect id="c2Hit" x="754" y="396" width="196" height="196" fill="none" pointer-events="all"/>
+    <rect id="c2Hit" x="764" y="406" width="176" height="176" fill="none" pointer-events="all"/>
   </g>
 
   <!-- 메뉴 틀. 그림보다 뒤에 그려 사진 아랫부분을 덮는다 -->
