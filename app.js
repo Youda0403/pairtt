@@ -265,13 +265,14 @@ function arcPath(sel, len, angle, apexY, dx = 0, dy = 0) {
 }
 
 const NAME_ARC = 21 * Math.PI / 180;   // 페어명
-const ARCH_CY = 127;                  // 띠 한가운데 (띠는 92~162)
-const NAME_TOP = 141;                 // 페어명 잉크 꼭대기 — 여기서 띠 아랫변을 21 밟는다
-const CAP_LAT = 0.842, CAP_KR = 0.874;   // 글자 크기 대비 잉크 높이 (픽셀로 재서 얻은 값)
-const PILL_DROP = 18;                 // 알약 중심은 페어명 baseline 에서 이만큼 아래
-/* 짧은 이름은 **글자 크기**(208/156)가, 긴 이름은 **폭**(850)이 한계다.
-   폭만 조이면 8글자가 확 쪼그라들고, 크기만 키우면 4글자가 배지를 덮는다. 둘 다 둬야 한다. */
-const NAME_MAX_W = 850;
+const ARCH_CY = 127;                  // 띠 한가운데 (띠는 92~162). 띠는 혼자 위에 선다
+/* 아래 두 값은 **고정**이다. 알약이 움직이지 않아야 알약~영수증 간격도, 알약이 페어명을
+   덮는 면적도 이름 길이와 무관하게 늘 같다. 대신 이름이 짧아지면 띠와의 간격이 벌어진다. */
+const PILL_CY = 358;                  // 알약 중심 (알약 332~384, 영수증 414 까지 30)
+const PILL_DROP = 18;                 // 페어명 baseline 은 알약 중심에서 이만큼 위
+/* 짧은 이름은 **글자 크기**(200/156)가, 긴 이름은 **폭**(850)이 한계다.
+   폭만 조이면 8글자가 확 쪼그라들고, 크기만 키우면 4글자가 배지와 띠를 덮는다. 둘 다 둬야 한다. */
+const NAME_MAX_W = 850, NAME_LAT = 200, NAME_KR = 156;
 const FOOT_CY = (FRAME_BOT + 1436) / 2;                // 메뉴 틀 아래 빈 띠(1364~1436)의 한가운데
 const nameArc = (sel, textW, apexY, dx, dy) =>
   arcPath(sel, Math.max(textW, 120) * 1.06, NAME_ARC, apexY, dx, dy);
@@ -333,21 +334,20 @@ function render() {
   const pairText = S.pair.trim() || PH.pair;
   $('#pairName').textContent = $('#pairShadow').textContent = pairText;
   const nameT = $('#pairNameT');
-  const kr = HANGUL.test(pairText);
-  fitText(nameT, NAME_MAX_W, kr ? 156 : 208);
+  fitText(nameT, NAME_MAX_W, HANGUL.test(pairText) ? NAME_KR : NAME_LAT);
   $('#pairShadowT').style.fontSize = nameT.style.fontSize;
-  /* baseline 이 아니라 **잉크 꼭대기**를 고정한다. 그래야 한글이든 긴 이름이든
-     띠를 밟는 깊이가 같다. 알약은 baseline 을 따라다니므로 밑동도 늘 덮인다. */
-  const nameBase = NAME_TOP + (kr ? CAP_KR : CAP_LAT) * parseFloat(nameT.style.fontSize);
+  /* **baseline 을 고정한다.** 이름이 짧아 글자가 커지면 위로만 자란다 —
+     알약과 겹치는 면적도, 알약과 영수증 사이 간격도 그대로 남는다.
+     글자 크기 상한(NAME_LAT/NAME_KR)은 제일 큰 이름도 띠에 닿지 않도록 잡은 값이다. */
+  const nameBase = PILL_CY - PILL_DROP;
   // 글자 길이에 맞춰 반지름을 다시 잡는다. 그래야 짧든 길든 휘는 각도가 같다
   nameArc('#arc-name', textWidth(nameT), nameBase, 0, 0);
   nameArc('#arc-name-s', textWidth(nameT), nameBase, 10, 16);
 
-  const pillCy = nameBase + PILL_DROP;
   const pillT = setText('#pillText', S.pill.trim() || PH.pill);
-  pill('#pillBg', '#pillText', CENTER, pillCy, 52, 42, 300, 34);
+  pill('#pillBg', '#pillText', CENTER, PILL_CY, 52, 42, 300, 34);
   $('#pillBg').setAttribute('rx', 26);
-  pillT.setAttribute('y', pillCy + parseFloat(pillT.style.fontSize) * 0.35);
+  pillT.setAttribute('y', PILL_CY + parseFloat(pillT.style.fontSize) * 0.35);
 
   /* --- 손글씨 덩어리 --- */
   const bd = splitLines(S.badge.trim() || PH.badge, 3);
