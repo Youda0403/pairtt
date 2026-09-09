@@ -58,7 +58,8 @@ const PRESETS = [
    열마다 MENU_TOP 에서 시작해 같은 간격으로 쌓으므로 섹션 사이 여백이 항상 같다. */
 const COLS = [{ x0: 70, x1: 336 }, { x0: 364, x1: 636 }, { x0: 664, x1: 930 }];
 const MENU_TOP = 826, ROW_PITCH = 33, HEAD_GAP = 36, SEC_GAP = 50;
-const MID_INSET = 30, MID_TOP_PAD = 12;   // 가운데 상자: 틀에서 띄우는 양 / 그 안에서 내용 위 여백
+const HEAD_MID = 19;                // 섹션 머리 중심은 top 에서 늘 이만큼 아래다
+const BOX_PAD = 28, BOX_GAP = 16;   // 상자가 마지막 줄 아래로 두는 여백 / 상자 다음 섹션까지 여백
 const FRAME_TOP = 774, FRAME_BOT = 1364;   // 메뉴 틀. index.html 의 사각형과 같아야 한다
 const MENU = [
   [ { title: 'MAIN DISHES', style: 'slant', dx: 22, rows: [
@@ -67,7 +68,7 @@ const MENU = [
     { title: 'SIDE DISHES', style: 'slant', rows: [
       ['MOZZARELLA STICKS','$5.5'], ['CHICKEN NUGGETS','$5.0'], ['COLESLAW','$3.5'],
       ['MAC & CHEESE','$4.5'], ['TATER TOTS','$4.0']] } ],
-  [ { title: 'SPECIAL / PAIR SET', style: 'plaque', rows: [
+  [ { title: 'SPECIAL / PAIR SET', style: 'plaque', box: true, rows: [
       ['@pair','$12.5'], ['CHICKEN + DRINK','$12.0'], ['PASTA + SALAD','$13.5'], ['PIZZA + DRINK','$14.0']] },
     { title: 'DRINKS', style: 'band', rows: [
       ['COLA','$2.5'], ['SPRITE','$2.5'], ['ORANGE JUICE','$3.0'], ['ICED TEA','$2.5'], ['MILKSHAKE','$4.5']] } ],
@@ -263,7 +264,10 @@ function arcPath(sel, len, angle, apexY, dx = 0, dy = 0) {
 }
 
 const NAME_ARC = 21 * Math.PI / 180;   // 페어명
-const ARCH_CY = 111, NAME_BASE = 312, PILL_CY = 330;   // 띠 · 페어명 · 알약의 세로 자리
+const ARCH_CY = 116;                  // 띠 한가운데 (띠는 78~154)
+const NAME_TOP = 136;                 // 페어명 잉크 꼭대기 — 여기서 띠 아랫변을 18 밟는다
+const CAP_LAT = 0.814, CAP_KR = 0.835;   // 글자 크기 대비 잉크 높이 (재서 얻은 값)
+const PILL_DROP = 18;                 // 알약 중심은 페어명 baseline 에서 이만큼 아래
 const FOOT_CY = (FRAME_BOT + 1436) / 2;                // 메뉴 틀 아래 빈 띠(1364~1436)의 한가운데
 const nameArc = (sel, textW, apexY, dx, dy) =>
   arcPath(sel, Math.max(textW, 120) * 1.06, NAME_ARC, apexY, dx, dy);
@@ -315,7 +319,7 @@ function render() {
   /* --- 간판 : 띠 · 페어명 · 알약이 서로 물려 한 덩어리로 읽힌다 --- */
   // 띠 길이는 글자 폭에서 잡는다. 고정 길이로 두면 짧은 문구가 붉은 소시지 위에 뜬다
   const archT = setText('#archText', S.arch.trim() || PH.arch);
-  pill('#archBg', '#archText', CENTER, ARCH_CY, 66, 76, 540, 40);
+  pill('#archBg', '#archText', CENTER, ARCH_CY, 76, 96, 540, 40);
   // baseline 은 실제 글자 크기에서 잡는다. 고정값을 쓰면 글자가 줄었을 때 위로 뜬다
   archT.setAttribute('y', ARCH_CY + parseFloat(archT.style.fontSize) * 0.35);
   const starX = textWidth(archT) / 2 + 28;
@@ -325,16 +329,21 @@ function render() {
   const pairText = S.pair.trim() || PH.pair;
   $('#pairName').textContent = $('#pairShadow').textContent = pairText;
   const nameT = $('#pairNameT');
-  fitText(nameT, 700, HANGUL.test(pairText) ? 162 : 224);
+  const kr = HANGUL.test(pairText);
+  fitText(nameT, 700, kr ? 162 : 224);
   $('#pairShadowT').style.fontSize = nameT.style.fontSize;
+  /* baseline 이 아니라 **잉크 꼭대기**를 고정한다. 그래야 한글이든 긴 이름이든
+     띠를 밟는 깊이가 같다. 알약은 baseline 을 따라다니므로 밑동도 늘 덮인다. */
+  const nameBase = NAME_TOP + (kr ? CAP_KR : CAP_LAT) * parseFloat(nameT.style.fontSize);
   // 글자 길이에 맞춰 반지름을 다시 잡는다. 그래야 짧든 길든 휘는 각도가 같다
-  nameArc('#arc-name', textWidth(nameT), NAME_BASE, 0, 0);
-  nameArc('#arc-name-s', textWidth(nameT), NAME_BASE, 10, 16);
+  nameArc('#arc-name', textWidth(nameT), nameBase, 0, 0);
+  nameArc('#arc-name-s', textWidth(nameT), nameBase, 10, 16);
 
+  const pillCy = nameBase + PILL_DROP;
   const pillT = setText('#pillText', S.pill.trim() || PH.pill);
-  pill('#pillBg', '#pillText', CENTER, PILL_CY, 52, 42, 300, 34);
+  pill('#pillBg', '#pillText', CENTER, pillCy, 52, 42, 300, 34);
   $('#pillBg').setAttribute('rx', 26);
-  pillT.setAttribute('y', PILL_CY + parseFloat(pillT.style.fontSize) * 0.35);
+  pillT.setAttribute('y', pillCy + parseFloat(pillT.style.fontSize) * 0.35);
 
   /* --- 손글씨 덩어리 --- */
   const bd = splitLines(S.badge.trim() || PH.badge, 3);
@@ -401,13 +410,13 @@ function renderMenu(n1, n2) {
   root.textContent = '';
 
   MENU.forEach((col, ci) => {
-    // 가운데 열은 따로 담는다. 다 그린 뒤 통째로 옮겨 메뉴 틀 한가운데에 맞춰야 하기 때문
-    const g = ci === 1 ? root.appendChild(svgEl('g')) : root;
+    const g = root;
     const { x0, x1 } = COLS[ci];
     const cx = (x0 + x1) / 2;
     let y = MENU_TOP;
 
     for (const sec of col) {
+      const headCy = y + HEAD_MID;                 // 머리 높이가 달라도 중심은 늘 같다
       const hh = drawHead(g, sec, cx + (sec.dx || 0), x1 - x0 - 48, y, ci);
       y += hh + HEAD_GAP;
 
@@ -436,20 +445,13 @@ function renderMenu(n1, n2) {
         }
       });
 
-      y += (sec.rows.length - 1) * ROW_PITCH + SEC_GAP;
-    }
-
-    /* 가운데 상자는 메뉴 틀에서 위아래 같은 양(MID_INSET)만큼 띄운 고정 크기다 —
-       내용 높이에서 만들면 상자가 늘 틀 한가운데에 오는 대신, 머리(간판)가 좌우 열의
-       머리보다 한참 아래로 처진다. 상자를 고정하고 열을 상자 위쪽에 붙이는 편이 낫다.
-       (내용을 상자 한가운데 두면 간판 중심은 언제나 874 로 고정된다. 계산해 봤다) */
-    if (ci === 1) {
-      const boxTop = FRAME_TOP + MID_INSET;
-      const box = $('#midBox');
-      box.setAttribute('y', boxTop);
-      box.setAttribute('height', FRAME_BOT - FRAME_TOP - MID_INSET * 2);
-      const b = g.getBBox();
-      g.setAttribute('transform', `translate(0 ${Math.round(boxTop + MID_TOP_PAD - b.y)})`);
+      /* 상자는 이 섹션 하나만 두른다. 윗변이 간판 한가운데에서 시작해 마지막 줄 아래로 닫힌다 —
+         간판이 상자에 얹힌 것처럼 보인다. 아래 DRINKS 는 상자 밖이다. */
+      if (sec.box) {
+        const last = y + (sec.rows.length - 1) * ROW_PITCH;
+        setRect($('#midBox'), { x: 354, y: headCy, w: 292, h: last + BOX_PAD - headCy });
+      }
+      y += (sec.rows.length - 1) * ROW_PITCH + SEC_GAP + (sec.box ? BOX_GAP : 0);
     }
   });
 }
@@ -473,7 +475,8 @@ function drawHead(g, sec, cx, maxW, top, ci) {
   const lines = sec.title.split('/').map(t => t.trim());
   const two = lines.length > 1;
   const h = sec.style === 'plaque' ? 76 : sec.style === 'ribbon' ? 42 : 38;
-  const cy = top + h / 2;
+  // 높이가 달라도 중심은 HEAD_MID 로 같다. 안 그러면 큰 머리만 아래로 처져 보인다
+  const cy = top + HEAD_MID;
   const base = sec.style === 'plaque' ? 25 : 22;
 
   const shape = svgEl('path', { class: 'f-red' });
@@ -521,7 +524,7 @@ function drawHead(g, sec, cx, maxW, top, ci) {
       texts.forEach(t => t.setAttribute('transform', rot));
     }
   }
-  return h;
+  return HEAD_MID + h / 2;
 }
 
 function placeFrame(key) {
