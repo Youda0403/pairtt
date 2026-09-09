@@ -24,9 +24,9 @@ const poster = $('#poster');
 
 /* 사진이 들어가는 세 자리. box 는 index.html 의 clip-path / hit 사각형과 같아야 한다. */
 const FRAMES = {
-  main: { box: { x: 250, y: 414, w: 500, h: 440 }, img: '#photoImg', hint: '#photoHint', hit: '#photoHit' },
-  c1:   { box: { x:  44, y: 390, w: 208, h: 208 }, img: '#c1Img',    hint: '#c1Hint',    hit: '#c1Hit'    },
-  c2:   { box: { x: 748, y: 390, w: 208, h: 208 }, img: '#c2Img',    hint: '#c2Hint',    hit: '#c2Hit'    },
+  main: { box: { x: 268, y: 414, w: 464, h: 440 }, img: '#photoImg', hint: '#photoHint', hit: '#photoHit' },
+  c1:   { box: { x:  50, y: 396, w: 196, h: 196 }, img: '#c1Img',    hint: '#c1Hint',    hit: '#c1Hit'    },
+  c2:   { box: { x: 754, y: 396, w: 196, h: 196 }, img: '#c2Img',    hint: '#c2Hint',    hit: '#c2Hit'    },
 };
 const framePic = k => (k === 'main' ? S.photo : S[k].img);
 
@@ -54,7 +54,8 @@ const PRESETS = [
 /* 메뉴판 본문은 고정값이다. SPECIAL PAIR SET 첫 줄만 두 사람 것으로 바뀐다.
    열마다 MENU_TOP 에서 시작해 같은 간격으로 쌓으므로 섹션 사이 여백이 항상 같다. */
 const COLS = [{ x0: 70, x1: 336 }, { x0: 364, x1: 636 }, { x0: 664, x1: 930 }];
-const MENU_TOP = 826, ROW_PITCH = 33, HEAD_GAP = 36, SEC_GAP = 50, MID_PAD = 24;
+const MENU_TOP = 826, ROW_PITCH = 33, HEAD_GAP = 36, SEC_GAP = 50, MID_PAD = 26;
+const FRAME_TOP = 774, FRAME_BOT = 1364;   // 메뉴 틀. index.html 의 사각형과 같아야 한다
 const MENU = [
   [ { title: 'MAIN DISHES', style: 'slant', dx: 22, rows: [
       ['CLASSIC BURGER','$8.5'], ['CHEESE BURGER','$9.5'], ['DOUBLE BURGER','$11.5'],
@@ -287,17 +288,17 @@ function render() {
   const bg = $('#badgeText');
   bg.textContent = '';
   bd.forEach((line, i) => {
-    const t = svgEl('text', { x: 876, y: 158 - (bd.length - 1) * 15 + i * 30 + 8, 'text-anchor': 'middle', 'letter-spacing': 1.6 });
+    const t = svgEl('text', { x: 872, y: 160 - (bd.length - 1) * 14 + i * 28 + 8, 'text-anchor': 'middle', 'letter-spacing': 1.6 });
     t.textContent = line;
     bg.appendChild(t);
-    fitText(t, 132, 23);
+    fitText(t, 118, 21);
   });
 
   /* --- 캐릭터 --- */
   for (const [key, def] of [['c1', PH.c1], ['c2', PH.c2]]) {
     const n = key === 'c1' ? 1 : 2;
     setText(`#c${n}Name`, S[key].name.trim() || def);
-    fitText($(`#c${n}NameT`), 196, 32);   // 호 길이(222)를 넘지 않게
+    fitText($(`#c${n}NameT`), 188, 32);   // 호 길이(212)를 넘지 않게
   }
 
   /* --- 메뉴 --- */
@@ -322,10 +323,12 @@ function render() {
 }
 
 function renderMenu(n1, n2) {
-  const g = $('#menu');
-  g.textContent = '';
+  const root = $('#menu');
+  root.textContent = '';
 
   MENU.forEach((col, ci) => {
+    // 가운데 열은 따로 담는다. 다 그린 뒤 통째로 옮겨 메뉴 틀 한가운데에 맞춰야 하기 때문
+    const g = ci === 1 ? root.appendChild(svgEl('g')) : root;
     const { x0, x1 } = COLS[ci];
     const cx = (x0 + x1) / 2;
     let y = MENU_TOP;
@@ -362,13 +365,16 @@ function renderMenu(n1, n2) {
       y += (sec.rows.length - 1) * ROW_PITCH + SEC_GAP;
     }
 
-    // 가운데 열을 두르는 상자. 머리 위와 마지막 줄 아래 여백을 같게 잡는다.
-    // 높이를 상수로 박아 두면 메뉴 줄 수가 바뀔 때마다 위아래가 어긋난다
+    /* 가운데 열과 그 상자는 메뉴 틀 한가운데에 놓는다.
+       가운데 열은 좌우 열보다 짧아서, 위를 맞추면 상자가 틀 안에서 위로 쏠린다.
+       그려 놓고 실제 높이를 재서 통째로 내리는 편이 값을 박는 것보다 안전하다. */
     if (ci === 1) {
-      const top = MENU_TOP - 7 - MID_PAD;              // oval 머리가 7 위로 튀어나온다
-      const bottom = (y - SEC_GAP) + 6 + MID_PAD;      // 마지막 줄 baseline + 글자 아랫부분
-      $('#midBox').setAttribute('y', top);
-      $('#midBox').setAttribute('height', bottom - top);
+      const b = g.getBBox();
+      const dy = Math.round((FRAME_TOP + FRAME_BOT) / 2 - (b.y + b.height / 2));
+      g.setAttribute('transform', `translate(0 ${dy})`);
+      const box = $('#midBox');
+      box.setAttribute('y', b.y + dy - MID_PAD);
+      box.setAttribute('height', b.height + MID_PAD * 2);
     }
   });
 }

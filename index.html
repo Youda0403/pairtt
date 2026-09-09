@@ -26,8 +26,8 @@
     <path id="arc-text" fill="none"/>
     <path id="arc-name"   fill="none"/>
     <path id="arc-name-s" fill="none"/>
-    <path id="arc-c1" d="M48.7 589.9 A 138 138 0 0 0 247.3 589.9" fill="none"/>
-    <path id="arc-c2" d="M752.7 589.9 A 138 138 0 0 0 951.3 589.9" fill="none"/>
+    <path id="arc-c1" d="M53.0 585.7 A 132 132 0 0 0 243.0 585.7" fill="none"/>
+    <path id="arc-c2" d="M757.0 585.7 A 132 132 0 0 0 947.0 585.7" fill="none"/>
 
     <pattern id="pat-check" width="24" height="24" patternUnits="userSpaceOnUse">
       <rect width="24" height="24" class="f-paper"/>
@@ -71,9 +71,9 @@
       </feComponentTransfer>
     </filter>
 
-    <clipPath id="clip-photo"><rect x="250" y="414" width="500" height="440"/></clipPath>
-    <clipPath id="clip-c1"><circle cx="148" cy="494" r="104"/></clipPath>
-    <clipPath id="clip-c2"><circle cx="852" cy="494" r="104"/></clipPath>
+    <clipPath id="clip-photo"><rect x="268" y="414" width="464" height="440"/></clipPath>
+    <clipPath id="clip-c1"><circle cx="148" cy="494" r="98"/></clipPath>
+    <clipPath id="clip-c2"><circle cx="852" cy="494" r="98"/></clipPath>
   </defs>
 
   <rect width="1000" height="1500" class="f-paper"/>
@@ -99,9 +99,9 @@
   </text>
 
   <!-- 오른쪽 위 별폭발 배지. 페어명보다 먼저 그려 긴 이름이 배지에 가리지 않게 한다 -->
-  <g transform="rotate(6 876 158)">
-    <use href="#ic-burst" class="f-green" transform="translate(876,158) scale(1.14)"/>
-    <g id="badgeText" class="cond f-on-green" font-size="23"></g>
+  <g transform="rotate(6 872 160)">
+    <use href="#ic-burst" class="f-green" transform="translate(872,160)"/>
+    <g id="badgeText" class="cond f-on-green" font-size="21"></g>
   </g>
 
   <!-- 그림자는 통색이어야 그림자로 읽힌다. 테두리를 두르면 조각처럼 부서져 보인다 -->
@@ -114,9 +114,15 @@
   </text>
 
   <!-- 가운데 그림. 아래쪽은 메뉴 틀에 가려 잘린다 -->
-  <rect id="photoMat" x="250" y="414" width="500" height="360" class="f-sheet" style="display:none"/>
+  <rect id="photoMat" x="268" y="414" width="464" height="440" class="f-sheet" style="display:none"/>
   <g clip-path="url(#clip-photo)">
     <image id="photoImg" preserveAspectRatio="none" filter="url(#fx-tone)" style="display:none"/>
+  </g>
+  <!-- 액자. 켤 때만 보인다. 포스터 테두리와 같은 규칙 — 굵은 선 + 안쪽 가는 선.
+       사진과 같은 층이라 아랫변은 메뉴 틀에 가려 잘린다 -->
+  <g id="photoFrame" style="display:none">
+    <rect x="268" y="414" width="464" height="440" class="s-red" fill="none" stroke-width="7"/>
+    <rect x="277" y="423" width="446" height="422" class="s-red" fill="none" stroke-width="1.6" opacity=".5"/>
   </g>
   <g id="photoHint" class="s-red" fill="none" opacity=".45">
     <g stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
@@ -126,12 +132,12 @@
     </g>
     <text class="script f-red" x="500" y="676" font-size="40" text-anchor="middle" stroke="none">two of us here!</text>
   </g>
-  <rect id="photoHit" x="250" y="414" width="500" height="360" fill="none" pointer-events="all"/>
+  <rect id="photoHit" x="268" y="414" width="464" height="360" fill="none" pointer-events="all"/>
 
   <!-- 캐릭터 01. 원 전체를 살짝 기울인다. 이름은 원 바깥 아래를 도는 호에 얹어
        얼굴을 가리지도, 섹션 머리처럼 보이지도 않게 한다 -->
   <g transform="rotate(-4 148 494)">
-    <circle cx="148" cy="494" r="104" class="f-sheet"/>
+    <circle cx="148" cy="494" r="98" class="f-sheet"/>
     <g clip-path="url(#clip-c1)">
       <image id="c1Img" preserveAspectRatio="none" filter="url(#fx-tone)" style="display:none"/>
       <g id="c1Hint" class="s-red" fill="none" stroke-width="5" stroke-linecap="round" opacity=".4"
@@ -140,16 +146,16 @@
         <path d="M-30 40 C-30 12 -15 2 0 2 C15 2 30 12 30 40"/>
       </g>
     </g>
-    <circle cx="148" cy="494" r="104" class="s-red" fill="none" stroke-width="7"/>
+    <circle cx="148" cy="494" r="98" class="s-red" fill="none" stroke-width="7"/>
     <text id="c1NameT" class="cond f-red" font-size="32" letter-spacing="2.6">
       <textPath id="c1Name" href="#arc-c1" startOffset="50%" text-anchor="middle">JUN</textPath>
     </text>
-    <rect id="c1Hit" x="44" y="390" width="208" height="208" fill="none" pointer-events="all"/>
+    <rect id="c1Hit" x="50" y="396" width="196" height="196" fill="none" pointer-events="all"/>
   </g>
 
   <!-- 캐릭터 02 -->
   <g transform="rotate(4 852 494)">
-    <circle cx="852" cy="494" r="104" class="f-sheet"/>
+    <circle cx="852" cy="494" r="98" class="f-sheet"/>
     <g clip-path="url(#clip-c2)">
       <image id="c2Img" preserveAspectRatio="none" filter="url(#fx-tone)" style="display:none"/>
       <g id="c2Hint" class="s-red" fill="none" stroke-width="5" stroke-linecap="round" opacity=".4"
@@ -158,24 +164,17 @@
         <path d="M-30 40 C-30 12 -15 2 0 2 C15 2 30 12 30 40"/>
       </g>
     </g>
-    <circle cx="852" cy="494" r="104" class="s-red" fill="none" stroke-width="7"/>
+    <circle cx="852" cy="494" r="98" class="s-red" fill="none" stroke-width="7"/>
     <text id="c2NameT" class="cond f-red" font-size="32" letter-spacing="2.6">
       <textPath id="c2Name" href="#arc-c2" startOffset="50%" text-anchor="middle">HANA</textPath>
     </text>
-    <rect id="c2Hit" x="748" y="390" width="208" height="208" fill="none" pointer-events="all"/>
+    <rect id="c2Hit" x="754" y="396" width="196" height="196" fill="none" pointer-events="all"/>
   </g>
 
   <!-- 메뉴 틀. 그림보다 뒤에 그려 사진 아랫부분을 덮는다 -->
   <rect x="40" y="774" width="920" height="590" rx="14" class="f-paper"/>
   <rect x="40" y="774" width="920" height="590" rx="14" class="s-red" fill="none" stroke-width="4"/>
   <rect id="midBox" x="354" width="292" rx="10" class="s-red" fill="none" stroke-width="2.6"/>
-
-  <!-- 가운데 그림 액자. 켤 때만 보인다. 포스터 테두리와 같은 규칙 — 굵은 선 + 안쪽 가는 선.
-       메뉴 틀보다 뒤에 그려 아래 모서리가 틀의 윗선 위에 얹힌다 -->
-  <g id="photoFrame" style="display:none">
-    <rect x="250" y="414" width="500" height="360" class="s-red" fill="none" stroke-width="7"/>
-    <rect x="259" y="423" width="482" height="342" class="s-red" fill="none" stroke-width="1.6" opacity=".5"/>
-  </g>
 
   <!-- 음식 그림 : 메뉴 글자보다 뒤에 그려 겹쳐도 글자가 읽히게 -->
   <g class="slot"><image id="img-burger" class="slot-img" preserveAspectRatio="xMidYMid meet"/><rect id="hit-burger" class="slot-hit" fill="none" pointer-events="all"/></g>
