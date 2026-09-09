@@ -241,16 +241,19 @@ function pill(rectSel, textSel, cx, cy, h, padX, maxW, base) {
   return w;
 }
 
-/** 가장자리가 반원으로 물결지는 사각형. 봉우리가 상자 선에 닿고 골은 안쪽으로 들어간다 */
+/** 가장자리가 반원으로 물결지는 사각형. 봉우리가 상자 선에 닿고 골은 안쪽으로 들어간다.
+    네 모서리에도 대각선으로 반원을 하나씩 넣는다 — 없으면 모서리에 직각 홈이 파여
+    "물결이 그러다 만" 것처럼 보인다. 변마다 봉우리를 2r 씩 놓고 모서리 몫으로 양끝에 2r 을 비운다. */
 function scallopPath({ x, y, w, h }, nx, ny) {
-  const rx = w / (2 * nx + 2), ry = h / (2 * ny + 2);
+  const rx = w / (2 * nx + 4), ry = h / (2 * ny + 4);
+  const cr = Math.hypot(rx, ry) / 2;                       // 모서리 반원(대각선 현의 절반)
   const arc = (r, dx, dy) => ` a${r} ${r} 0 0 1 ${dx} ${dy}`;
-  let d = `M${x + rx} ${y + ry}`;
-  for (let i = 0; i < nx; i++) d += arc(rx, rx * 2, 0);
-  for (let i = 0; i < ny; i++) d += arc(ry, 0, ry * 2);
-  for (let i = 0; i < nx; i++) d += arc(rx, -rx * 2, 0);
-  for (let i = 0; i < ny; i++) d += arc(ry, 0, -ry * 2);
-  return d + 'Z';
+  const run = (n, r, dx, dy) => Array.from({ length: n }, () => arc(r, dx, dy)).join('');
+  return `M${x + 2 * rx} ${y + ry}` +
+    run(nx, rx, rx * 2, 0)  + arc(cr,  rx,  ry) +
+    run(ny, ry, 0, ry * 2)  + arc(cr, -rx,  ry) +
+    run(nx, rx, -rx * 2, 0) + arc(cr, -rx, -ry) +
+    run(ny, ry, 0, -ry * 2) + arc(cr,  rx, -ry) + 'Z';
 }
 
 /** 늘 같은 각도로 휘는 호. 길이가 길어지면 반지름이 커져 곡률이 유지된다.
@@ -262,7 +265,8 @@ function arcPath(sel, len, angle, apexY, dx = 0, dy = 0) {
 }
 
 const NAME_ARC = 21 * Math.PI / 180;   // 페어명
-const ARCH_CY = 112, NAME_BASE = 314, PILL_CY = 348;   // 간판 세 덩어리의 세로 자리
+const ARCH_CY = 111, NAME_BASE = 328, PILL_CY = 770;   // 띠 · 페어명 · 알약의 세로 자리
+const FOOT_CY = (FRAME_BOT + 1436) / 2;                // 메뉴 틀 아래 빈 띠(1364~1436)의 한가운데
 const nameArc = (sel, textW, apexY, dx, dy) =>
   arcPath(sel, Math.max(textW, 120) * 1.06, NAME_ARC, apexY, dx, dy);
 
@@ -313,7 +317,7 @@ function render() {
   /* --- 간판 : 띠 · 페어명 · 알약이 서로 물려 한 덩어리로 읽힌다 --- */
   // 띠 길이는 글자 폭에서 잡는다. 고정 길이로 두면 짧은 문구가 붉은 소시지 위에 뜬다
   const archT = setText('#archText', S.arch.trim() || PH.arch);
-  pill('#archBg', '#archText', CENTER, ARCH_CY, 80, 84, 540, 42);
+  pill('#archBg', '#archText', CENTER, ARCH_CY, 66, 76, 540, 40);
   // baseline 은 실제 글자 크기에서 잡는다. 고정값을 쓰면 글자가 줄었을 때 위로 뜬다
   archT.setAttribute('y', ARCH_CY + parseFloat(archT.style.fontSize) * 0.35);
   const starX = textWidth(archT) / 2 + 28;
@@ -323,15 +327,15 @@ function render() {
   const pairText = S.pair.trim() || PH.pair;
   $('#pairName').textContent = $('#pairShadow').textContent = pairText;
   const nameT = $('#pairNameT');
-  fitText(nameT, 700, HANGUL.test(pairText) ? 152 : 210);
+  fitText(nameT, 700, HANGUL.test(pairText) ? 162 : 224);
   $('#pairShadowT').style.fontSize = nameT.style.fontSize;
   // 글자 길이에 맞춰 반지름을 다시 잡는다. 그래야 짧든 길든 휘는 각도가 같다
   nameArc('#arc-name', textWidth(nameT), NAME_BASE, 0, 0);
   nameArc('#arc-name-s', textWidth(nameT), NAME_BASE, 10, 16);
 
   const pillT = setText('#pillText', S.pill.trim() || PH.pill);
-  pill('#pillBg', '#pillText', CENTER, PILL_CY, 58, 42, 300, 34);
-  $('#pillBg').setAttribute('rx', 29);
+  pill('#pillBg', '#pillText', CENTER, PILL_CY, 52, 36, 260, 30);
+  $('#pillBg').setAttribute('rx', 26);
   pillT.setAttribute('y', PILL_CY + parseFloat(pillT.style.fontSize) * 0.35);
 
   /* --- 손글씨 덩어리 --- */
@@ -364,24 +368,33 @@ function render() {
   box.y = PHOTO_BOX.y + inset;
   box.w = PHOTO_BOX.w - inset * 2;
   box.h = PHOTO_BOX.h - inset * 2;
-  setRect($('#clip-photo').firstElementChild, box);
+  const clipR = $('#clip-photo').firstElementChild;
+  setRect(clipR, box);
   setRect($('#photoHit'), { ...box, h: FRAME_TOP - box.y });   // 메뉴 틀에 가린 데는 끌 수 없다
   setRect($('#photoKey'), box);
-  const pad = 15;
-  const outer = scallopPath(PHOTO_BOX, 10, 9);
+  // 액자를 켜면 사진 모서리도 둥글려 물결 모서리와 맞물리게 한다
+  for (const el of [clipR, $('#photoKey')]) el.setAttribute('rx', S.frame ? 16 : 0);
+  const outer = scallopPath(PHOTO_BOX, 9, 8);
   $('#photoScallop').setAttribute('d', outer);
   $('#photoScallopSh').setAttribute('d', outer);   // 종이 매트가 떠 보이게 하는 옅은 그림자
-  $('#photoScallopIn').setAttribute('d', scallopPath({
-    x: PHOTO_BOX.x + pad, y: PHOTO_BOX.y + pad,
-    w: PHOTO_BOX.w - pad * 2, h: PHOTO_BOX.h - pad * 2,
-  }, 10, 9));
+  // 안쪽 겹선은 같은 path 를 상자 한가운데 기준으로 줄인 것이다.
+  // 작은 상자에 다시 그리면 봉우리 반지름이 달라져 바깥선과 어긋난다. 실제로 그랬다
+  const inn = $('#photoScallopIn');
+  const mx = PHOTO_BOX.x + PHOTO_BOX.w / 2, my = PHOTO_BOX.y + PHOTO_BOX.h / 2;
+  inn.setAttribute('d', outer);
+  inn.setAttribute('transform', `translate(${mx} ${my}) scale(.962) translate(${-mx} ${-my})`);
   for (const sel of ['#photoScallopSh', '#photoScallop', '#photoScallopIn', '#photoKey'])
     $(sel).style.display = fr;
 
   /* --- 바닥 장식 : 별은 글자 폭을 재서 양옆에 붙인다 --- */
-  const footW = textWidth($('#footNote'));
+  // 글자 상자를 재서 띠 한가운데에 맞춘다. baseline 을 박아 두면 손글씨의 위아래 여백이 어긋난다
+  const foot = $('#footNote');
+  foot.setAttribute('y', FOOT_CY);
+  const fb = foot.getBBox();
+  foot.setAttribute('y', FOOT_CY + (FOOT_CY - (fb.y + fb.height / 2)));
+  const footW = textWidth(foot);
   for (const [sel, sgn] of [['#footStarL', -1], ['#footStarR', 1]]) {
-    $(sel).setAttribute('transform', `translate(${CENTER + sgn * (footW / 2 + 26)},1397) scale(.9)`);
+    $(sel).setAttribute('transform', `translate(${CENTER + sgn * (footW / 2 + 26)},${FOOT_CY}) scale(.9)`);
   }
 
   Object.keys(FRAMES).forEach(placeFrame);
@@ -465,9 +478,9 @@ function plaque(x1, y1, x2, y2, bow) {
 function drawHead(g, sec, cx, maxW, top, ci) {
   const lines = sec.title.split('/').map(t => t.trim());
   const two = lines.length > 1;
-  const h = sec.style === 'plaque' ? 90 : sec.style === 'ribbon' ? 42 : 38;
+  const h = sec.style === 'plaque' ? 76 : sec.style === 'ribbon' ? 42 : 38;
   const cy = top + h / 2;
-  const base = sec.style === 'plaque' ? 27 : 22;
+  const base = sec.style === 'plaque' ? 25 : 22;
 
   const shape = svgEl('path', { class: 'f-red' });
   g.appendChild(shape);
@@ -481,20 +494,20 @@ function drawHead(g, sec, cx, maxW, top, ci) {
   });
   const fs = parseFloat(texts[0].style.fontSize);
   texts.forEach((t, i) => {
-    const off = two ? (i - 0.5) * (fs + 11) : 0;
+    const off = two ? (i - 0.5) * (fs + 9) : 0;
     t.setAttribute('y', cy + off + fs * 0.35);
   });
 
   const tw = Math.max(...texts.map(textWidth));
-  const w = tw + (sec.style === 'plaque' ? 84 : sec.style === 'ribbon' ? 52 : 36);
+  const w = tw + (sec.style === 'plaque' ? 72 : sec.style === 'ribbon' ? 52 : 36);
   const x1 = cx - w / 2, x2 = cx + w / 2, y1 = cy - h / 2, y2 = cy + h / 2;
   const rr = 5;
 
   if (sec.style === 'plaque') {
     // 위아래가 살짝 부푼 간판. 안쪽에 종이색 괘선을 한 줄 더 둘러 간판처럼 보이게 한다
-    shape.setAttribute('d', plaque(x1, y1, x2, y2, 10));
-    const inner = svgEl('path', { class: 's-paper', fill: 'none', 'stroke-width': 2.4, opacity: .55 });
-    inner.setAttribute('d', plaque(x1 + 8, y1 + 7, x2 - 8, y2 - 7, 8));
+    shape.setAttribute('d', plaque(x1, y1, x2, y2, 9));
+    const inner = svgEl('path', { class: 's-paper', fill: 'none', 'stroke-width': 2.2, opacity: .55 });
+    inner.setAttribute('d', plaque(x1 + 7, y1 + 6, x2 - 7, y2 - 6, 7));
     g.appendChild(inner);
     for (const sgn of [-1, 1]) {
       const u = svgEl('use', { class: 'f-accent', transform: `translate(${cx + sgn * (w / 2 - 20)},${cy}) scale(.58)` });
