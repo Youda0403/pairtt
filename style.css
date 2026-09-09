@@ -90,6 +90,9 @@ button, input { font: inherit; color: inherit; }
 }
 .fld input[type=text]:focus { outline: 2px solid #dfa79a; outline-offset: -1px; }
 .fld input[type=range] { width: 100%; accent-color: #c4362c; }
+.fld.check { display: flex; align-items: center; gap: 8px; }
+.fld.check > span { margin: 0; }
+.fld.check input[type=checkbox] { width: 17px; height: 17px; accent-color: #c4362c; flex: none; }
 .hint { font-size: 12px; opacity: .55; line-height: 1.5; margin-top: 6px; }
 .hint code { background: #f1e6d2; border-radius: 4px; padding: 0 3px; }
 .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0 10px; }

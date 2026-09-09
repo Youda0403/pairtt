@@ -54,7 +54,7 @@ const PRESETS = [
 /* 메뉴판 본문은 고정값이다. SPECIAL PAIR SET 첫 줄만 두 사람 것으로 바뀐다.
    열마다 MENU_TOP 에서 시작해 같은 간격으로 쌓으므로 섹션 사이 여백이 항상 같다. */
 const COLS = [{ x0: 70, x1: 336 }, { x0: 364, x1: 636 }, { x0: 664, x1: 930 }];
-const MENU_TOP = 826, ROW_PITCH = 33, HEAD_GAP = 36, SEC_GAP = 50;
+const MENU_TOP = 826, ROW_PITCH = 33, HEAD_GAP = 36, SEC_GAP = 50, MID_PAD = 24;
 const MENU = [
   [ { title: 'MAIN DISHES', style: 'slant', dx: 22, rows: [
       ['CLASSIC BURGER','$8.5'], ['CHEESE BURGER','$9.5'], ['DOUBLE BURGER','$11.5'],
@@ -78,10 +78,10 @@ const newPic     = () => ({ src: null, nw: 0, nh: 0, zoom: 1, ox: 0, oy: 0 });
 const newChar    = () => ({ name: '', img: newPic() });
 
 const defaults = () => ({
-  pair: '', arch: '', pill: '',
+  pair: '', arch: '',
   badge: '',
   set: '', setp: '',
-  c1: newChar(), c2: newChar(), photo: newPic(),
+  c1: newChar(), c2: newChar(), photo: newPic(), frame: false,
   stickers: Object.fromEntries(SLOTS.map(s => [s.k, newSticker()])),
   colors: Object.fromEntries(COLORS.map(c => [c.k, c.def])),
 });
@@ -89,7 +89,7 @@ const defaults = () => ({
 let S = defaults();
 
 const PH = {
-  pair: 'PAIR', arch: 'OUR SPECIAL', pill: 'MENU',
+  pair: 'PAIR', arch: 'OUR SPECIAL',
   badge: 'TWO HEARTS / ONE / MENU',
   c1: 'JUN', c2: 'HANA', setp: '$12.5',
 };
@@ -221,19 +221,6 @@ const ARCH_ARC = 26 * Math.PI / 180;   // 아치 띠
 const nameArc = (sel, textW, apexY, dx, dy) =>
   arcPath(sel, Math.max(textW, 120) * 1.06, NAME_ARC, apexY, dx, dy);
 
-/** 글자 폭에 맞춰 크기가 정해지는 알약 */
-function pill(rectSel, textSel, cx, cy, h, padX, maxW, base) {
-  const t = fitText($(textSel), maxW, base);
-  const w = textWidth(t) + padX * 2;
-  const r = $(rectSel);
-  r.setAttribute('x', cx - w / 2);
-  r.setAttribute('y', cy - h / 2);
-  r.setAttribute('width', w);
-  r.setAttribute('height', h);
-  r.setAttribute('rx', h / 2);
-  return w;
-}
-
 /* ===================== 한글 폰트 ===================== */
 
 const HANGUL = /[ᄀ-ᇿ㄰-㆏가-힣]/;
@@ -283,8 +270,8 @@ function render() {
   const archT = $('#archText');
   archT.textContent = S.arch.trim() || PH.arch;
   const archW = textWidth(archT.parentNode);
-  arcPath('#arc-band', Math.max(archW, 150) + 118, ARCH_ARC, 120);
-  arcPath('#arc-text', Math.max(archW, 150) + 118, ARCH_ARC, 131);
+  arcPath('#arc-band', Math.max(archW, 150) + 118, ARCH_ARC, 142);
+  arcPath('#arc-text', Math.max(archW, 150) + 118, ARCH_ARC, 153);
 
   const pairText = S.pair.trim() || PH.pair;
   $('#pairName').textContent = $('#pairShadow').textContent = pairText;
@@ -292,18 +279,15 @@ function render() {
   fitText(nameT, 700, HANGUL.test(pairText) ? 140 : 172);
   $('#pairShadowT').style.fontSize = nameT.style.fontSize;
   // 글자 길이에 맞춰 반지름을 다시 잡는다. 그래야 짧든 길든 휘는 각도가 같다
-  nameArc('#arc-name', textWidth(nameT), 316, 0, 0);
-  nameArc('#arc-name-s', textWidth(nameT), 316, 9, 15);
-
-  setText('#pillText', S.pill.trim() || PH.pill);
-  pill('#pillBg', '#pillText', CENTER, 372, 52, 34, 300, 28);
+  nameArc('#arc-name', textWidth(nameT), 338, 0, 0);
+  nameArc('#arc-name-s', textWidth(nameT), 338, 9, 15);
 
   /* --- 손글씨 덩어리 --- */
   const bd = splitLines(S.badge.trim() || PH.badge, 3);
   const bg = $('#badgeText');
   bg.textContent = '';
   bd.forEach((line, i) => {
-    const t = svgEl('text', { x: 866, y: 168 - (bd.length - 1) * 15 + i * 30 + 8, 'text-anchor': 'middle', 'letter-spacing': 1.6 });
+    const t = svgEl('text', { x: 876, y: 158 - (bd.length - 1) * 15 + i * 30 + 8, 'text-anchor': 'middle', 'letter-spacing': 1.6 });
     t.textContent = line;
     bg.appendChild(t);
     fitText(t, 132, 23);
@@ -312,16 +296,23 @@ function render() {
   /* --- 캐릭터 --- */
   for (const [key, def] of [['c1', PH.c1], ['c2', PH.c2]]) {
     const n = key === 'c1' ? 1 : 2;
-    fitText(setText(`#c${n}Name`, S[key].name.trim() || def), 140, 26);
+    setText(`#c${n}Name`, S[key].name.trim() || def);
+    fitText($(`#c${n}NameT`), 196, 32);   // 호 길이(222)를 넘지 않게
   }
 
   /* --- 메뉴 --- */
   renderMenu(n1, n2);
 
+  /* --- 가운데 그림 액자 --- */
+  // display 는 반드시 값으로 지정한다. ''(인라인 해제)로 두면 스타일시트 규칙이 이긴다
+  const fr = S.frame ? 'inline' : 'none';
+  $('#photoMat').style.display = fr;
+  $('#photoFrame').style.display = fr;
+
   /* --- 바닥 장식 : 별은 글자 폭을 재서 양옆에 붙인다 --- */
   const footW = textWidth($('#footNote'));
   for (const [sel, sgn] of [['#footStarL', -1], ['#footStarR', 1]]) {
-    $(sel).setAttribute('transform', `translate(${CENTER + sgn * (footW / 2 + 30)},1394) scale(.9)`);
+    $(sel).setAttribute('transform', `translate(${CENTER + sgn * (footW / 2 + 26)},1397) scale(.9)`);
   }
 
   Object.keys(FRAMES).forEach(placeFrame);
@@ -369,6 +360,15 @@ function renderMenu(n1, n2) {
       });
 
       y += (sec.rows.length - 1) * ROW_PITCH + SEC_GAP;
+    }
+
+    // 가운데 열을 두르는 상자. 머리 위와 마지막 줄 아래 여백을 같게 잡는다.
+    // 높이를 상수로 박아 두면 메뉴 줄 수가 바뀔 때마다 위아래가 어긋난다
+    if (ci === 1) {
+      const top = MENU_TOP - 7 - MID_PAD;              // oval 머리가 7 위로 튀어나온다
+      const bottom = (y - SEC_GAP) + 6 + MID_PAD;      // 마지막 줄 baseline + 글자 아랫부분
+      $('#midBox').setAttribute('y', top);
+      $('#midBox').setAttribute('height', bottom - top);
     }
   });
 }
@@ -880,12 +880,13 @@ function buildColorUI() {
 
 const syncColorInputs = () => COLORS.forEach(({ k }) => { $('#col-' + k).value = S.colors[k]; });
 
-const TEXT_FIELDS = ['pair', 'arch', 'pill', 'badge'];
+const TEXT_FIELDS = ['pair', 'arch', 'badge'];
 
 function syncInputs() {
   TEXT_FIELDS.forEach(k => { $('#in-' + k).value = S[k]; });
   $('#in-set').value = S.set;
   $('#in-setp').value = S.setp;
+  $('#in-frame').checked = !!S.frame;
   $$('[data-f]').forEach(el => { el.value = getPath(el.dataset.f); });
   ['main', 'c1', 'c2'].forEach(k => setZoom(k, framePic(k).zoom));
   syncColorInputs();
@@ -948,6 +949,7 @@ async function init() {
     setZoom('main', 1);
   });
   $('#in-zoom').addEventListener('input', e => setZoom('main', +e.target.value / 100));
+  $('#in-frame').addEventListener('change', e => { S.frame = e.target.checked; render(); });
 
   $('#btn-color-reset').addEventListener('click', () => {
     S.colors = defaults().colors;
