@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Pairframe — 페어 다이너 메뉴판 메이커</title>
-<link rel="stylesheet" href="style.css?v=8">
+<link rel="stylesheet" href="style.css?v=9">
 </head>
 <body>
 <div class="app">
@@ -216,7 +216,7 @@
 <div class="panel">
   <div class="brand">
     <h1>Pair<em>frame</em></h1>
-    <p>우리 둘을 다이너 메뉴판의 오늘의 스페셜로 <span class="ver">v8</span></p>
+    <p>우리 둘을 다이너 메뉴판의 오늘의 스페셜로 <span class="ver">v9</span></p>
   </div>
 
   <details class="sec" open>
@@ -288,8 +288,10 @@
     <div class="body">
       <div id="presets" class="presets"></div>
       <div id="color-list" class="colors"></div>
+      <button class="btn ghost wide" id="btn-palette" type="button">팔레트 이미지에서 색 가져오기</button>
       <button class="btn ghost wide" id="btn-color-reset" type="button">기본 색으로</button>
-      <p class="hint">음식 그림은 그려진 색 그대로라 테마를 따르지 않습니다.</p>
+      <p class="hint">캐릭터 컬러랩 같은 팔레트 이미지를 올리면 네 가지 색을 자동으로 채웁니다.
+        음식 그림은 그려진 색 그대로라 테마를 따르지 않습니다.</p>
     </div>
   </details>
 
@@ -303,8 +305,9 @@
 
 <input id="in-photo" type="file" accept="image/*" hidden>
 <input id="in-sticker" type="file" accept="image/*" hidden>
+<input id="in-palette" type="file" accept="image/*" hidden>
 <div id="toast" class="toast" hidden></div>
 
-<script src="app.js?v=8"></script>
+<script src="app.js?v=9"></script>
 </body>
 </html>

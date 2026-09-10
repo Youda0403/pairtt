@@ -157,6 +157,111 @@ function onColor(bg, sheet) {
   return lum(bg) > 0.62 ? hsl2hex(h, clamp(s * 1.1, 0, 1), 0.22) : sheet;
 }
 
+/* ===================== 팔레트 이미지 ===================== */
+
+/* 캐릭터 컬러랩(youda0403.github.io/Color)이 뽑아 주는 팔레트 이미지를 그대로 받는다.
+   **글자(hex)를 읽지 않고 면적으로 찾는다** — 작게 줄여 4bit 로 뭉갠 히스토그램에서 큰 덩어리만
+   남기면 스와치만 남고 글자·테두리·둥근 모서리는 저절로 걸러진다. OCR 도 라이브러리도 필요 없다.
+   그래서 컬러랩 말고 다른 팔레트 이미지(칸이 크기만 하면)도 그대로 먹는다. */
+const PAL_N = 200;           // 분석용 가로 픽셀. 이보다 키워도 답이 달라지지 않는다
+const PAL_MIN_AREA = 0.006;  // 화면의 이만큼은 차지해야 스와치로 친다
+const PAL_MERGE = 22;        // 채널 차이가 이보다 작으면 같은 색으로 묶는다
+const PAL_CONTRAST = 0.28;   // 종이와 이만큼은 밝기가 벌어져야 글자가 읽힌다
+const PAL_ACC_CONTRAST = 0.12;   // 별 장식은 작아서 조금 덜 벌어져도 된다
+
+const nearColor = (a, b) => {
+  const [x, y] = [hex2rgb(a), hex2rgb(b)];
+  return Math.max(Math.abs(x[0] - y[0]), Math.abs(x[1] - y[1]), Math.abs(x[2] - y[2])) < PAL_MERGE;
+};
+const hueGap = (a, b) => { const d = Math.abs(a - b) % 360; return d > 180 ? 360 - d : d; };
+const bestOf = (arr, score) => arr.reduce((a, c) => (score(c) > score(a) ? c : a), arr[0]);
+
+/** 그림 파일을 PAL_N 폭으로 줄여 픽셀을 그대로 돌려준다 */
+function readPixels(file) {
+  return new Promise((res, rej) => {
+    const fr = new FileReader();
+    fr.onerror = rej;
+    fr.onload = () => {
+      const im = new Image();
+      im.onerror = rej;
+      im.onload = () => {
+        const w = Math.min(PAL_N, im.width);
+        const h = Math.max(1, Math.round(im.height * w / im.width));
+        const cv = document.createElement('canvas');
+        cv.width = w; cv.height = h;
+        const ctx = cv.getContext('2d', { willReadFrequently: true });
+        ctx.drawImage(im, 0, 0, w, h);
+        res(ctx.getImageData(0, 0, w, h));
+      };
+      im.src = fr.result;
+    };
+    fr.readAsDataURL(file);
+  });
+}
+
+/** 면적이 큰 색들을 많은 순으로. 테두리에서 제일 많은 색은 배경으로 따로 뺀다 */
+function imagePalette({ data, width: w, height: h }) {
+  const bucket = new Map(), edge = new Map();
+  const add = (m, k, i) => {
+    const e = m.get(k) || [0, 0, 0, 0];
+    e[0]++; e[1] += data[i]; e[2] += data[i + 1]; e[3] += data[i + 2];
+    m.set(k, e);
+  };
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      const i = (y * w + x) * 4;
+      const k = ((data[i] >> 4) << 8) | ((data[i + 1] >> 4) << 4) | (data[i + 2] >> 4);
+      add(bucket, k, i);
+      if (x === 0 || y === 0 || x === w - 1 || y === h - 1) add(edge, k, i);
+    }
+  }
+  const rank = m => [...m.values()].sort((a, b) => b[0] - a[0]);
+  const avg = e => rgb2hex(e[1] / e[0], e[2] / e[0], e[3] / e[0]);
+  const ranked = rank(bucket);
+  const bg = avg(rank(edge)[0]);
+  const list = [];
+  for (const e of ranked) {
+    if (e[0] < w * h * PAL_MIN_AREA) break;
+    const hex = avg(e);
+    if (nearColor(hex, bg) || list.some(o => nearColor(o.hex, hex))) continue;
+    list.push({ hex, n: e[0] });
+  }
+  return { bg, list };
+}
+
+/** 뽑은 색을 포스터의 네 자리에 나눠 준다. 못 나누면 null */
+function themeFromPalette({ bg, list }) {
+  const tag = o => { const [h, s, l] = rgb2hsl(o.hex); return { ...o, h, s, l, y: lum(o.hex) }; };
+  const all = [tag({ hex: bg, n: 0 }), ...list.map(tag)];
+  if (all.length < 3) return null;
+
+  // 종이 : 제일 밝은 색. 컬러랩 배경처럼 거의 흰 색은 한 칸 양보한다
+  const byLum = [...all].sort((a, b) => b.y - a.y);
+  const paper = byLum.find(c => c.y <= 0.95) || byLum[0];
+
+  // 종이와 밝기가 벌어진 것만 글자·띠에 쓸 수 있다
+  let rest = all.filter(c => c !== paper && Math.abs(c.y - paper.y) >= PAL_CONTRAST);
+  if (rest.length < 2) rest = all.filter(c => c !== paper && Math.abs(c.y - paper.y) >= PAL_ACC_CONTRAST);
+  if (!rest.length) return null;
+
+  const vivid = c => c.s * (1 - Math.abs(c.l - 0.45) * 1.1);
+  // 메인 : 선명하면서 **면적이 넓은** 것. 컬러랩은 베이스 색을 세 번 찍어 주므로 그게 뽑힌다
+  const wide = Math.max(...rest.map(c => c.n), 1);
+  const red = bestOf(rest, c => vivid(c) * (1 + 0.6 * c.n / wide));
+  // 서브 : 색상환에서 메인과 제일 먼 것
+  const r2 = rest.filter(c => c !== red);
+  const green = r2.length ? bestOf(r2, c => hueGap(c.h, red.h) / 180 * 0.7 + vivid(c) * 0.3)
+                          : tag({ hex: hsl2hex((red.h + 150) % 360, red.s, red.l), n: 0 });
+  // 포인트 : 둘 다에서 멀고 선명한 것. 별 장식이라 조금 옅어도 된다
+  const r3 = all.filter(c => c !== paper && c !== red && c !== green
+                          && Math.abs(c.y - paper.y) >= PAL_ACC_CONTRAST);
+  const accent = r3.length
+    ? bestOf(r3, c => Math.min(hueGap(c.h, red.h), hueGap(c.h, green.h)) / 180 * 0.4 + c.s * 0.6)
+    : tag({ hex: hsl2hex((red.h + 45) % 360, clamp(red.s * 1.1, 0, 1), 0.62), n: 0 });
+
+  return { paper: paper.hex, red: red.hex, green: green.hex, accent: accent.hex };
+}
+
 /* ===================== 테마 주입 ===================== */
 
 /* 한글은 라틴 폰트에 글리프가 없어 자동으로 뒤쪽 한글 폰트로 넘어간다. */
@@ -998,6 +1103,22 @@ function buildColorUI() {
     S.colors = { ...PRESETS[+b.dataset.preset].c };
     syncColorInputs();
     render();
+  });
+
+  // 팔레트 이미지에서 색 가져오기 (파일 입력은 따로 숨겨 둔다 — label 안에 겹치면 모바일에서 말썽)
+  $('#btn-palette').addEventListener('click', () => $('#in-palette').click());
+  $('#in-palette').addEventListener('change', async e => {
+    const f = e.target.files[0];
+    e.target.value = '';
+    if (!f) return;
+    try {
+      const found = themeFromPalette(imagePalette(await readPixels(f)));
+      if (!found) { toast('팔레트를 찾지 못했어요. 색 칸이 큰 이미지를 올려 주세요.'); return; }
+      S.colors = found;
+      syncColorInputs();
+      render();
+      toast('팔레트를 적용했어요.');
+    } catch { toast('이미지를 읽지 못했어요.'); }
   });
 }
 
