@@ -166,8 +166,12 @@ function onColor(bg, sheet) {
 const PAL_N = 200;           // 분석용 가로 픽셀. 이보다 키워도 답이 달라지지 않는다
 const PAL_MIN_AREA = 0.006;  // 화면의 이만큼은 차지해야 스와치로 친다
 const PAL_MERGE = 22;        // 채널 차이가 이보다 작으면 같은 색으로 묶는다
-const PAL_CONTRAST = 0.28;   // 종이와 이만큼은 밝기가 벌어져야 글자가 읽힌다
-const PAL_ACC_CONTRAST = 0.12;   // 별 장식은 작아서 조금 덜 벌어져도 된다
+/* 종이와 밝기가 얼마나 벌어져야 하는지는 **그 색이 하는 일에 따라 다르다.**
+   하나로 묶으면 문턱 바로 옆에 있는 색이 팔레트마다 서브가 됐다 안 됐다 한다 —
+   실제로 파랑이 어떤 팔레트에선 서브, 어떤 팔레트에선 포인트로 갔다(0.349 vs 0.197). */
+const PAL_MAIN_CONTRAST = 0.28;  // 메인은 가격·괘선 같은 **가는 글자**라 제일 많이 벌어져야 한다
+const PAL_SUB_CONTRAST = 0.16;   // 서브는 띠·알약을 **채우는** 색이라 이만큼이면 보인다
+const PAL_ACC_CONTRAST = 0.12;   // 포인트는 작은 별 장식이라 제일 느슨하다
 
 const nearColor = (a, b) => {
   const [x, y] = [hex2rgb(a), hex2rgb(b)];
@@ -239,24 +243,25 @@ function themeFromPalette({ bg, list }) {
   const byLum = [...all].sort((a, b) => b.y - a.y);
   const paper = byLum.find(c => c.y <= 0.95) || byLum[0];
 
-  // 종이와 밝기가 벌어진 것만 글자·띠에 쓸 수 있다
-  let rest = all.filter(c => c !== paper && Math.abs(c.y - paper.y) >= PAL_CONTRAST);
-  if (rest.length < 2) rest = all.filter(c => c !== paper && Math.abs(c.y - paper.y) >= PAL_ACC_CONTRAST);
-  if (!rest.length) return null;
+  // 자리마다 요구하는 밝기 차가 다르다. 하나라도 남지 않으면 아래 단계까지 느슨하게 푼다
+  const pool = gap => all.filter(c => c !== paper && Math.abs(c.y - paper.y) >= gap);
+  const mains = pool(PAL_MAIN_CONTRAST).length ? pool(PAL_MAIN_CONTRAST)
+              : pool(PAL_SUB_CONTRAST).length  ? pool(PAL_SUB_CONTRAST)
+              : pool(PAL_ACC_CONTRAST);
+  if (!mains.length) return null;
 
   const vivid = c => c.s * (1 - Math.abs(c.l - 0.45) * 1.1);
   // 메인 : 선명하면서 **면적이 넓은** 것. 컬러랩은 베이스 색을 세 번 찍어 주므로 그게 뽑힌다
-  const wide = Math.max(...rest.map(c => c.n), 1);
-  const red = bestOf(rest, c => vivid(c) * (1 + 0.6 * c.n / wide));
+  const wide = Math.max(...mains.map(c => c.n), 1);
+  const red = bestOf(mains, c => vivid(c) * (1 + 0.6 * c.n / wide));
   // 서브 : 색상환에서 메인과 제일 먼 것
-  const r2 = rest.filter(c => c !== red);
-  const green = r2.length ? bestOf(r2, c => hueGap(c.h, red.h) / 180 * 0.7 + vivid(c) * 0.3)
-                          : tag({ hex: hsl2hex((red.h + 150) % 360, red.s, red.l), n: 0 });
+  const subs = pool(PAL_SUB_CONTRAST).filter(c => c !== red);
+  const green = subs.length ? bestOf(subs, c => hueGap(c.h, red.h) / 180 * 0.7 + vivid(c) * 0.3)
+                            : tag({ hex: hsl2hex((red.h + 150) % 360, red.s, red.l), n: 0 });
   // 포인트 : 둘 다에서 멀고 선명한 것. 별 장식이라 조금 옅어도 된다
-  const r3 = all.filter(c => c !== paper && c !== red && c !== green
-                          && Math.abs(c.y - paper.y) >= PAL_ACC_CONTRAST);
-  const accent = r3.length
-    ? bestOf(r3, c => Math.min(hueGap(c.h, red.h), hueGap(c.h, green.h)) / 180 * 0.4 + c.s * 0.6)
+  const accs = pool(PAL_ACC_CONTRAST).filter(c => c !== red && c !== green);
+  const accent = accs.length
+    ? bestOf(accs, c => Math.min(hueGap(c.h, red.h), hueGap(c.h, green.h)) / 180 * 0.4 + c.s * 0.6)
     : tag({ hex: hsl2hex((red.h + 45) % 360, clamp(red.s * 1.1, 0, 1), 0.62), n: 0 });
 
   return { paper: paper.hex, red: red.hex, green: green.hex, accent: accent.hex };
