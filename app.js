@@ -271,6 +271,10 @@ const PILL_CY = 358;                  // 알약 중심 **고정** (알약 332~38
    똑같이 줄어들어 늘 가운데에 남는다 — 아래(알약)에 매달면 짧은 이름일수록 위가 텅 빈다. */
 const NAME_MID = (ARCH_CY + ARCH_H / 2 + PILL_CY) / 2;
 const CAP_LAT = 0.786, CAP_KR = 0.782;   // 글자 크기 대비 잉크 높이 (픽셀로 재서 얻은 값)
+/* 호 끝에서 잰 처짐(`arcSag`)은 **실제로 보이는 잉크보다 깊다** — 글자는 호 양끝까지 가지 않고
+   마지막 글자의 밑동만 내려앉기 때문이다. 픽셀로 재서 얻은 보정값(라틴 0.857 / 한글 0.927).
+   한글이 큰 것은 글자통이 정사각형이라 끝까지 꽉 차기 때문이다. */
+const SAG_LAT = 0.857, SAG_KR = 0.927;
 /* 짧은 이름은 **글자 크기**(200/156)가, 긴 이름은 **폭**(850)이 한계다.
    폭만 조이면 8글자가 확 쪼그라들고, 크기만 키우면 4글자가 배지와 띠를 덮는다. 둘 다 둬야 한다. */
 const NAME_MAX_W = 850, NAME_LAT = 200, NAME_KR = 156;
@@ -280,9 +284,9 @@ const ARCH_BOT = ARCH_CY + ARCH_H / 2;               // 162 — 띠 아랫변
 const PILL_TOP = PILL_CY - 26;                       // 332 — 알약 윗변
 const NAME_GAP_MID = (ARCH_BOT + PILL_TOP) / 2;      // 247 — 그 사이의 한가운데
 const NAME_RAMP = 0.25;                              // 최대 크기에서 이만큼 줄면 완전히 가운데
-/* 가운데로 옮기다가 잉크가 띠에 닿으면 안 된다 — 종이색 테두리 12(바깥 6)가 띠 밑동을 갉는다.
-   딱 한 경우(라틴 7글자)만 여기서 걸리고, 남는 겹침은 위에 얹히는 알약이 덮는다. */
-const NAME_TOP_PAD = 12;
+/* 마지막 안전선 — 잉크 꼭대기를 띠 아랫변에서 이만큼 아래로 묶는다. 종이색 테두리 12(바깥 6)가
+   띠의 빨간 아랫변을 갉지 않을 만큼만 둔다. 지금 값들에서는 어떤 이름도 여기 걸리지 않는다. */
+const NAME_TOP_PAD = 6;
 const FOOT_CY = (FRAME_BOT + 1436) / 2;                // 메뉴 틀 아래 빈 띠(1364~1436)의 한가운데
 /** 페어명 호의 길이 — 짧은 이름도 최소 곡률을 갖도록 바닥을 둔다 */
 const nameLen = textW => Math.max(textW, 120) * 1.06;
@@ -354,7 +358,8 @@ function render() {
   // 최대 크기에서는 잉크 한가운데가 NAME_MID, 글자가 작아질수록 블록 한가운데가 NAME_GAP_MID
   const nameFs = parseFloat(nameT.style.fontSize);
   const nameInk = (kr ? CAP_KR : CAP_LAT) * nameFs;
-  const nameSag = arcSag(nameLen(textWidth(nameT)));
+  // 보이는 잉크의 처짐. 호 끝의 기하값을 그대로 쓰면 이름이 9 남짓 아래로 처진다
+  const nameSag = arcSag(nameLen(textWidth(nameT))) * (kr ? SAG_KR : SAG_LAT);
   const nameT0 = NAME_MID + nameSag / 2;                       // 지금 자리의 블록 한가운데
   const ramp = clamp((1 - nameFs / (kr ? NAME_KR : NAME_LAT)) / NAME_RAMP, 0, 1);
   const nameBase = Math.max(nameT0 + (NAME_GAP_MID - nameT0) * ramp + (nameInk - nameSag) / 2,
