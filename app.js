@@ -274,9 +274,22 @@ const CAP_LAT = 0.786, CAP_KR = 0.782;   // 글자 크기 대비 잉크 높이 (
 /* 짧은 이름은 **글자 크기**(200/156)가, 긴 이름은 **폭**(850)이 한계다.
    폭만 조이면 8글자가 확 쪼그라들고, 크기만 키우면 4글자가 배지와 띠를 덮는다. 둘 다 둬야 한다. */
 const NAME_MAX_W = 850, NAME_LAT = 200, NAME_KR = 156;
+/* 글자가 작아질수록 **블록(잉크 + 호 처짐) 한가운데**를 띠·알약 사이 한가운데로 옮긴다.
+   최대 크기(=짧은 이름)에서는 t = 0 이라 지금 자리가 그대로 유지된다. */
+const ARCH_BOT = ARCH_CY + ARCH_H / 2;               // 162 — 띠 아랫변
+const PILL_TOP = PILL_CY - 26;                       // 332 — 알약 윗변
+const NAME_GAP_MID = (ARCH_BOT + PILL_TOP) / 2;      // 247 — 그 사이의 한가운데
+const NAME_RAMP = 0.25;                              // 최대 크기에서 이만큼 줄면 완전히 가운데
+/* 가운데로 옮기다가 잉크가 띠에 닿으면 안 된다 — 종이색 테두리 12(바깥 6)가 띠 밑동을 갉는다.
+   딱 한 경우(라틴 7글자)만 여기서 걸리고, 남는 겹침은 위에 얹히는 알약이 덮는다. */
+const NAME_TOP_PAD = 12;
 const FOOT_CY = (FRAME_BOT + 1436) / 2;                // 메뉴 틀 아래 빈 띠(1364~1436)의 한가운데
+/** 페어명 호의 길이 — 짧은 이름도 최소 곡률을 갖도록 바닥을 둔다 */
+const nameLen = textW => Math.max(textW, 120) * 1.06;
+/** 호의 처짐: 가운데(꼭대기) 글자와 양끝 글자의 baseline 차이 */
+const arcSag = len => (len / NAME_ARC) * (1 - Math.cos(NAME_ARC / 2));
 const nameArc = (sel, textW, apexY, dx, dy) =>
-  arcPath(sel, Math.max(textW, 120) * 1.06, NAME_ARC, apexY, dx, dy);
+  arcPath(sel, nameLen(textW), NAME_ARC, apexY, dx, dy);
 
 /* ===================== 한글 폰트 ===================== */
 
@@ -338,8 +351,14 @@ function render() {
   const kr = HANGUL.test(pairText);
   fitText(nameT, NAME_MAX_W, kr ? NAME_KR : NAME_LAT);
   $('#pairShadowT').style.fontSize = nameT.style.fontSize;
-  // 잉크 높이의 절반을 더해 baseline 을 잡는다 → 잉크 한가운데가 늘 NAME_MID 에 온다
-  const nameBase = NAME_MID + (kr ? CAP_KR : CAP_LAT) * parseFloat(nameT.style.fontSize) / 2;
+  // 최대 크기에서는 잉크 한가운데가 NAME_MID, 글자가 작아질수록 블록 한가운데가 NAME_GAP_MID
+  const nameFs = parseFloat(nameT.style.fontSize);
+  const nameInk = (kr ? CAP_KR : CAP_LAT) * nameFs;
+  const nameSag = arcSag(nameLen(textWidth(nameT)));
+  const nameT0 = NAME_MID + nameSag / 2;                       // 지금 자리의 블록 한가운데
+  const ramp = clamp((1 - nameFs / (kr ? NAME_KR : NAME_LAT)) / NAME_RAMP, 0, 1);
+  const nameBase = Math.max(nameT0 + (NAME_GAP_MID - nameT0) * ramp + (nameInk - nameSag) / 2,
+                            ARCH_BOT + NAME_TOP_PAD + nameInk);
   // 글자 길이에 맞춰 반지름을 다시 잡는다. 그래야 짧든 길든 휘는 각도가 같다
   nameArc('#arc-name', textWidth(nameT), nameBase, 0, 0);
   nameArc('#arc-name-s', textWidth(nameT), nameBase, 10, 16);
