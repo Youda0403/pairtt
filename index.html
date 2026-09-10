@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Pairframe — 페어 다이너 메뉴판 메이커</title>
-<link rel="stylesheet" href="style.css?v=7">
+<link rel="stylesheet" href="style.css?v=8">
 </head>
 <body>
 <div class="app">
@@ -43,13 +43,19 @@
       </g>
     </pattern>
 
-    <!-- 종이 섬유 : 잔 알갱이 -->
+    <!-- 종이 섬유 : 잔 알갱이. 어두운 알갱이와 밝은 알갱이를 함께 뿌려야 종이 결로 읽힌다
+         (어두운 쪽만 뿌리면 때가 탄 것처럼 보이고 자글거리는 질감이 안 산다) -->
     <filter id="fx-fiber" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
       <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" seed="7" result="t"/>
-      <feColorMatrix in="t" type="matrix" result="a"
+      <feColorMatrix in="t" type="matrix" result="ad"
         values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  1.1 0 0 0 -0.42"/>
-      <feFlood flood-color="#6b4a2a" result="c"/>
-      <feComposite in="c" in2="a" operator="in"/>
+      <feFlood flood-color="#6b4a2a" result="cd"/>
+      <feComposite in="cd" in2="ad" operator="in" result="dark"/>
+      <feColorMatrix in="t" type="matrix" result="al"
+        values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -1.1 0 0 0 0.60"/>
+      <feFlood flood-color="#fffaf0" result="cl"/>
+      <feComposite in="cl" in2="al" operator="in" result="light"/>
+      <feMerge><feMergeNode in="light"/><feMergeNode in="dark"/></feMerge>
     </filter>
     <!-- 오래된 종이 얼룩 : 넓고 성긴 무늬 -->
     <filter id="fx-stain" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
@@ -200,7 +206,7 @@
 
   <!-- 종이 질감 : 맨 위에서 전체를 덮는다(사진 포함) -->
   <rect width="1000" height="1500" filter="url(#fx-stain)" opacity=".3" pointer-events="none"/>
-  <rect width="1000" height="1500" filter="url(#fx-fiber)" opacity=".38" pointer-events="none"/>
+  <rect width="1000" height="1500" filter="url(#fx-fiber)" opacity=".55" pointer-events="none"/>
 
 </svg>
 
@@ -210,7 +216,7 @@
 <div class="panel">
   <div class="brand">
     <h1>Pair<em>frame</em></h1>
-    <p>우리 둘을 다이너 메뉴판의 오늘의 스페셜로 <span class="ver">v7</span></p>
+    <p>우리 둘을 다이너 메뉴판의 오늘의 스페셜로 <span class="ver">v8</span></p>
   </div>
 
   <details class="sec" open>
@@ -299,6 +305,6 @@
 <input id="in-sticker" type="file" accept="image/*" hidden>
 <div id="toast" class="toast" hidden></div>
 
-<script src="app.js?v=7"></script>
+<script src="app.js?v=8"></script>
 </body>
 </html>

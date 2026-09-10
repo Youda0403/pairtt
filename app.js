@@ -580,6 +580,9 @@ function placeSticker(k) {
   const src = st.src || slot.art;
 
   if (img.getAttribute('href') !== src) img.setAttribute('href', src);
+  // 사용자가 올린 사진만 종이 톤에 맞춘다. 기본 그림은 이미 이 팔레트로 그린 것이라 덧칠하면 흐려진다
+  if (st.src) img.setAttribute('filter', 'url(#fx-tone)');
+  else img.removeAttribute('filter');
 
   st.dx = clamp(st.dx, -box.cx, POSTER_W - box.cx);
   st.dy = clamp(st.dy, -box.cy, POSTER_H - box.cy);
