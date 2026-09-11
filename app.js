@@ -376,9 +376,10 @@ function arcPath(sel, len, angle, apexY, dx = 0, dy = 0) {
 
 const NAME_ARC = 21 * Math.PI / 180;   // 페어명
 const ARCH_CY = 127, ARCH_H = 70;     // 띠 한가운데 / 높이 (띠는 92~162)
-/* 띠 글자의 baseline 계수. 잉크는 baseline 위로 0.795 자라고 아래로는 거의 안 내려가므로
-   한가운데는 baseline 에서 0.41 만큼 위다. 0.35 였을 때 글자가 2.6 위로 떠 있었다. */
-const ARCH_INK = 0.41;
+/* Oswald(`.cond`) 글자의 baseline 계수. 잉크는 baseline 위로 0.795 자라고 아래로는 거의
+   안 내려가므로 한가운데는 baseline 에서 0.41 만큼 위다. 0.35 였을 때 다 같이 위로 떠 있었다.
+   띠 · 알약 · 섹션 머리가 **같은 폰트라 같은 값을 쓴다.** 따로 두면 또 어긋난다. */
+const COND_INK = 0.41;
 const PILL_CY = 358;                  // 알약 중심 **고정** (알약 332~384, 영수증 414 까지 30)
 /* 페어명은 **띠 아랫변과 알약 중심의 한가운데**에 세로로 놓는다. 글자가 작아져도 위아래로
    똑같이 줄어들어 늘 가운데에 남는다 — 아래(알약)에 매달면 짧은 이름일수록 위가 텅 빈다. */
@@ -453,8 +454,8 @@ function render() {
   const archT = setText('#archText', S.arch.trim() || PH.arch);
   pill('#archBg', '#archText', CENTER, ARCH_CY, 70, 96, 540, 40);
   // baseline 은 실제 글자 크기에서 잡는다. 고정값을 쓰면 글자가 줄었을 때 위로 뜬다.
-  // ARCH_INK 는 잉크 한가운데가 띠 한가운데(127)에 오도록 픽셀로 재서 얻은 값이다
-  archT.setAttribute('y', ARCH_CY + parseFloat(archT.style.fontSize) * ARCH_INK);
+  // COND_INK 는 잉크 한가운데가 모양 한가운데에 오도록 픽셀로 재서 얻은 값이다
+  archT.setAttribute('y', ARCH_CY + parseFloat(archT.style.fontSize) * COND_INK);
   const starX = textWidth(archT) / 2 + 28;
   $('#archStarL').setAttribute('transform', `translate(${CENTER - starX},${ARCH_CY}) scale(.8)`);
   $('#archStarR').setAttribute('transform', `translate(${CENTER + starX},${ARCH_CY}) scale(.8)`);
@@ -478,7 +479,7 @@ function render() {
   const pillT = setText('#pillText', S.pill.trim() || PH.pill);
   pill('#pillBg', '#pillText', CENTER, PILL_CY, 52, 42, 300, 34);
   $('#pillBg').setAttribute('rx', 26);
-  pillT.setAttribute('y', PILL_CY + parseFloat(pillT.style.fontSize) * 0.35);
+  pillT.setAttribute('y', PILL_CY + parseFloat(pillT.style.fontSize) * COND_INK);
 
   /* --- 손글씨 덩어리 --- */
   const bd = splitLines(S.badge.trim() || PH.badge, 3);
@@ -627,7 +628,7 @@ function drawHead(g, sec, cx, maxW, top, ci) {
   const fs = parseFloat(texts[0].style.fontSize);
   texts.forEach((t, i) => {
     const off = two ? (i - 0.5) * (fs + 9) : 0;
-    t.setAttribute('y', cy + off + fs * 0.35);
+    t.setAttribute('y', cy + off + fs * COND_INK);
   });
 
   const tw = Math.max(...texts.map(textWidth));
@@ -726,15 +727,18 @@ function saveNow() {
   try {
     localStorage.setItem(STORE_KEY, JSON.stringify(S));
   } catch {
-    // 이미지까지 넣으면 용량을 넘길 수 있다. 텍스트/색상만이라도 남긴다.
+    /* 이미지까지 넣으면 용량을 넘길 수 있다. 텍스트/색상만이라도 남긴다.
+       **그림을 버릴 때는 크기·위치도 같이 버려야 한다.** 남겨 두면 다음에 열었을 때
+       기본 음식 그림이 사용자가 키워 둔 배율로 그려져 혼자 거대해진다(실제로 그 버그가 있었다).
+       숨김(`off`)은 그림과 상관없는 선택이라 그것만 들고 간다. */
     try {
-      const strip = p => ({ ...p, src: null });
       localStorage.setItem(STORE_KEY, JSON.stringify({
         ...S,
-        photo: strip(S.photo),
-        c1: { ...S.c1, img: strip(S.c1.img) },
-        c2: { ...S.c2, img: strip(S.c2.img) },
-        stickers: Object.fromEntries(Object.entries(S.stickers).map(([k, v]) => [k, strip(v)])),
+        photo: newPic(),
+        c1: { ...S.c1, img: newPic() },
+        c2: { ...S.c2, img: newPic() },
+        stickers: Object.fromEntries(Object.entries(S.stickers)
+          .map(([k, v]) => [k, { ...newSticker(), off: v.off }])),
       }));
     } catch {}
   }
