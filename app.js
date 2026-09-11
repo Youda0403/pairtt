@@ -80,7 +80,7 @@ const MENU = [
       ['EXTRA CHEESE','$1.0'], ['BACON','$1.5'], ['AVOCADO','$1.5'], ['EGG','$1.0']] } ],
 ];
 
-const newSticker = () => ({ src: null, scale: 1, dx: 0, dy: 0 });
+const newSticker = () => ({ src: null, scale: 1, dx: 0, dy: 0, off: false });
 const newPic     = () => ({ src: null, nw: 0, nh: 0, zoom: 1, ox: 0, oy: 0 });
 const newChar    = () => ({ name: '', img: newPic() });
 
@@ -376,6 +376,9 @@ function arcPath(sel, len, angle, apexY, dx = 0, dy = 0) {
 
 const NAME_ARC = 21 * Math.PI / 180;   // 페어명
 const ARCH_CY = 127, ARCH_H = 70;     // 띠 한가운데 / 높이 (띠는 92~162)
+/* 띠 글자의 baseline 계수. 잉크는 baseline 위로 0.795 자라고 아래로는 거의 안 내려가므로
+   한가운데는 baseline 에서 0.41 만큼 위다. 0.35 였을 때 글자가 2.6 위로 떠 있었다. */
+const ARCH_INK = 0.41;
 const PILL_CY = 358;                  // 알약 중심 **고정** (알약 332~384, 영수증 414 까지 30)
 /* 페어명은 **띠 아랫변과 알약 중심의 한가운데**에 세로로 놓는다. 글자가 작아져도 위아래로
    똑같이 줄어들어 늘 가운데에 남는다 — 아래(알약)에 매달면 짧은 이름일수록 위가 텅 빈다. */
@@ -449,8 +452,9 @@ function render() {
   // 띠 길이는 글자 폭에서 잡는다. 고정 길이로 두면 짧은 문구가 붉은 소시지 위에 뜬다
   const archT = setText('#archText', S.arch.trim() || PH.arch);
   pill('#archBg', '#archText', CENTER, ARCH_CY, 70, 96, 540, 40);
-  // baseline 은 실제 글자 크기에서 잡는다. 고정값을 쓰면 글자가 줄었을 때 위로 뜬다
-  archT.setAttribute('y', ARCH_CY + parseFloat(archT.style.fontSize) * 0.35);
+  // baseline 은 실제 글자 크기에서 잡는다. 고정값을 쓰면 글자가 줄었을 때 위로 뜬다.
+  // ARCH_INK 는 잉크 한가운데가 띠 한가운데(127)에 오도록 픽셀로 재서 얻은 값이다
+  archT.setAttribute('y', ARCH_CY + parseFloat(archT.style.fontSize) * ARCH_INK);
   const starX = textWidth(archT) / 2 + 28;
   $('#archStarL').setAttribute('transform', `translate(${CENTER - starX},${ARCH_CY}) scale(.8)`);
   $('#archStarR').setAttribute('transform', `translate(${CENTER + starX},${ARCH_CY}) scale(.8)`);
@@ -703,8 +707,10 @@ function placeSticker(k) {
     el.setAttribute('x', x); el.setAttribute('y', y);
     el.setAttribute('width', w); el.setAttribute('height', h);
   }
-  img.style.display = 'inline';
-  hit.style.display = 'inline';
+  // 숨긴 칸은 히트 사각형까지 같이 내린다. display 는 반드시 값으로 지정한다('' 로 지우면 CSS 가 이긴다)
+  const show = st.off ? 'none' : 'inline';
+  img.style.display = show;
+  hit.style.display = show;
 }
 
 /* ===================== 저장(로컬) ===================== */
@@ -1052,6 +1058,7 @@ function buildStickerUI() {
       <div class="row">
         <button class="btn" type="button" data-slot="${k}">교체</button>
         <button class="btn ghost" type="button" data-reset="${k}">되돌리기</button>
+        <button class="btn ghost hide" type="button" data-hide="${k}">숨기기</button>
       </div>
     </div>`).join('');
 
@@ -1061,7 +1068,13 @@ function buildStickerUI() {
     const pick = e.target.closest('[data-slot]');
     if (pick) { pendingSlot = pick.dataset.slot; $('#in-sticker').click(); return; }
     const reset = e.target.closest('[data-reset]');
-    if (reset) { S.stickers[reset.dataset.reset] = newSticker(); render(); updateStickerCards(); }
+    if (reset) { S.stickers[reset.dataset.reset] = newSticker(); render(); updateStickerCards(); return; }
+    const hide = e.target.closest('[data-hide]');
+    if (hide) {
+      const st = S.stickers[hide.dataset.hide];
+      st.off = !st.off;
+      render(); updateStickerCards();
+    }
   });
   wrap.addEventListener('input', e => {
     const k = e.target.dataset.scale;
@@ -1085,6 +1098,8 @@ function updateStickerCards() {
     const st = S.stickers[k];
     $(`[data-thumb="${k}"]`).innerHTML = `<img src="${st.src || art}" alt="">`;
     $(`[data-scale="${k}"]`).value = Math.round(st.scale * 100);
+    $(`[data-thumb="${k}"]`).classList.toggle('off', st.off);
+    $(`[data-hide="${k}"]`).textContent = st.off ? '다시 넣기' : '숨기기';
   }
 }
 

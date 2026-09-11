@@ -135,8 +135,10 @@ button, input { font: inherit; color: inherit; }
 .sticker .szrow { display: block; margin: 0 0 7px; }
 .sticker .szrow span { display: block; font-size: 11px; opacity: .55; margin-bottom: 2px; }
 .sticker .szrow input[type=range] { width: 100%; accent-color: #c4362c; }
-.sticker .row { display: flex; gap: 5px; }
+.sticker .row { display: flex; gap: 5px; flex-wrap: wrap; }
 .sticker .row .btn { flex: 1; font-size: 12px; padding: 7px 4px; }
+.sticker .row .btn.hide { flex-basis: 100%; }   /* 숨기기는 아랫줄 전체를 쓴다 */
+.sticker .thumb.off { opacity: .3; }            /* 숨긴 칸은 미리보기도 흐리게 */
 
 /* ---------- 색상 ---------- */
 .presets { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
